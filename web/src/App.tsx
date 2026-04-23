@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/store/useStore';
 import { fetchSchedule } from '@/services/scheduleService';
 import { HeroCard } from '@/components/HeroCard';
