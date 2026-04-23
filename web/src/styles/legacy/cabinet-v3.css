@@ -1,3 +1,4 @@
+.sssk-legacy-ui {
 /* 
    Cabinet V3 - Apple Health-inspired Minimalist Design
    Typography-driven, no icons, clear layout structure.
@@ -904,3 +905,4 @@ body.status-off {
     background: var(--system-text-neutral);
 }
 
+}

@@ -1,3 +1,4 @@
+.sssk-legacy-ui {
 .home-dashboard-bar {
     display: flex;
     justify-content: space-between;
@@ -1229,4 +1230,4 @@
         z-index: 30;
         pointer-events: none;
     }
-}
+}}

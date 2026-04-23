@@ -1,3 +1,4 @@
+.sssk-legacy-ui {
 /* 
    Cabinet V2 - Apple Health-inspired Design System
    Utility first, minimal noise, maximum clarity.
@@ -472,4 +473,5 @@
     border-color: transparent;
     color: white;
     box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+}
 }

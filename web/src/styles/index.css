@@ -1,21 +1,25 @@
-/* Global Reset and Original Styles */
-@import "./legacy/style.css";
-@import "./legacy/home.css";
-@import "./legacy/tech-ui.css";
-@import "./legacy/selector.css";
-@import "./legacy/sssk-modern.css";
-@import "./legacy/cabinet-v3.css";
+/* Base styles for Admin and App */
+@import "tailwindcss";
 
-/* Ensuring fonts are loaded (copied from your index.html) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;600;800&display=swap');
+:root {
+  --admin-bg: #09090b;
+}
 
 body {
-    background: #000 !important;
-    color: #fff !important;
     margin: 0;
-    font-family: 'Inter', sans-serif;
+    padding: 0;
+    background: #000;
 }
 
-#root {
-    width: 100%;
+/* We will wrap legacy UI in a specific class to avoid conflicts with Admin */
+.sssk-legacy-ui {
+    @import "./legacy/style.css";
+    @import "./legacy/home.css";
+    @import "./legacy/tech-ui.css";
+    @import "./legacy/selector.css";
+    @import "./legacy/sssk-modern.css";
+    @import "./legacy/cabinet-v3.css";
 }
+
+/* Ensure fonts are global */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;600;800&display=swap');

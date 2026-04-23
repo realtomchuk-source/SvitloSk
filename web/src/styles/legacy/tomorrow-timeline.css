@@ -1,3 +1,4 @@
+.sssk-legacy-ui {
 /* 
   Tomorrow Page Timeline RE-DESIGN (Variant B: Single Row Capsules)
   Isolated styles for tomorrow.html
@@ -147,4 +148,5 @@
 
 .tl-v2-container.tomorrow-mode .tl-v2-stage {
   min-width: 800px;
+}
 }

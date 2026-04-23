@@ -1,3 +1,4 @@
+.sssk-legacy-ui {
 :root {
   --green-primary: #00FF85;
   --green-dim: rgba(0, 255, 133, 0.6);
@@ -817,4 +818,4 @@
   #tablo-real-time {
     font-size: 16px !important;
   }
-}
+}}
