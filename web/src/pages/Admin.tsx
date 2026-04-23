@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { triggerParserWorkflow, fetchHealthStatus, fetchParserState } from '@/services/adminService';
 import { 
   LayoutDashboard, Users, Database, Terminal, Settings, 
-  Play, ShieldAlert, CheckCircle, Save, RotateCcw, 
+  Play, ShieldAlert, CheckCircle, RotateCcw, 
   Key, Bell, MessageSquare, Activity, ChevronRight
 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -23,7 +23,6 @@ export const Admin: React.FC = () => {
     Object.fromEntries(GROUPS.map(g => [g, "1".repeat(24)]))
   );
   const [isTriggering, setIsTriggering] = useState(false);
-  const [statusMsg, setStatusMsg] = useState('');
 
   useEffect(() => {
     fetchHealthStatus().then(setHealth).catch(console.error);
@@ -40,7 +39,6 @@ export const Admin: React.FC = () => {
   const handleTrigger = async () => {
     if (!token) return alert('Введіть токен!');
     setIsTriggering(true);
-    setStatusMsg('Запуск...');
     try {
       localStorage.setItem('sssk_admin_token', token);
       await triggerParserWorkflow(token, {
@@ -52,9 +50,9 @@ export const Admin: React.FC = () => {
           message: 'Ручне оновлення через Admin Console'
         })
       });
-      setStatusMsg('Успішно запущено!');
+      alert('Успішно запущено!');
     } catch (err: any) {
-      setStatusMsg(`Помилка: ${err.message}`);
+      alert(`Помилка: ${err.message}`);
     } finally {
       setIsTriggering(false);
     }
@@ -63,7 +61,7 @@ export const Admin: React.FC = () => {
   return (
     <div className="fixed inset-0 bg-zinc-950 flex overflow-hidden">
       {/* Sidebar Navigation */}
-      <aside className="w-64 bg-zinc-900 border-r border-white/5 flex flex-col p-4 z-20">
+      <aside className="w-64 bg-zinc-900 border-r border-white/5 flex flex-col p-4 z-20 text-white">
         <div className="flex items-center gap-3 px-2 mb-10">
           <div className="p-2 bg-blue-600 rounded-xl">
             <ShieldAlert size={20} className="text-white" />
@@ -85,16 +83,16 @@ export const Admin: React.FC = () => {
               <div className={clsx("w-2 h-2 rounded-full", health?.status === 'ok' ? "bg-green-500" : "bg-red-500")} />
               <span className="text-[10px] font-black uppercase text-zinc-400">System Status</span>
            </div>
-           <p className="text-[11px] text-zinc-500 font-medium leading-tight">
+           <p className="text-[11px] text-zinc-500 font-medium leading-tight text-left">
               {health?.status === 'ok' ? 'Усі системи працюють штатно' : 'Помилка підключення до парсера'}
            </p>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-8 relative">
+      <main className="flex-1 overflow-y-auto p-8 relative text-white">
         {/* Header */}
-        <header className="flex justify-between items-center mb-10">
+        <header className="flex justify-between items-center mb-10 text-left">
             <div>
                 <h2 className="text-3xl font-black capitalize">{activeTab === 'dashboard' ? 'Загальний огляд' : activeTab === 'users' ? 'Аналітика користувачів' : activeTab === 'editor' ? 'Ручне керування' : activeTab}</h2>
                 <p className="text-zinc-500 text-sm mt-1">Остання перевірка: {new Date().toLocaleTimeString()}</p>
@@ -108,7 +106,8 @@ export const Admin: React.FC = () => {
                 </button>
                 <button 
                   onClick={handleTrigger}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-900/20"
+                  disabled={isTriggering}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-900/20 disabled:opacity-50"
                 >
                     <Play size={18} />
                     Запустити парсер
@@ -118,26 +117,26 @@ export const Admin: React.FC = () => {
 
         {/* Tab Contents */}
         {activeTab === 'dashboard' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in duration-500 text-left">
                 <StatCard icon={<Activity className="text-blue-500" />} label="Версія парсера" value={health?.version || '2.1-Adaptive'} />
                 <StatCard icon={<CheckCircle className="text-green-500" />} label="Останній графік" value={latestEntry?.target_date || '—'} />
                 <StatCard icon={<Users className="text-purple-500" />} label="Активні сесії (EST)" value="1,248" />
                 
                 <div className="md:col-span-2 bg-zinc-900 border border-white/5 p-8 rounded-[2.5rem]">
-                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2"><Bell size={20} className="text-amber-500" /> Останні анонси</h3>
+                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-white"><Bell size={20} className="text-amber-500" /> Останні анонси</h3>
                     <div className="space-y-4">
                         {latestEntry?.announcements?.length > 0 ? latestEntry.announcements.map((ann: any, i: number) => (
                             <div key={i} className="p-4 bg-zinc-800/50 rounded-2xl border border-white/5">
-                                <p className="text-sm text-zinc-300 italic">"{ann.text}"</p>
+                                <p className="text-sm text-zinc-300 italic text-left">"{ann.text}"</p>
                             </div>
                         )) : (
-                            <p className="text-zinc-600 text-sm italic">Анонсів не виявлено</p>
+                            <p className="text-zinc-600 text-sm italic text-left">Анонсів не виявлено</p>
                         )}
                     </div>
                 </div>
 
                 <div className="bg-zinc-900 border border-white/5 p-8 rounded-[2.5rem]">
-                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2"><Settings size={20} className="text-zinc-500" /> Швидкі дії</h3>
+                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-white"><Settings size={20} className="text-zinc-500" /> Швидкі дії</h3>
                     <div className="flex flex-col gap-2">
                         <ActionButton label="Скинути кеш" />
                         <ActionButton label="Оновити історію" />
@@ -182,9 +181,9 @@ export const Admin: React.FC = () => {
         )}
 
         {activeTab === 'editor' && (
-            <div className="bg-zinc-900 p-8 rounded-[2.5rem] border border-white/5 animate-in fade-in duration-500">
+            <div className="bg-zinc-900 p-8 rounded-[2.5rem] border border-white/5 animate-in fade-in duration-500 text-left">
                 <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-bold flex items-center gap-2"><Database size={22} className="text-blue-500" /> Manual Grid Editor</h3>
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-white"><Database size={22} className="text-blue-500" /> Manual Grid Editor</h3>
                     <div className="flex gap-2">
                         <button 
                             onClick={() => setManualGrid(Object.fromEntries(GROUPS.map(g => [g, "1".repeat(24)])))}
@@ -228,7 +227,7 @@ export const Admin: React.FC = () => {
         )}
 
         {activeTab === 'logs' && (
-            <div className="bg-black p-6 rounded-[2.5rem] border border-white/5 font-mono text-sm h-[600px] overflow-y-auto flex flex-col gap-1 animate-in fade-in duration-500 shadow-2xl">
+            <div className="bg-black p-6 rounded-[2.5rem] border border-white/5 font-mono text-sm h-[600px] overflow-y-auto flex flex-col gap-1 animate-in fade-in duration-500 shadow-2xl text-left">
                 <div className="text-green-500 mb-4">[SYSTEM] Initializing stream...</div>
                 <div className="text-zinc-500">2026-04-23 15:08:27,831 [INFO] SSSK-Main: Starting scan...</div>
                 <div className="text-zinc-500">2026-04-23 15:08:29,120 [INFO] SiteParser: Checking hoe.com.ua...</div>
@@ -240,23 +239,23 @@ export const Admin: React.FC = () => {
         )}
 
         {activeTab === 'settings' && (
-            <div className="max-w-2xl flex flex-col gap-6 animate-in fade-in duration-500">
+            <div className="max-w-2xl flex flex-col gap-6 animate-in fade-in duration-500 text-left">
                 <div className="bg-zinc-900 p-8 rounded-[2.5rem] border border-white/5">
-                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2"><Key size={20} className="text-amber-500" /> GitHub Configuration</h3>
+                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-white"><Key size={20} className="text-amber-500" /> GitHub Configuration</h3>
                     <div className="flex flex-col gap-4">
                         <div>
-                            <label className="text-xs font-bold text-zinc-500 uppercase mb-2 block">Personal Access Token</label>
+                            <label className="text-xs font-bold text-zinc-500 uppercase mb-2 block text-left">Personal Access Token</label>
                             <input 
                                 type="password" 
                                 value={token}
                                 onChange={(e) => setToken(e.target.value)}
                                 placeholder="ghp_..."
-                                className="w-full bg-zinc-800 border-2 border-white/5 rounded-2xl p-4 text-sm font-mono focus:border-blue-500 outline-none transition-all"
+                                className="w-full bg-zinc-800 border-2 border-white/5 rounded-2xl p-4 text-sm font-mono focus:border-blue-500 outline-none transition-all text-white"
                             />
                         </div>
                         <button 
                           onClick={() => { localStorage.setItem('sssk_admin_token', token); alert('Збережено!'); }}
-                          className="px-6 py-4 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-bold transition-all"
+                          className="px-6 py-4 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-bold transition-all text-white"
                         >
                             Зберегти токен локально
                         </button>
@@ -264,12 +263,12 @@ export const Admin: React.FC = () => {
                 </div>
 
                 <div className="bg-zinc-900 p-8 rounded-[2.5rem] border border-white/5">
-                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2"><MessageSquare size={20} className="text-blue-500" /> Глобальне повідомлення</h3>
+                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-white"><MessageSquare size={20} className="text-blue-500" /> Глобальне повідомлення</h3>
                     <textarea 
-                        className="w-full bg-zinc-800 border-2 border-white/5 rounded-2xl p-4 text-sm min-h-[100px] outline-none focus:border-blue-500 transition-all mb-4"
+                        className="w-full bg-zinc-800 border-2 border-white/5 rounded-2xl p-4 text-sm min-h-[100px] outline-none focus:border-blue-500 transition-all mb-4 text-white"
                         placeholder="Введіть текст для всіх користувачів..."
                     />
-                    <button className="w-full py-4 bg-blue-600 rounded-2xl font-bold">Опублікувати повідомлення</button>
+                    <button className="w-full py-4 bg-blue-600 rounded-2xl font-bold text-white">Опублікувати повідомлення</button>
                 </div>
             </div>
         )}
@@ -295,17 +294,17 @@ const NavItem = ({ icon, label, active, onClick }: { icon: React.ReactNode, labe
 );
 
 const StatCard = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
-  <div className="bg-zinc-900 border border-white/5 p-8 rounded-[2.5rem]">
+  <div className="bg-zinc-900 border border-white/5 p-8 rounded-[2.5rem] text-left">
     <div className="p-3 bg-zinc-800 w-fit rounded-2xl mb-6">
       {icon}
     </div>
     <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">{label}</p>
-    <p className="text-2xl font-black">{value}</p>
+    <p className="text-2xl font-black text-white">{value}</p>
   </div>
 );
 
 const ActionButton = ({ label }: { label: string }) => (
-  <button className="flex items-center justify-between p-4 bg-zinc-800 rounded-2xl hover:bg-zinc-750 transition-all">
+  <button className="flex items-center justify-between p-4 bg-zinc-800 rounded-2xl hover:bg-zinc-750 transition-all w-full">
     <span className="text-xs font-bold text-zinc-400">{label}</span>
     <ChevronRight size={14} className="text-zinc-600" />
   </button>
