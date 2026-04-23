@@ -1,12 +1,11 @@
 import React from 'react';
-import { clsx } from 'clsx';
 
 interface DashboardBarProps {
   isOn: boolean;
   realTime: Date;
 }
 
-export const DashboardBar: React.FC<DashboardBarProps> = ({ isOn, realTime }) => {
+export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime }) => {
   const dayStr = realTime.toLocaleDateString('uk-UA', { weekday: 'short' }).toUpperCase();
   const dateNum = realTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: '2-digit' });
   const timeStr = realTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });

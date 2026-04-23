@@ -1,18 +1,15 @@
 import { useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useStore } from '@/store/useStore';
 import { fetchSchedule } from '@/services/scheduleService';
 import { Home } from '@/pages/Home';
 import { Cabinet } from '@/pages/Cabinet';
 import { Admin } from '@/pages/Admin';
 import { Archive, Apps } from '@/pages/Stubs';
-import { Tomorrow } from '@/pages/Tomorrow';
 import { BottomNav } from '@/components/navigation/BottomNav';
-import { Selector } from '@/components/Selector';
-import { clsx } from 'clsx';
 
 function AppContent() {
-  const { scheduleData, setScheduleData, setLoading, setError, loadUserData } = useStore();
+  const { setScheduleData, setLoading, setError, loadUserData } = useStore();
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
 

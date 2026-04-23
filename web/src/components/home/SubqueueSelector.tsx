@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { clsx } from 'clsx';
 
 interface SubqueueSelectorProps {
   selectedGroup: string;
