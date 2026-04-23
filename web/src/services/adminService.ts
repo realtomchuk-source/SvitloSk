@@ -28,14 +28,14 @@ export const triggerParserWorkflow = async (token: string, inputs: any) => {
 };
 
 export const fetchHealthStatus = async () => {
-    const response = await fetch(`/data/health.json?t=${Date.now()}`);
+    const response = await fetch(`${import.meta.env.BASE_URL}data/health.json?t=${Date.now()}`);
     if (!response.ok) throw new Error('Health data not found');
     return response.json();
 };
 
 export const fetchParserState = async () => {
     // Note: In development, this might be in web/public/data or relative to parser
-    const response = await fetch(`/data/unified_schedules.json?t=${Date.now()}`);
+    const response = await fetch(`${import.meta.env.BASE_URL}data/unified_schedules.json?t=${Date.now()}`);
     if (!response.ok) throw new Error('Parser state not found');
     const history = await response.json();
     return history[history.length - 1];

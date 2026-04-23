@@ -1,4 +1,3 @@
-.sssk-legacy-ui {
 /* 
  * SSSK MODERN DASHBOARD - FINAL RECOVERY LAYER
  * Aesthetic: Light Chrome / Pure Silver
@@ -62,4 +61,3 @@
 
 /* REMOVE LEGACY INDICATORS */
 .btn-legend-call { display: none !important; }
-}

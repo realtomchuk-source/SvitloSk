@@ -1,90 +1,85 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '@/store/useStore';
 import { getStatusInfo } from '@/services/scheduleService';
-import { clsx } from 'clsx';
+import { HeroCard } from '@/components/home/HeroCard';
+import { DashboardBar } from '@/components/home/DashboardBar';
+import { SubqueueSelector } from '@/components/home/SubqueueSelector';
+import { InteractiveTimeline } from '@/components/home/InteractiveTimeline';
+
+import '@/styles/legacy/home.css';
+import '@/styles/legacy/tech-ui.css';
+import '@/styles/legacy/selector.css';
+import '@/styles/legacy/sssk-modern.css';
 
 export const Home: React.FC = () => {
-  const { selectedGroup, scheduleData } = useStore();
-  const [status, setStatus] = useState(getStatusInfo(scheduleData?.queues[selectedGroup] || "1".repeat(24)));
+  const { selectedGroup, setSelectedGroup, scheduleData } = useStore();
+  const fallbackSchedule = "1".repeat(24);
+  const currentQueuesStr = scheduleData?.queues[selectedGroup] || fallbackSchedule;
+  
   const [realTime, setRealTime] = useState(new Date());
+  
+  // TIME MACHINE STATE
+  const [scrubSlot, setScrubSlot] = useState<number | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setRealTime(new Date());
-      if (scheduleData?.queues[selectedGroup]) {
-        setStatus(getStatusInfo(scheduleData.queues[selectedGroup]));
-      }
     }, 1000);
     return () => clearInterval(timer);
-  }, [scheduleData, selectedGroup]);
+  }, []);
 
-  const isOn = status.isCurrentlyOn;
+  // REAL TIME STATUS (Always facts for now)
+  const currentHour = realTime.getHours();
+  const isOn = currentQueuesStr[currentHour] === '1';
+  
+  let nextChangeHour = 24;
+  for (let i = currentHour + 1; i < 24; i++) {
+    if (currentQueuesStr[i] !== (isOn ? '1' : '0')) {
+      nextChangeHour = i;
+      break;
+    }
+  }
+
+  const { h: timeH, m: timeM } = getStatusInfo(currentQueuesStr);
+  
+  // VIRTUAL POINTER PERCENT
+  // Use SLOTS_COUNT - 1 (47) to perfectly align 100% with the right edge
+  const pointerPercent = scrubSlot !== null 
+    ? (scrubSlot / 47) * 100 
+    : ((realTime.getHours() * 60 + realTime.getMinutes()) / 1440) * 100;
 
   return (
-    <section id="home-section" className="animate-in fade-in duration-700">
-      <div className="pwa-page-label">STARKON СВІТЛО</div>
-
-      {/* Original Hero Card Structure */}
-      <div id="smart-hero" className={clsx("hero-card", isOn ? "status-on" : "status-off")}>
-        <div className="hero-icon">
-          <img 
-            src={isOn ? "assets/power_off.png" : "assets/power_on.png"} 
-            alt="Status Icon" 
-          />
+    <div className="page-home">
+      <section id="home-section" className="animate-in fade-in duration-700">
+        <div className="pwa-page-label" style={{ color: '#8E8E93', letterSpacing: '4px', fontWeight: 700, fontSize: '10px' }}>
+          STARKON СВІТЛО
         </div>
 
-        <div className="hero-text-block">
-          <div className="hero-status">{isOn ? 'Світло є' : 'Світла немає'}</div>
-          <div className="hero-timer">{status.h}:{status.m.toString().padStart(2, '0')}</div>
-          <div className="hero-context hero-context--active">
-            до {isOn ? 'вимкнення' : 'увімкнення'} о {status.nextChangeHour}:00
-          </div>
-        </div>
+        <HeroCard 
+          isOn={isOn}
+          timeH={timeH}
+          timeM={timeM}
+          nextChangeHour={nextChangeHour}
+          queuesStr={currentQueuesStr}
+          currentTimePercent={pointerPercent}
+        />
 
-        {/* Progress Capsule */}
-        <div className="hero-phase" id="hero-phase-capsule">
-          <div className="phase-track"></div>
-          <div className="phase-fill" style={{ height: `${((24 - status.nextChangeHour) / 24) * 100}%` }}></div>
-          <div className="phase-dot phase-start"></div>
-          <div className="phase-dot phase-end"></div>
-          <div className="phase-dot phase-current" style={{ bottom: `${((24 - status.nextChangeHour) / 24) * 100}%` }}></div>
-        </div>
+        <DashboardBar isOn={isOn} realTime={realTime} />
+        
+        <InteractiveTimeline 
+          queuesStr={currentQueuesStr} 
+          onScrub={setScrubSlot}
+        />
 
-        {/* Mini-Graph Placeholder (Original Style) */}
-        <div className="hero-timeline-capsule">
-          <div className="hero-tl-track">
-            <div className="hero-tl-segments flex gap-[1px]">
-              {Array.from({ length: 48 }).map((_, i) => {
-                const hour = Math.floor(i / 2);
-                const segOn = (scheduleData?.queues[selectedGroup] || "1".repeat(24))[hour] === '1';
-                return (
-                  <div key={i} className={clsx("flex-1 h-full rounded-sm", segOn ? "bg-orange-500/80" : "bg-zinc-700/50")} />
-                );
-              })}
-            </div>
-            <div 
-              className="hero-tl-pointer" 
-              style={{ left: `${((realTime.getHours() * 60 + realTime.getMinutes()) / 1440) * 100}%` }} 
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Dynamic Dashboard Block */}
-      <div id="dynamic-info-block" className={clsx("dash-container", isOn ? "status-on" : "status-off")}>
-        <div className="dash-segment dash-date">
-          <span className="dash-day">{realTime.toLocaleDateString('uk-UA', { weekday: 'short' }).toUpperCase()}</span>
-          <span className="dash-date-num">{realTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
-        </div>
-
-        <div className="dash-segment dash-clock">
-          <span>{realTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}</span>
-          <span className="dash-clock-sec">{realTime.getSeconds().toString().padStart(2, '0')}</span>
-        </div>
-      </div>
-      
-      {/* Spacer for original layout */}
-      <div style={{ height: '20px' }} />
-    </section>
+        <SubqueueSelector 
+          selectedGroup={selectedGroup}
+          onSelect={setSelectedGroup}
+        />
+        
+        {/* Spacer for bottom nav */}
+        <div style={{ height: '100px' }} />
+      </section>
+    </div>
   );
 };
+

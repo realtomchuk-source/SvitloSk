@@ -1,7 +1,8 @@
 import { ScheduleSchema, type Schedule, type TimeInterval } from '@/schemas/schedule';
 
 export const fetchSchedule = async (type: 'today' | 'tomorrow' = 'today'): Promise<Schedule> => {
-  const response = await fetch(`/data/${type}.json?t=${Date.now()}`);
+  const base = import.meta.env.BASE_URL;
+  const response = await fetch(`${base}data/${type}.json?t=${Date.now()}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch ${type} schedule`);
   }
