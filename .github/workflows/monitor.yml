@@ -1,0 +1,51 @@
+name: SSSK Monitor (Parser)
+
+# on:
+#   schedule:
+#     - cron: '*/40 3-21 * * *' # Every 40 mins from 6:00 to 00:00 Kyiv time
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Force source (site/manual)'
+        required: true
+        default: 'site'
+      manual_data:
+        description: 'Manual JSON data for override'
+        required: false
+        default: ''
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          cd parser
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Run Parser
+        env:
+          MANUAL_DATA: ${{ github.event.inputs.manual_data }}
+          FORCE_SOURCE: ${{ github.event.inputs.source }}
+        run: |
+          cd parser/src
+          python parse_schedule.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "SSSK-Bot"
+          git config --global user.email "bot@svitlo-starkon.com"
+          git add web/public/data/*.json
+          git commit -m "Auto-update schedules [skip ci]" || echo "No changes to commit"
+          git push
