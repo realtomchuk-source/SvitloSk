@@ -114,8 +114,8 @@ def parse_schedule_from_text(text, img_bytes=None):
                     queues[group_id] = "".join(hours).ljust(24, "1")
 
     # If we failed both
-    if len(queues) < 3:
-        logger.warning(f"Failed to parse queues (Vision/OCR). Found {len(queues)}")
+    if len(queues) < 6: # Increased threshold to 50% (6 out of 12) for better reliability
+        logger.warning(f"ANOMALY: Too few queues parsed (Vision/OCR). Found {len(queues)}. Potential design change or bad image.")
         return None
 
     # Fill missing queues with default "always on"

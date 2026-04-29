@@ -21,6 +21,7 @@ __pycache__
 parser/data/logs/*
 parser/data/raw_site/*
 parser/data/archive/*
+parser/data/*.db
 
 # Sensitive data
 .env

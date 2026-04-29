@@ -17,9 +17,12 @@ def get_hash(data_bytes_or_str):
 def check_site_light():
     """Швидка перевірка сторінки через requests (без браузера)."""
     import requests
+    import time
     from config import OBL_URL, HEADERS
     try:
-        resp = requests.get(OBL_URL, headers=HEADERS, timeout=20)
+        # Add timestamp to bypass cache
+        url_with_cache_buster = f"{OBL_URL}?t={int(time.time())}"
+        resp = requests.get(url_with_cache_buster, headers=HEADERS, timeout=20)
         if resp.status_code == 200:
             return get_hash(resp.text)
     except Exception as e:
@@ -30,6 +33,10 @@ def fetch_page_dynamic(url):
     """Fetches the page content using Playwright."""
     logger.info(f"Fetching {url} with Playwright...")
     try:
+        import time
+        # Add timestamp to bypass cache
+        url_with_cache_buster = f"{url}?t={int(time.time())}"
+        
         with sync_playwright() as p:
             # Using browser with common desktop resolution
             browser = p.chromium.launch(headless=True)
@@ -40,7 +47,7 @@ def fetch_page_dynamic(url):
             page = context.new_page()
             Stealth().apply_stealth_sync(page)
             
-            page.goto(url, wait_until="networkidle", timeout=60000)
+            page.goto(url_with_cache_buster, wait_until="networkidle", timeout=60000)
             time.sleep(3) # Wait for images to settle
             
             html = page.content()
@@ -131,7 +138,12 @@ def run_site_parser(state):
     dynamic content and downloads the image for processing.
     """
     logger.info("Executing heavy scan...")
-    # ... (rest of the function remains similar, but we optimize it)
+    
+    # 1. Fetch the page with Playwright (dynamic rendering)
+    html = fetch_page_dynamic(OBL_URL)
+    if not html:
+        logger.error("Failed to fetch page via Playwright.")
+        return None
 
     # 2. Extract specific image URL
     soup = BeautifulSoup(html, 'html.parser')
@@ -171,8 +183,11 @@ def run_site_parser(state):
 
     try:
         import requests
+        import time
         from config import HEADERS
-        img_bytes = requests.get(img_url, timeout=30, headers=HEADERS).content
+        # Add timestamp to bypass cache
+        url_with_cache_buster = f"{img_url}?t={int(time.time())}"
+        img_bytes = requests.get(url_with_cache_buster, timeout=30, headers=HEADERS).content
     except Exception as e:
         logger.error(f"Image download error: {e}")
         return None

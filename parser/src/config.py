@@ -18,7 +18,7 @@ TODAY_JSON_FILE = os.path.join(PWA_DATA_DIR, "today.json")
 TOMORROW_JSON_FILE = os.path.join(PWA_DATA_DIR, "tomorrow.json")
 # RAW_TELEGRAM_DIR removed (Telegram purge)
 
-TIMEZONE = "Europe/Kiev"
+TIMEZONE = "Europe/Kyiv"
 KYIV_TZ_OFFSET = 3  # Поточне зміщення (UTC+3)
 
 OBL_URL = "https://hoe.com.ua/page/pogodinni-vidkljuchennja"

@@ -6,8 +6,6 @@ import xml.etree.ElementTree as ET
 
 logger = logging.getLogger("SSSK-GridVision")
 
-logger = logging.getLogger("SSSK-GridVision")
-
 def _parse_svg_grid(svg_bytes):
     """
     Parses SVG XML to find outage rectangles.

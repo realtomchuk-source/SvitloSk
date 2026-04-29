@@ -1,23 +1,24 @@
-name: SSSK Monitor (Parser)
+name: SSSK Monitor
 
-# on:
-#   schedule:
-#     - cron: '*/40 3-21 * * *' # Every 40 mins from 6:00 to 00:00 Kyiv time
 on:
+  schedule:
+    # Peak hours: 19:00 - 23:00 Kyiv (16:00 - 20:00 UTC) every 15 minutes
+    - cron: '*/15 16-20 * * *'
+    # Standard mode: Every 5 hours
+    - cron: '0 */5 * * *'
   workflow_dispatch:
     inputs:
       source:
         description: 'Force source (site/manual)'
-        required: true
-        default: 'site'
-      manual_data:
-        description: 'Manual JSON data for override'
         required: false
-        default: ''
+        default: 'site'
 
 jobs:
   parse:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,27 +26,40 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.14'
-          cache: 'pip'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
+          sudo apt-get update && sudo apt-get install -y tesseract-ocr
           cd parser
           pip install -r requirements.txt
           playwright install --with-deps chromium
 
-      - name: Run Parser
+      # ===== Chain 1: New Parser (SQLite pipeline) — may fail, that's OK =====
+      - name: Run Parser (SQLite pipeline)
+        continue-on-error: true
         env:
-          MANUAL_DATA: ${{ github.event.inputs.manual_data }}
-          FORCE_SOURCE: ${{ github.event.inputs.source }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           cd parser/src
           python parse_schedule.py
 
-      - name: Commit and Push changes
+      # ===== Chain 2: PWA pipeline (stable, keeps the app alive) =====
+      - name: Run History Crawler (JSON pipeline)
+        run: |
+          cd parser/src
+          python history_crawler.py
+
+      - name: Generate today/tomorrow JSON for PWA
+        run: |
+          cd parser/src
+          python generate_today.py
+
+      # ===== Commit results =====
+      - name: Commit and Push
         run: |
           git config --global user.name "SSSK-Bot"
           git config --global user.email "bot@svitlo-starkon.com"
-          git add web/public/data/*.json
+          git add parser/data/*.json web/public/data/*.json || true
           git commit -m "Auto-update schedules [skip ci]" || echo "No changes to commit"
           git push
