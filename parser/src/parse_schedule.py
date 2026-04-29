@@ -5,7 +5,7 @@ import json
 import logging
 from datetime import datetime, timedelta
 from modules.utils import load_json, save_json, get_now, should_run, cleanup_old_files, is_tomorrow_processed
-from modules.site_parser import run_site_parser
+from modules.site_parser import run_site_parser, check_for_changes
 from modules.ocr_helper import extract_text_from_image
 from modules.table_parser import parse_schedule_from_text, validate_queues
 from modules.text_parser import apply_text_overrides
@@ -217,24 +217,30 @@ def main():
     # 3. Пріоритетне завдання вже визначене через is_aggressive
 
     # 4. Легкий моніторинг (Детектор змін)
-    from modules.site_parser import check_site_light
-    current_light_hash = check_site_light()
-    last_light_hash = state.get("last_html_hash")
+    # Use the new multi-stage trigger instead of simple hash check
+    should_scan, reason, html_hash, img_url = check_for_changes(state)
     
-    site_changed = current_light_hash and current_light_hash != last_light_hash
-    if site_changed:
-        logger.info("DETECTOR: Site HTML changed! Forcing heavy scan.")
+    if should_scan:
+        logger.info(f"DETECTOR: Change detected! Reason: {reason}. Forcing heavy scan.")
+        site_changed = True
+    else:
+        logger.info(f"DETECTOR: No changes. Reason: {reason}.")
+        site_changed = False
+        # Update HTML hash even if no heavy scan is needed
+        if html_hash:
+            state["last_html_hash"] = html_hash
 
     # 5. Виконання завдань
-    # А) Пошук графіка на завтра в новинах (якщо вечір і ще не знайдено)
-    if is_aggressive:
-        logger.info("Mode: AGGRESSIVE. Searching for tomorrow's schedule in News...")
-
-    # Б) Стандартний моніторинг головної (якщо є зміни або плановий запуск)
-    # Плановий запуск кожні 2 години в будь-якому випадку для надійності
+    # ... (logic for aggressive mode)
+    
+    # Determine if we MUST run a heavy scan
+    # Heavy scan is needed if:
+    # 1. Trigger found a change (site_changed)
+    # 2. We are in AGGRESSIVE mode (evening search for tomorrow)
+    # 3. Forced interval reached (every 2 hours)
+    
     last_run_str = state.get("last_run")
     last_run = datetime.fromisoformat(last_run_str) if last_run_str else now - timedelta(hours=5)
-    # Ensure last_run is timezone aware for comparison if now is TZ aware
     if last_run.tzinfo is None:
         last_run = TZ.localize(last_run)
     force_heavy = (now - last_run).total_seconds() / 3600 >= 2
@@ -244,14 +250,15 @@ def main():
         
         site_res = run_site_parser(state)
         if site_res:
-            state["last_site_hash"] = site_res.get("hash")
+            # Update state with latest hashes and URL
+            state["last_site_hash"] = site_res.get("hash") # This is the image MD5
             state["last_html_hash"] = site_res.get("html_hash")
+            # Store the URL as well for the next DOM-trigger check
+            state["last_img_url"] = site_res.get("img_url", "") 
             
-            # Одержуємо поточну базу для аналізу змін
             db = load_json(UNIFIED_DB, default=[])
             last_valid_entry = db[-1] if db else None
             
-            # А) Зміна картинки або форсований запуск
             image_changed = site_res.get("changed")
             if image_changed:
                 process_image(site_res["img_bytes"], "site", site_res["raw_path"], state, site_res.get("html"))

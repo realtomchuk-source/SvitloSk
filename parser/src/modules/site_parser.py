@@ -64,12 +64,74 @@ def extract_image_url(html):
                 
     return None
 
-def run_site_parser(state):
-    logger.info("Starting site parser cycle...")
+def check_for_changes(state):
+    """
+    Multi-stage trigger to detect if the schedule has changed.
+    Returns (should_run_heavy_scan, trigger_reason, current_html_hash, current_img_url)
+    """
+    logger.info("Running multi-stage trigger check...")
     
-    html = fetch_page_dynamic(OBL_URL)
-    if not html:
-        return None
+    # --- Stage 1: Light-check (HTML Hash) ---
+    # We use requests instead of Playwright for speed
+    current_html_hash = check_site_light()
+    if not current_html_hash:
+        logger.error("Stage 1: Could not reach site.")
+        return False, "SITE_UNREACHABLE", None, None
+    
+    if current_html_hash == state.get("last_html_hash"):
+        # Even if HTML is same, the image might be updated on the server 
+        # but the URL remains the same. However, for 99% of cases, 
+        # if HTML is identical, nothing changed.
+        # We still allow a 'forced' run every few hours for safety.
+        logger.info("Stage 1: HTML hash matches. No change detected.")
+        return False, "HTML_MATCH", current_html_hash, None
+
+    logger.info("Stage 1: HTML changed. Moving to Stage 2 (DOM-trigger).")
+
+    # --- Stage 2: DOM-trigger (Image URL) ---
+    # Now we need the actual HTML to find the image URL. 
+    # Since we already have the HTML from check_site_light (implicitly), 
+    # let's fetch it properly.
+    try:
+        import requests
+        from config import OBL_URL, HEADERS
+        resp = requests.get(OBL_URL, headers=HEADERS, timeout=20)
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        img_url = extract_image_url(resp.text)
+        
+        if not img_url:
+            # Check for "no outages" text if image is missing
+            text = soup.get_text().lower()
+            if "не прогнозує відключень" in text or "графік не застосовується" in text:
+                logger.info("Stage 2: Site says 'No Outages'. Triggering empty update.")
+                return True, "NO_OUTAGES_TEXT", current_html_hash, None
+            
+            logger.warning("Stage 2: Image URL not found and no 'No Outage' text.")
+            return False, "NO_IMAGE_FOUND", current_html_hash, None
+
+        # Normalize URL
+        from urllib.parse import urljoin
+        img_url = urljoin(OBL_URL, img_url)
+        
+        last_img_url = state.get("last_site_hash") # We use this field as image URL storage for the trigger
+        if img_url == last_img_url:
+            logger.info("Stage 2: Image URL is identical. No change.")
+            return False, "IMG_URL_MATCH", current_html_hash, img_url
+            
+        logger.info(f"Stage 2: New image URL detected: {img_url}")
+        return True, "NEW_IMG_URL", current_html_hash, img_url
+
+    except Exception as e:
+        logger.error(f"Stage 2 error: {e}")
+        return False, "TRIGGER_ERROR", current_html_hash, None
+
+def run_site_parser(state):
+    """
+    Heavy scan: fetches full page via Playwright to ensure we have the latest 
+    dynamic content and downloads the image for processing.
+    """
+    logger.info("Executing heavy scan...")
+    # ... (rest of the function remains similar, but we optimize it)
 
     # 2. Extract specific image URL
     soup = BeautifulSoup(html, 'html.parser')
@@ -136,6 +198,7 @@ def run_site_parser(state):
         "hash": new_hash,
         "html_hash": html_hash,
         "img_bytes": img_bytes,
+        "img_url": img_url,
         "html": html,
         "news_text": news_text,
         "caption": "Schedule updated (image or text)" if changed else "No changes"

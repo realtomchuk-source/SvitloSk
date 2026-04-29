@@ -2,8 +2,72 @@ import logging
 from PIL import Image, ImageStat
 import io
 import os
+import xml.etree.ElementTree as ET
 
 logger = logging.getLogger("SSSK-GridVision")
+
+logger = logging.getLogger("SSSK-GridVision")
+
+def _parse_svg_grid(svg_bytes):
+    """
+    Parses SVG XML to find outage rectangles.
+    Looking for rects inside the 'clip-path-dot-color' which defines the outage areas.
+    """
+    try:
+        root = ET.fromstring(svg_bytes)
+        # Namespace handling
+        ns = {'svg': 'http://www.w3.org/2000/svg'}
+        
+        # Find the clipPath that defines outage areas
+        clip_path = root.find(".//svg:clipPath[@id='clip-path-dot-color']", ns)
+        if clip_path is None:
+            logger.error("SVG missing 'clip-path-dot-color' definition.")
+            return None
+        
+        # Find all rectangles in that clipPath
+        rects = clip_path.findall("svg:rect", ns)
+        if not rects:
+            logger.info("No outage rectangles found in SVG.")
+            # Return all 1s (no outages)
+            return {g: "1" * 24 for g in ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2", "5.1", "5.2", "6.1", "6.2"]}
+        
+        # We need to map rect coordinates to the 12x24 grid.
+        # Based on the sample: 
+        # x values: 56, 80, 104, 128, 152, 176, 200, 224... (step 24)
+        # y values: 248, 272, 296, 320... (step 24)
+        
+        queues = {g: ["1"] * 24 for g in ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2", "5.1", "5.2", "6.1", "6.2"]}
+        
+        # Coordinate mapping constants (derived from the sample SVG)
+        # Start X for queue 1.1 is approx 56
+        # Start Y for hour 0 is approx 248
+        START_X = 56
+        START_Y = 248
+        CELL_SIZE = 24
+        
+        for rect in rects:
+            try:
+                x = int(float(rect.get('x', 0)))
+                y = int(float(rect.get('y', 0)))
+                
+                # Calculate grid position
+                col_idx = (x - START_X) // CELL_SIZE
+                row_idx = (y - START_Y) // CELL_SIZE
+                
+                if 0 <= col_idx < 24 and 0 <= row_idx < 12:
+                    group_names = ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2", "5.1", "5.2", "6.1", "6.2"]
+                    group = group_names[row_idx]
+                    queues[group][col_idx] = "0"
+            except (ValueError, TypeError):
+                continue
+        
+        # Convert lists to strings
+        final_queues = {g: "".join(bits) for g, bits in queues.items()}
+        logger.info("Successfully parsed SVG grid.")
+        return final_queues
+    except Exception as e:
+        logger.error(f"SVG parsing error: {e}")
+        return None
 
 def _linspace(start, stop, num):
     """Native replacement for np.linspace to avoid numpy dependency."""
@@ -112,6 +176,12 @@ def is_grey_line_pixel(rgb):
 
 def parse_grid_from_image(img_bytes):
     try:
+        # ===== SVG HANDLING =====
+        # Check if it's an SVG (starts with XML declaration or <svg)
+        if img_bytes.startswith(b'<?xml') or img_bytes.startswith(b'<svg'):
+            logger.info("Detected SVG format. Using SVG-XML parser.")
+            return _parse_svg_grid(img_bytes)
+
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
         w, h = img.size
         logger.info(f"Image size: {w}x{h}")
