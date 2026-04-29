@@ -141,18 +141,19 @@ def generate_files():
     return True
 
 def write_status(status, today, tomorrow):
-    status_data = load_json(STATUS_FILE, default={})
     now = get_now()
-    status_data["last_sync"] = now.isoformat()
-    status_data["today"] = {
-        "date": today.get("date"),
-        "state": today.get("meta", {}).get("state"),
-        "updated": today.get("meta", {}).get("generated_at")
-    }
-    status_data["tomorrow"] = {
-        "date": tomorrow.get("date"),
-        "state": tomorrow.get("meta", {}).get("state"),
-        "updated": tomorrow.get("meta", {}).get("generated_at")
+    status_data = {
+        "last_sync": now.isoformat(),
+        "today": {
+            "date": today.get("date"),
+            "state": today.get("meta", {}).get("state"),
+            "updated": today.get("meta", {}).get("generated_at")
+        },
+        "tomorrow": {
+            "date": tomorrow.get("date"),
+            "state": tomorrow.get("meta", {}).get("state"),
+            "updated": tomorrow.get("meta", {}).get("generated_at")
+        }
     }
     save_json(STATUS_FILE, status_data)
 
