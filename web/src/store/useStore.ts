@@ -60,23 +60,7 @@ export const useStore = create<AppState>()(
       initAuth: async () => {
         set({ isAuthLoading: true });
 
-        // 1. Manually check for code in URL
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        
-        if (code) {
-          try {
-            console.log('Exchanging OAuth code for session...');
-            await supabase.auth.exchangeCodeForSession(code);
-            // Clean URL
-            const newUrl = window.location.origin + window.location.pathname + window.location.hash;
-            window.history.replaceState({}, document.title, newUrl);
-          } catch (err) {
-            console.error('Code exchange failed:', err);
-          }
-        }
-
-        // 2. Set up listener
+        // 1. Set up listener FIRST so we don't miss any events
         supabase.auth.onAuthStateChange(async (event, session) => {
           console.log('Auth event:', event, !!session);
           
@@ -99,17 +83,40 @@ export const useStore = create<AppState>()(
               set({ userConfig: remoteConfig, isAuthLoading: false });
               await db.setSetting('userConfig', remoteConfig);
             }
+
+            // If we are on the landing page with auth params, redirect to cabinet
+            if (window.location.search.includes('code=') || window.location.hash.includes('access_token=')) {
+                window.location.hash = '#/cabinet';
+            }
           } else {
             set({ user: null, isAuthLoading: false });
           }
         });
 
-        // 3. Initial check
+        // 2. Check for code in URL and manual exchange
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        
+        if (code) {
+          try {
+            console.log('Exchanging OAuth code for session...');
+            const { error } = await supabase.auth.exchangeCodeForSession(code);
+            if (error) throw error;
+            
+            // Clean URL query params but keep the hash
+            const newUrl = window.location.origin + window.location.pathname + window.location.hash;
+            window.history.replaceState({}, document.title, newUrl);
+          } catch (err) {
+            console.error('Code exchange failed:', err);
+            set({ isAuthLoading: false });
+          }
+        }
+
+        // 3. Initial check for existing session
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           set({ user: session.user, isAuthLoading: false });
         } else if (!code) {
-          // If no code and no session, we are done loading
           set({ isAuthLoading: false });
         }
       },
