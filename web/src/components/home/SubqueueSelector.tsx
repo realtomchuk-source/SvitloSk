@@ -22,7 +22,7 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
   const startX = useRef(0);
   const currentScrollLeft = useRef(0);
 
-  const cardWidth = 56; 
+  const cardWidth = 64; 
   const cardGap = 12;
   const itemWidth = cardWidth + cardGap; 
 
@@ -30,9 +30,7 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
     if (containerRef.current && !isDragging) {
       const centerIndex = GROUPS.length + GROUPS.indexOf(selectedGroup);
       setActiveIndex(centerIndex);
-      // Because we use padding: '0 calc(50% - 28px)', 
-      // index 0 is perfectly centered at scrollLeft = 0.
-      // So target scroll is exactly index * itemWidth.
+      // Center the active card precisely
       const targetScroll = centerIndex * itemWidth;
       containerRef.current.scrollTo({ left: targetScroll, behavior: 'smooth' });
     }
@@ -116,7 +114,7 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
             scrollBehavior: isDragging ? 'auto' : 'smooth',
             touchAction: 'pan-x',
             cursor: isDragging ? 'grabbing' : 'grab',
-            height: '66px', 
+            height: '76px', 
             alignItems: 'center'
           }}
         >
@@ -129,7 +127,7 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
                 onClick={() => { if (!isDragging) onSelect(group); }}
                 style={{
                   flex: `0 0 ${cardWidth}px`,
-                  height: isActive ? '60px' : '52px',
+                  height: `${cardWidth}px`, // Perfectly square
                   borderRadius: '16px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -138,6 +136,7 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
                   background: '#FFFFFF',
                   border: isActive ? '2.5px solid #FF7A00' : '1px solid rgba(0,0,0,0.1)',
                   boxShadow: isActive ? '0 0 20px rgba(255, 122, 0, 0.4)' : 'none',
+                  transform: isActive ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   cursor: 'pointer',
                   position: 'relative',
@@ -148,22 +147,23 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
                   fontSize: isActive ? '22px' : '18px', 
                   fontWeight: isActive ? 800 : 700, 
                   color: isActive ? '#111' : '#6B7280',
-                  lineHeight: 1,
-                  marginTop: isActive ? '-2px' : '0'
+                  lineHeight: 1
                 }}>
                   {group}
                 </span>
-                {isActive && (
-                  <span style={{ 
-                    fontSize: '8px', 
-                    fontWeight: 600, 
-                    color: '#888', 
-                    marginTop: '2px', 
-                    letterSpacing: '0.2px'
-                  }}>
-                    підчерга
-                  </span>
-                )}
+                
+                {/* Preserve space for the label even if inactive to maintain geometry */}
+                <span style={{ 
+                  fontSize: '8px', 
+                  fontWeight: 600, 
+                  color: '#888', 
+                  marginTop: '2px', 
+                  letterSpacing: '0.2px',
+                  opacity: isActive ? 1 : 0,
+                  transition: 'opacity 0.2s'
+                }}>
+                  підчерга
+                </span>
               </div>
             );
           })}
