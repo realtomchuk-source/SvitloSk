@@ -21,26 +21,6 @@ export const Cabinet: React.FC = () => {
     const [editingSlot, setEditingSlot] = useState<Slot | null>(null);
 
     const isAnon = !user || user.is_anonymous;
-
-    if (isAuthLoading) {
-        return (
-            <div className={styles.container} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ 
-                        width: '40px', 
-                        height: '40px', 
-                        border: '3px solid #e4e4e7', 
-                        borderTop: '3px solid #1a1a1c', 
-                        borderRadius: '50%', 
-                        animation: 'spin 1s linear infinite',
-                        margin: '0 auto 16px'
-                    }} />
-                    <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-                    <div style={{ color: '#71717a', fontSize: '14px', fontWeight: '500' }}>Синхронізація...</div>
-                </div>
-            </div>
-        );
-    }
     
     const profile = {
         name: isAnon ? 'Гість SvitloSk' : (user?.user_metadata?.full_name || 'Google Auth Профіль'),
