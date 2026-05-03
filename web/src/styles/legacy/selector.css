@@ -121,9 +121,9 @@
 
 /* Card Base — Inactive State */
 .selector-card {
-  flex: 0 0 56px;
-  height: 56px;
-  border-radius: 14px;
+  flex: 0 0 64px; /* Fixed width */
+  height: 64px;   /* Fixed height */
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -152,14 +152,16 @@
   transition: color 0.2s ease;
 }
 
-/* Card Label — Context only for active */
+/* Card Label — Reserved space for stability */
 .selector-card .selector-label {
   font-size: 8px;
   font-weight: 400;
   color: #666;
-  margin-top: 3px;
-  display: none;
+  margin-top: 2px;
+  display: block; /* Always block to keep card square */
+  opacity: 0;     /* Hidden when inactive */
   line-height: 1;
+  transition: opacity 0.2s ease;
 }
 
 /* ===== ACTIVE STATE — Focus through Geometry & System Accents ===== */
@@ -180,7 +182,7 @@
 }
 
 .selector-card.active .selector-label {
-  display: block; /* Show context helper */
+  opacity: 0.6; /* Show context helper */
 }
 
 /* ===== PRESSED STATE — Physical Feel ===== */

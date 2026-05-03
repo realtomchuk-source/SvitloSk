@@ -79,15 +79,20 @@ export const useStore = create<AppState>()(
             }
           } else {
             set({ user: null });
-            // No session -> create anonymous session
-            await supabase.auth.signInAnonymously();
           }
         });
 
         // Initial check
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (!session) {
-            supabase.auth.signInAnonymously();
+            // Only sign in anonymously if we're not in the middle of an OAuth flow
+            const hasAuthParams = window.location.href.includes('code=') || 
+                                window.location.href.includes('access_token=') ||
+                                window.location.href.includes('error=');
+            
+            if (!hasAuthParams) {
+              supabase.auth.signInAnonymously();
+            }
           } else {
             set({ user: session.user });
           }
