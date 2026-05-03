@@ -1,12 +1,6 @@
 import React from 'react';
+import type { Slot } from '@/schemas/user';
 import styles from '../Cabinet.module.css';
-
-interface Slot {
-    id: string;
-    locationName: string;
-    group: string;
-    notifyTime: number;
-}
 
 interface NotificationSlotsProps {
     slots: Slot[];
@@ -46,18 +40,18 @@ export const NotificationSlots: React.FC<NotificationSlotsProps> = ({ slots, isL
                             <div className={styles.slotCard}>
                                 <div className={styles.slotTopRow}>
                                     <div className={styles.slotTitleWrap}>
-                                        <span className={styles.slotTitle}>{slot.name}</span>
-                                        <span className={styles.slotTimeText}>за {slot.settings.advanceMinutes} хв. до змін</span>
+                                        <span className={styles.slotTitle}>{slot.locationName}</span>
+                                        <span className={styles.slotTimeText}>за {slot.notifyTime} хв. до змін</span>
                                     </div>
                                     <div className={styles.slotGroup}>{slot.group}</div>
                                 </div>
                                 <div className={styles.slotBottomRow}>
                                     <span className={styles.slotDnd}>
-                                        {slot.settings.dnd?.active 
-                                            ? `Не турбувати з ${slot.settings.dnd.start} до ${slot.settings.dnd.end}` 
+                                        {slot.dndEnabled 
+                                            ? 'Режим "Не турбувати" увімкнено' 
                                             : 'Сповіщати 24/7'}
                                     </span>
-                                    <div className={slot.settings.pushEnabled ? styles.dotOrange : styles.dotGray}></div>
+                                    <div className={slot.isActive ? styles.dotOrange : styles.dotGray}></div>
                                 </div>
                             </div>
                         </div>

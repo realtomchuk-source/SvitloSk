@@ -1,6 +1,5 @@
 import React from 'react';
 import { BottomSheet } from '../../../components/ui/BottomSheet/BottomSheet';
-import styles from './NotificationEditorSheet.module.css'; // Re-use some button styles if needed
 
 interface AuthPromptSheetProps {
     isOpen: boolean;

@@ -58,7 +58,7 @@ export const useStore = create<AppState>()(
 
       initAuth: () => {
         // Set up listener
-        supabase.auth.onAuthStateChange(async (event, session) => {
+        supabase.auth.onAuthStateChange(async (_event, session) => {
           if (session?.user) {
             set({ user: session.user });
             // Fetch remote config if available
