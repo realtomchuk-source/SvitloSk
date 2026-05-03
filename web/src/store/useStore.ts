@@ -60,16 +60,20 @@ export const useStore = create<AppState>()(
       initAuth: async () => {
         set({ isAuthLoading: true });
 
-        // 1. Manually check for code in URL (especially for mobile/HashRouter)
+        // 1. Manually check for code in URL
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
         
         if (code) {
-          console.log('Detected OAuth code, exchanging...');
-          await supabase.auth.exchangeCodeForSession(code);
-          // Clean up URL to prevent multiple exchanges
-          const newUrl = window.location.origin + window.location.pathname + window.location.hash;
-          window.history.replaceState({}, document.title, newUrl);
+          try {
+            console.log('Exchanging OAuth code for session...');
+            await supabase.auth.exchangeCodeForSession(code);
+            // Clean URL
+            const newUrl = window.location.origin + window.location.pathname + window.location.hash;
+            window.history.replaceState({}, document.title, newUrl);
+          } catch (err) {
+            console.error('Code exchange failed:', err);
+          }
         }
 
         // 2. Set up listener
@@ -79,6 +83,7 @@ export const useStore = create<AppState>()(
           if (session?.user) {
             set({ user: session.user, isAuthLoading: false });
             
+            // Sync profiles
             const { data } = await supabase
               .from('user_profiles')
               .select('start_group, tomorrow_push')
@@ -91,34 +96,21 @@ export const useStore = create<AppState>()(
                 startGroup: data.start_group || '1.1',
                 tomorrowPush: data.tomorrow_push || false
               };
-              set({ userConfig: remoteConfig });
+              set({ userConfig: remoteConfig, isAuthLoading: false });
               await db.setSetting('userConfig', remoteConfig);
             }
           } else {
-            set({ user: null });
-            // Only stop loading if we're not currently exchanging a code
-            if (!code) {
-              set({ isAuthLoading: false });
-            }
+            set({ user: null, isAuthLoading: false });
           }
         });
 
-        // 3. Initial session check
+        // 3. Initial check
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           set({ user: session.user, isAuthLoading: false });
         } else if (!code) {
-          // If no session and no code, we're definitely a guest
-          // But let's wait a bit before signing in anonymously
-          setTimeout(() => {
-            if (!get().user) {
-               supabase.auth.signInAnonymously().then(() => {
-                 set({ isAuthLoading: false });
-               });
-            } else {
-              set({ isAuthLoading: false });
-            }
-          }, 2000);
+          // If no code and no session, we are done loading
+          set({ isAuthLoading: false });
         }
       },
 
