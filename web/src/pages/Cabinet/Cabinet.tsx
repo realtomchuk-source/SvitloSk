@@ -13,7 +13,7 @@ import type { Slot } from '@/schemas/user';
 import styles from './Cabinet.module.css';
 
 export const Cabinet: React.FC = () => {
-    const { user, userConfig, updateUserConfig, slots, addSlot, updateSlot, deleteSlot, signInWithGoogle, isAuthLoading } = useStore();
+    const { user, userConfig, updateUserConfig, slots, addSlot, updateSlot, deleteSlot, signInWithGoogle } = useStore();
 
     const [isSubGroupSheetOpen, setSubGroupSheetOpen] = useState(false);
     const [isEditorSheetOpen, setEditorSheetOpen] = useState(false);
@@ -135,6 +135,8 @@ export const Cabinet: React.FC = () => {
                 isOpen={isAboutSheetOpen}
                 onClose={() => setAboutSheetOpen(false)}
             />
+
+            <DebugPanel />
         </div>
     );
 };
