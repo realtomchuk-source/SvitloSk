@@ -58,9 +58,21 @@ export const useStore = create<AppState>()(
       setError: (error) => set({ error: error }),
 
       initAuth: async () => {
-        set({ isAuthLoading: true });
+        // Capture code immediately from URL before Router mangles it
+        const params = new URLSearchParams(window.location.search);
+        const hasCode = params.has('code');
+        
+        if (hasCode) {
+            set({ isAuthLoading: true });
+        } else {
+            // Check session to decide if we need to show loading
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                set({ isAuthLoading: false });
+            }
+        }
 
-        // 1. Set up listener
+        // Set up listener
         supabase.auth.onAuthStateChange(async (event, session) => {
           console.log('Auth event:', event, !!session);
           localStorage.setItem('sssk_last_auth_event', `${event} at ${new Date().toLocaleTimeString()}`);
@@ -89,32 +101,19 @@ export const useStore = create<AppState>()(
             if (window.location.search.includes('code=')) {
               window.location.hash = '#/cabinet';
             }
-          } else {
-            set({ user: null });
-            // If no ongoing OAuth, stop loading
-            if (!window.location.search.includes('code=')) {
-              set({ isAuthLoading: false });
-            }
+          } else if (event === 'INITIAL_SESSION' && !hasCode) {
+            set({ user: null, isAuthLoading: false });
+          } else if (event === 'SIGNED_OUT') {
+            set({ user: null, isAuthLoading: false });
           }
         });
 
-        // 2. Initial check
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          set({ user: session.user, isAuthLoading: false });
-        } else {
-          // If no session and no code, we are done
-          if (!window.location.search.includes('code=')) {
+        // Safety timeout for the "Instant Skip"
+        setTimeout(() => {
+          if (get().isAuthLoading) {
             set({ isAuthLoading: false });
-          } else {
-            // Safety timeout: if after 10s we still don't have a session but have a code, stop loading
-            setTimeout(() => {
-              if (get().isAuthLoading) {
-                set({ isAuthLoading: false });
-              }
-            }, 10000);
           }
-        }
+        }, 8000);
       },
 
       signInWithGoogle: async () => {
