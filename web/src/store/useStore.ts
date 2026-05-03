@@ -16,7 +16,7 @@ interface AppState {
   // User State
   user: User | null;
   userConfig: UserConfig;
-  slots: Slot[];
+  isAuthLoading: boolean;
 
   // Actions
   setSelectedGroup: (group: string) => void;
@@ -49,6 +49,7 @@ export const useStore = create<AppState>()(
       error: null,
       user: null,
       userConfig: DEFAULT_CONFIG,
+      isAuthLoading: true,
       slots: [],
 
       setSelectedGroup: (group) => set({ selectedGroup: group }),
@@ -57,11 +58,14 @@ export const useStore = create<AppState>()(
       setError: (error) => set({ error: error }),
 
       initAuth: () => {
+        set({ isAuthLoading: true });
+
         // Set up listener for all auth events
         supabase.auth.onAuthStateChange(async (event, session) => {
-          console.log('Auth event:', event);
+          console.log('Auth event:', event, !!session);
+          
           if (session?.user) {
-            set({ user: session.user });
+            set({ user: session.user, isAuthLoading: false });
             
             const { data } = await supabase
               .from('user_profiles')
@@ -81,22 +85,43 @@ export const useStore = create<AppState>()(
           } else {
             set({ user: null });
             
-            // If no session and no ongoing OAuth, then sign in anonymously
+            // Only end loading if there are no auth params in URL
             const hasParams = window.location.href.includes('code=') || window.location.href.includes('access_token=');
-            if (!hasParams && event === 'SIGNED_OUT') {
-               supabase.auth.signInAnonymously();
+            if (!hasParams) {
+              set({ isAuthLoading: false });
+              
+              // If signed out and no ongoing OAuth, then sign in anonymously
+              if (event === 'SIGNED_OUT') {
+                 supabase.auth.signInAnonymously();
+              }
             }
           }
         });
 
-        // Initial check
+        // Initial check with a safety timeout for OAuth
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (session) {
-            set({ user: session.user });
+            set({ user: session.user, isAuthLoading: false });
           } else {
             const hasParams = window.location.href.includes('code=') || window.location.href.includes('access_token=');
+            
             if (!hasParams) {
-              supabase.auth.signInAnonymously();
+              // Longer delay for mobile to process redirect
+              setTimeout(() => {
+                const currentSession = get().user;
+                if (!currentSession) {
+                  supabase.auth.signInAnonymously().then(() => {
+                    set({ isAuthLoading: false });
+                  });
+                } else {
+                  set({ isAuthLoading: false });
+                }
+              }, 3000);
+            } else {
+              // Wait for onAuthStateChange to fire from URL detection
+              setTimeout(() => {
+                set({ isAuthLoading: false });
+              }, 5000);
             }
           }
         });
