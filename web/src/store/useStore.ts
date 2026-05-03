@@ -60,7 +60,7 @@ export const useStore = create<AppState>()(
       initAuth: async () => {
         set({ isAuthLoading: true });
 
-        // 1. Set up listener FIRST so we don't miss any events
+        // 1. Set up listener
         supabase.auth.onAuthStateChange(async (event, session) => {
           console.log('Auth event:', event, !!session);
           
@@ -84,40 +84,35 @@ export const useStore = create<AppState>()(
               await db.setSetting('userConfig', remoteConfig);
             }
 
-            // If we are on the landing page with auth params, redirect to cabinet
-            if (window.location.search.includes('code=') || window.location.hash.includes('access_token=')) {
-                window.location.hash = '#/cabinet';
+            // Redirect to cabinet if coming from OAuth
+            if (window.location.search.includes('code=')) {
+              window.location.hash = '#/cabinet';
             }
           } else {
-            set({ user: null, isAuthLoading: false });
+            set({ user: null });
+            // If no ongoing OAuth, stop loading
+            if (!window.location.search.includes('code=')) {
+              set({ isAuthLoading: false });
+            }
           }
         });
 
-        // 2. Check for code in URL and manual exchange
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        
-        if (code) {
-          try {
-            console.log('Exchanging OAuth code for session...');
-            const { error } = await supabase.auth.exchangeCodeForSession(code);
-            if (error) throw error;
-            
-            // Clean URL query params but keep the hash
-            const newUrl = window.location.origin + window.location.pathname + window.location.hash;
-            window.history.replaceState({}, document.title, newUrl);
-          } catch (err) {
-            console.error('Code exchange failed:', err);
-            set({ isAuthLoading: false });
-          }
-        }
-
-        // 3. Initial check for existing session
+        // 2. Initial check
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           set({ user: session.user, isAuthLoading: false });
-        } else if (!code) {
-          set({ isAuthLoading: false });
+        } else {
+          // If no session and no code, we are done
+          if (!window.location.search.includes('code=')) {
+            set({ isAuthLoading: false });
+          } else {
+            // Safety timeout: if after 10s we still don't have a session but have a code, stop loading
+            setTimeout(() => {
+              if (get().isAuthLoading) {
+                set({ isAuthLoading: false });
+              }
+            }, 10000);
+          }
         }
       },
 
@@ -125,7 +120,8 @@ export const useStore = create<AppState>()(
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: window.location.origin + window.location.pathname
+            // Use EXACT string from Supabase Dashboard
+            redirectTo: 'https://realtomchuk-source.github.io/SvitloSk/'
           }
         });
         if (error) console.error('Error signing in with Google', error);
