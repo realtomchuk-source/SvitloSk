@@ -8,7 +8,6 @@ import { SubGroupSheet } from './components/SubGroupSheet';
 import { NotificationEditorSheet } from './components/NotificationEditorSheet';
 import { AuthPromptSheet } from './components/AuthPromptSheet';
 import { AboutSheet } from './components/AboutSheet';
-import { DebugPanel } from './components/DebugPanel';
 import type { Slot } from '@/schemas/user';
 import styles from './Cabinet.module.css';
 
@@ -135,8 +134,6 @@ export const Cabinet: React.FC = () => {
                 isOpen={isAboutSheetOpen}
                 onClose={() => setAboutSheetOpen(false)}
             />
-
-            <DebugPanel />
         </div>
     );
 };

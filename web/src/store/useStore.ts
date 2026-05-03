@@ -149,26 +149,77 @@ export const useStore = create<AppState>()(
 
       addSlot: async (slot) => {
         await db.saveSlot(slot);
+        const { user } = get();
+        if (user) {
+          await supabase.from('notification_slots').upsert({
+            id: slot.id,
+            user_id: user.id,
+            data: slot,
+            updated_at: new Date().toISOString()
+          });
+        }
         set({ slots: [...get().slots, slot] });
       },
 
       updateSlot: async (slot) => {
         await db.saveSlot(slot);
+        const { user } = get();
+        if (user) {
+          await supabase.from('notification_slots').upsert({
+            id: slot.id,
+            user_id: user.id,
+            data: slot,
+            updated_at: new Date().toISOString()
+          });
+        }
         set({ slots: get().slots.map(s => s.id === slot.id ? slot : s) });
       },
 
       deleteSlot: async (id) => {
         await db.deleteSlot(id);
+        const { user } = get();
+        if (user) {
+          await supabase.from('notification_slots').delete().eq('id', id);
+        }
         set({ slots: get().slots.filter(s => s.id !== id) });
       },
 
       loadUserData: async () => {
-        const config = await db.getSetting<UserConfig>('userConfig');
-        const slots = await db.getAllSlots();
+        const localConfig = await db.getSetting<UserConfig>('userConfig');
+        const localSlots = await db.getAllSlots();
+        
+        const { user } = get();
+        if (user) {
+          // 1. Load slots from Supabase
+          const { data: remoteSlots } = await supabase
+            .from('notification_slots')
+            .select('data')
+            .eq('user_id', user.id);
+            
+          if (remoteSlots && remoteSlots.length > 0) {
+            const syncedSlots = remoteSlots.map(r => r.data as Slot);
+            set({ slots: syncedSlots });
+            // Update local DB
+            for (const s of syncedSlots) await db.saveSlot(s);
+          } else if (localSlots.length > 0) {
+            // 2. Migration: Upload local slots to Supabase if remote is empty
+            for (const s of localSlots) {
+              await supabase.from('notification_slots').upsert({
+                id: s.id,
+                user_id: user.id,
+                data: s,
+                updated_at: new Date().toISOString()
+              });
+            }
+            set({ slots: localSlots });
+          }
+        } else {
+          set({ slots: localSlots || [] });
+        }
+
         set({ 
-          userConfig: config || DEFAULT_CONFIG,
-          slots: slots || [],
-          selectedGroup: config?.startGroup || get().selectedGroup 
+          userConfig: localConfig || DEFAULT_CONFIG,
+          selectedGroup: localConfig?.startGroup || get().selectedGroup 
         });
       }
     }),
