@@ -23,19 +23,21 @@ export const SubGroupSheet: React.FC<SubGroupSheetProps> = ({
 }) => {
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Оберіть підчергу">
-            <div className={styles.grid}>
-                {GROUPS.map(group => (
-                    <button
-                        key={group}
-                        className={`${styles.button} ${selectedGroup === group ? styles.buttonSelected : ''}`}
-                        onClick={() => {
-                            onSelectGroup(group);
-                            onClose();
-                        }}
-                    >
-                        {group}
-                    </button>
-                ))}
+            <div style={{ padding: '16px 16px 120px' }}>
+                <div className={styles.grid}>
+                    {GROUPS.map(group => (
+                        <button
+                            key={group}
+                            className={`${styles.button} ${selectedGroup === group ? styles.buttonSelected : ''}`}
+                            onClick={() => {
+                                onSelectGroup(group);
+                                onClose();
+                            }}
+                        >
+                            {group}
+                        </button>
+                    ))}
+                </div>
             </div>
         </BottomSheet>
     );
