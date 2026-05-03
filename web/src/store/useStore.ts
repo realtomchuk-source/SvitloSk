@@ -61,7 +61,7 @@ export const useStore = create<AppState>()(
         supabase.auth.onAuthStateChange(async (_event, session) => {
           if (session?.user) {
             set({ user: session.user });
-            // Fetch remote config if available
+            
             const { data } = await supabase
               .from('user_profiles')
               .select('start_group, tomorrow_push')
@@ -82,23 +82,28 @@ export const useStore = create<AppState>()(
           }
         });
 
-        // Initial check
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        // Initial check and forced exchange
+        const checkSession = async () => {
+          // Check if we have auth params in URL (Supabase SDK usually handles this, but let's be sure)
+          const params = new URLSearchParams(window.location.search);
+          const hasCode = params.has('code');
+          const hasFragment = window.location.hash.includes('access_token=');
+
+          const { data: { session } } = await supabase.auth.getSession();
+          
           if (!session) {
-            // Give Supabase a moment to process URL params if they exist
-            setTimeout(() => {
-              const hasAuthParams = window.location.href.includes('code=') || 
-                                  window.location.href.includes('access_token=') ||
-                                  window.location.href.includes('error=');
-              
-              if (!hasAuthParams) {
+            if (!hasCode && !hasFragment) {
+              // Only sign in anonymously if it's a clean visit
+              setTimeout(() => {
                 supabase.auth.signInAnonymously();
-              }
-            }, 500);
+              }, 1000);
+            }
           } else {
             set({ user: session.user });
           }
-        });
+        };
+
+        checkSession();
       },
 
       signInWithGoogle: async () => {
