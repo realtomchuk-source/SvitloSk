@@ -17,6 +17,7 @@ interface AppState {
   user: User | null;
   userConfig: UserConfig;
   isAuthLoading: boolean;
+  slots: Slot[];
 
   // Actions
   setSelectedGroup: (group: string) => void;
@@ -25,9 +26,9 @@ interface AppState {
   setError: (error: string | null) => void;
 
   // User Actions
-  initAuth: () => void;
+  initAuth: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  updateUserConfig: (config: Partial<UserConfig>) => void;
+  updateUserConfig: (config: Partial<UserConfig>) => Promise<void>;
   addSlot: (slot: Slot) => Promise<void>;
   updateSlot: (slot: Slot) => Promise<void>;
   deleteSlot: (id: string) => Promise<void>;
