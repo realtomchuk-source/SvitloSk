@@ -1,5 +1,6 @@
 import React from 'react';
 import { BottomSheet } from '../../../components/ui/BottomSheet/BottomSheet';
+import { AppLogo } from '../../../components/ui/Icons/AppLogo';
 
 interface AuthPromptSheetProps {
     isOpen: boolean;
@@ -10,30 +11,46 @@ interface AuthPromptSheetProps {
 export const AuthPromptSheet: React.FC<AuthPromptSheetProps> = ({ isOpen, onClose, onLogin }) => {
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Потрібна реєстрація">
-            <div style={{ textAlign: 'center', padding: '24px 0 40px' }}>
-                <div style={{ 
-                    fontSize: '16px', 
-                    color: '#1a1a1c', 
-                    marginBottom: '32px', 
-                    lineHeight: '1.5', 
-                    padding: '0 24px',
-                    fontWeight: '500'
-                }}>
-                    Для того, щоб отримати доступ до цієї функції, увійдіть у свій обліковий запис.
+            <div style={{ textAlign: 'center', padding: '32px 16px 48px' }}>
+                
+                {/* Branded Identity - Bulb */}
+                <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ 
+                        width: 72, 
+                        height: 72, 
+                        background: '#e4e4e7', 
+                        borderRadius: '18px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center' 
+                    }}>
+                        <AppLogo size={50} />
+                    </div>
                 </div>
+
+                <div style={{ 
+                    fontSize: '17px', 
+                    color: '#1a1a1c', 
+                    marginBottom: '40px', 
+                    lineHeight: '1.6', 
+                    padding: '0 12px',
+                    fontWeight: '600'
+                }}>
+                    Щоб користуватися цією функцією та синхронізувати дані, будь ласка, увійдіть у свій профіль.
+                </div>
+
                 <button 
                     onClick={() => {
                         onClose();
                         onLogin();
                     }} 
                     style={{
-                        width: 'calc(100% - 48px)',
-                        margin: '0 24px 40px 24px',
+                        width: '100%',
                         background: '#ffffff',
                         color: '#1a1a1c',
                         border: '1px solid #e4e4e7',
-                        borderRadius: '12px',
-                        padding: '14px',
+                        borderRadius: '14px',
+                        padding: '16px',
                         fontSize: '16px',
                         fontWeight: '600',
                         cursor: 'pointer',
@@ -42,7 +59,7 @@ export const AuthPromptSheet: React.FC<AuthPromptSheetProps> = ({ isOpen, onClos
                         justifyContent: 'center',
                         gap: '12px',
                         transition: 'all 0.2s',
-                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                     }}
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24">
