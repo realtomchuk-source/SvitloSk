@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 import type { Schedule } from '@/schemas/schedule';
 import type { Slot, UserConfig } from '@/schemas/user';
 import { db } from '@/services/db';
+import { supabase } from '@/services/supabaseClient';
+import type { User } from '@supabase/supabase-js';
 
 interface AppState {
   // Data State
@@ -12,6 +14,7 @@ interface AppState {
   error: string | null;
   
   // User State
+  user: User | null;
   userConfig: UserConfig;
   slots: Slot[];
 
@@ -22,6 +25,8 @@ interface AppState {
   setError: (error: string | null) => void;
 
   // User Actions
+  initAuth: () => void;
+  signInWithGoogle: () => Promise<void>;
   updateUserConfig: (config: Partial<UserConfig>) => void;
   addSlot: (slot: Slot) => Promise<void>;
   updateSlot: (slot: Slot) => Promise<void>;
@@ -42,6 +47,7 @@ export const useStore = create<AppState>()(
       scheduleData: null,
       isLoading: false,
       error: null,
+      user: null,
       userConfig: DEFAULT_CONFIG,
       slots: [],
 
@@ -50,10 +56,71 @@ export const useStore = create<AppState>()(
       setLoading: (loading) => set({ isLoading: loading }),
       setError: (error) => set({ error: error }),
 
+      initAuth: () => {
+        // Set up listener
+        supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user) {
+            set({ user: session.user });
+            // Fetch remote config if available
+            const { data } = await supabase
+              .from('user_profiles')
+              .select('start_group, tomorrow_push')
+              .eq('id', session.user.id)
+              .single();
+              
+            if (data) {
+              const remoteConfig = {
+                ...get().userConfig,
+                startGroup: data.start_group || '1.1',
+                tomorrowPush: data.tomorrow_push || false
+              };
+              set({ userConfig: remoteConfig });
+              await db.setSetting('userConfig', remoteConfig);
+            }
+          } else {
+            set({ user: null });
+            // No session -> create anonymous session
+            await supabase.auth.signInAnonymously();
+          }
+        });
+
+        // Initial check
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!session) {
+            supabase.auth.signInAnonymously();
+          } else {
+            set({ user: session.user });
+          }
+        });
+      },
+
+      signInWithGoogle: async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + window.location.pathname + '#/cabinet'
+          }
+        });
+        if (error) console.error('Error signing in with Google', error);
+      },
+
       updateUserConfig: async (newConfig) => {
         const updated = { ...get().userConfig, ...newConfig };
         set({ userConfig: updated });
         await db.setSetting('userConfig', updated);
+
+        // Sync to Supabase if we have a user
+        const { user } = get();
+        if (user) {
+          await supabase
+            .from('user_profiles')
+            .update({
+              start_group: updated.startGroup,
+              tomorrow_push: updated.tomorrowPush,
+              last_active: new Date().toISOString()
+            })
+            .eq('id', user.id);
+        }
       },
 
       addSlot: async (slot) => {

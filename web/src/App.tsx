@@ -3,17 +3,18 @@ import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'reac
 import { useStore } from '@/store/useStore';
 import { fetchSchedule } from '@/services/scheduleService';
 import { Home } from '@/pages/Home';
-import { Cabinet } from '@/pages/Cabinet';
+import { Cabinet } from '@/pages/Cabinet/Cabinet';
 import { Admin } from '@/pages/Admin';
 import { Archive, Apps } from '@/pages/Stubs';
 import { BottomNav } from '@/components/navigation/BottomNav';
 
 function AppContent() {
-  const { setScheduleData, setLoading, setError, loadUserData } = useStore();
+  const { setScheduleData, setLoading, setError, loadUserData, initAuth } = useStore();
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
+    initAuth();
     loadUserData();
     const loadData = async () => {
       setLoading(true);

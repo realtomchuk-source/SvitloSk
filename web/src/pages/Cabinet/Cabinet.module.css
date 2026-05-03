@@ -1,0 +1,278 @@
+/* ============================================
+   Cabinet — User's Desired Design
+   ============================================ */
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 16px 100px 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #1a1a1c;
+}
+
+/* ============================================
+   SECTION WRAPPER
+   ============================================ */
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sectionTitle {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #a1a1aa;
+    padding: 0 4px;
+    margin-bottom: -4px;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+.solidCard {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+}
+
+/* ============================================
+   PROFILE CARD
+   ============================================ */
+.profileHeader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+}
+
+.avatarWrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e4e4e7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.avatarIcon {
+    color: #71717a;
+}
+
+.profileText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.profileName {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1c;
+}
+
+.profileSub {
+    font-size: 13px;
+    color: #71717a;
+}
+
+/* ============================================
+   NOTIFICATION SLOTS
+   ============================================ */
+.slotCard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+}
+
+.slotTopRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.slotTitleWrap {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.slotTitle {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.slotTimeText {
+    font-size: 12px;
+    font-weight: 500;
+    color: #f97316; /* Orange */
+}
+
+.slotGroup {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.slotBottomRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.slotDnd {
+    font-size: 13px;
+    color: #52525b;
+}
+
+.dotOrange {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #f97316;
+}
+
+/* Add Button */
+.addButton {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 16px;
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    color: #1a1a1c;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.addButton:active {
+    opacity: 0.8;
+}
+
+/* ============================================
+   GENERAL SETTINGS
+   ============================================ */
+.settingItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    position: relative;
+}
+
+.settingItem:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 48px;
+    right: 0;
+    height: 1px;
+    background: #f4f4f5;
+}
+
+.settingLeft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.settingIconWrap {
+    color: #a1a1aa;
+    display: flex;
+}
+
+.settingLabel {
+    font-size: 15px;
+    color: #1a1a1c;
+}
+
+.settingRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settingValueOrange {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f97316;
+}
+
+.settingChevron {
+    color: #d4d4d8;
+    font-size: 16px;
+}
+
+/* Toggle */
+.toggle {
+    width: 44px;
+    height: 24px;
+    background: #e4e4e7;
+    border-radius: 12px;
+    position: relative;
+    transition: background 0.2s;
+}
+.toggleActive {
+    background: #10b981; /* Green */
+}
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.toggleActive::after {
+    transform: translateX(20px);
+}
+
+/* ============================================
+   ABOUT SECTION (Floating items)
+   ============================================ */
+.aboutList {
+    display: flex;
+    flex-direction: column;
+    padding: 0 8px;
+}
+
+.infoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 8px;
+    cursor: pointer;
+}
+
+.infoLeft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #52525b;
+}
+
+.infoLabel {
+    font-size: 15px;
+}
+
+.infoChevron {
+    color: #d4d4d8;
+}
