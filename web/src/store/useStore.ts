@@ -63,6 +63,7 @@ export const useStore = create<AppState>()(
         // 1. Set up listener
         supabase.auth.onAuthStateChange(async (event, session) => {
           console.log('Auth event:', event, !!session);
+          localStorage.setItem('sssk_last_auth_event', `${event} at ${new Date().toLocaleTimeString()}`);
           
           if (session?.user) {
             set({ user: session.user, isAuthLoading: false });
