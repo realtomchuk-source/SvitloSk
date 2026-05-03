@@ -57,10 +57,22 @@ export const useStore = create<AppState>()(
       setLoading: (loading) => set({ isLoading: loading }),
       setError: (error) => set({ error: error }),
 
-      initAuth: () => {
+      initAuth: async () => {
         set({ isAuthLoading: true });
 
-        // Set up listener for all auth events
+        // 1. Manually check for code in URL (especially for mobile/HashRouter)
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        
+        if (code) {
+          console.log('Detected OAuth code, exchanging...');
+          await supabase.auth.exchangeCodeForSession(code);
+          // Clean up URL to prevent multiple exchanges
+          const newUrl = window.location.origin + window.location.pathname + window.location.hash;
+          window.history.replaceState({}, document.title, newUrl);
+        }
+
+        // 2. Set up listener
         supabase.auth.onAuthStateChange(async (event, session) => {
           console.log('Auth event:', event, !!session);
           
@@ -84,47 +96,30 @@ export const useStore = create<AppState>()(
             }
           } else {
             set({ user: null });
-            
-            // Only end loading if there are no auth params in URL
-            const hasParams = window.location.href.includes('code=') || window.location.href.includes('access_token=');
-            if (!hasParams) {
+            // Only stop loading if we're not currently exchanging a code
+            if (!code) {
               set({ isAuthLoading: false });
-              
-              // If signed out and no ongoing OAuth, then sign in anonymously
-              if (event === 'SIGNED_OUT') {
-                 supabase.auth.signInAnonymously();
-              }
             }
           }
         });
 
-        // Initial check with a safety timeout for OAuth
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          if (session) {
-            set({ user: session.user, isAuthLoading: false });
-          } else {
-            const hasParams = window.location.href.includes('code=') || window.location.href.includes('access_token=');
-            
-            if (!hasParams) {
-              // Longer delay for mobile to process redirect
-              setTimeout(() => {
-                const currentSession = get().user;
-                if (!currentSession) {
-                  supabase.auth.signInAnonymously().then(() => {
-                    set({ isAuthLoading: false });
-                  });
-                } else {
-                  set({ isAuthLoading: false });
-                }
-              }, 3000);
+        // 3. Initial session check
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          set({ user: session.user, isAuthLoading: false });
+        } else if (!code) {
+          // If no session and no code, we're definitely a guest
+          // But let's wait a bit before signing in anonymously
+          setTimeout(() => {
+            if (!get().user) {
+               supabase.auth.signInAnonymously().then(() => {
+                 set({ isAuthLoading: false });
+               });
             } else {
-              // Wait for onAuthStateChange to fire from URL detection
-              setTimeout(() => {
-                set({ isAuthLoading: false });
-              }, 5000);
+              set({ isAuthLoading: false });
             }
-          }
-        });
+          }, 2000);
+        }
       },
 
       signInWithGoogle: async () => {
