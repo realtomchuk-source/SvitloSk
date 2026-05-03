@@ -57,8 +57,9 @@ export const useStore = create<AppState>()(
       setError: (error) => set({ error: error }),
 
       initAuth: () => {
-        // Set up listener
-        supabase.auth.onAuthStateChange(async (_event, session) => {
+        // Set up listener for all auth events
+        supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log('Auth event:', event);
           if (session?.user) {
             set({ user: session.user });
             
@@ -79,31 +80,26 @@ export const useStore = create<AppState>()(
             }
           } else {
             set({ user: null });
+            
+            // If no session and no ongoing OAuth, then sign in anonymously
+            const hasParams = window.location.href.includes('code=') || window.location.href.includes('access_token=');
+            if (!hasParams && event === 'SIGNED_OUT') {
+               supabase.auth.signInAnonymously();
+            }
           }
         });
 
-        // Initial check and forced exchange
-        const checkSession = async () => {
-          // Check if we have auth params in URL (Supabase SDK usually handles this, but let's be sure)
-          const params = new URLSearchParams(window.location.search);
-          const hasCode = params.has('code');
-          const hasFragment = window.location.hash.includes('access_token=');
-
-          const { data: { session } } = await supabase.auth.getSession();
-          
-          if (!session) {
-            if (!hasCode && !hasFragment) {
-              // Only sign in anonymously if it's a clean visit
-              setTimeout(() => {
-                supabase.auth.signInAnonymously();
-              }, 1000);
-            }
-          } else {
+        // Initial check
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session) {
             set({ user: session.user });
+          } else {
+            const hasParams = window.location.href.includes('code=') || window.location.href.includes('access_token=');
+            if (!hasParams) {
+              supabase.auth.signInAnonymously();
+            }
           }
-        };
-
-        checkSession();
+        });
       },
 
       signInWithGoogle: async () => {
