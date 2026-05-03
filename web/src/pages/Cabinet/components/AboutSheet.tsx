@@ -10,7 +10,7 @@ interface AboutSheetProps {
 export const AboutSheet: React.FC<AboutSheetProps> = ({ isOpen, onClose }) => {
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Про застосунок">
-            <div style={{ textAlign: 'center', padding: '24px 16px 40px' }}>
+            <div style={{ textAlign: 'center', padding: '24px 16px 120px' }}>
                 <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}>
                     <div style={{ 
                         width: 80, 
