@@ -85,14 +85,16 @@ export const useStore = create<AppState>()(
         // Initial check
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (!session) {
-            // Only sign in anonymously if we're not in the middle of an OAuth flow
-            const hasAuthParams = window.location.href.includes('code=') || 
-                                window.location.href.includes('access_token=') ||
-                                window.location.href.includes('error=');
-            
-            if (!hasAuthParams) {
-              supabase.auth.signInAnonymously();
-            }
+            // Give Supabase a moment to process URL params if they exist
+            setTimeout(() => {
+              const hasAuthParams = window.location.href.includes('code=') || 
+                                  window.location.href.includes('access_token=') ||
+                                  window.location.href.includes('error=');
+              
+              if (!hasAuthParams) {
+                supabase.auth.signInAnonymously();
+              }
+            }, 500);
           } else {
             set({ user: session.user });
           }
@@ -103,7 +105,7 @@ export const useStore = create<AppState>()(
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: window.location.origin + window.location.pathname + '#/cabinet'
+            redirectTo: window.location.origin + window.location.pathname
           }
         });
         if (error) console.error('Error signing in with Google', error);
