@@ -1,4 +1,5 @@
 import { openDB, type IDBPDatabase } from 'idb';
+import type { Slot } from '@/schemas/user';
 
 const DB_NAME = 'svitlosk_db';
 const DB_VERSION = 1;
@@ -8,14 +9,7 @@ export interface AppDatabase {
     key: string;
     value: any;
   };
-  slots: {
-    id: string;
-    locationName: string;
-    group: string;
-    notifyTime: number;
-    isActive: boolean;
-    dndEnabled: boolean;
-  };
+  slots: Slot;
 }
 
 let dbPromise: Promise<IDBPDatabase<any>>;
@@ -44,11 +38,11 @@ export const db = {
     const d = await dbPromise;
     return d.put('settings', value, key);
   },
-  async getAllSlots(): Promise<AppDatabase['slots'][]> {
+  async getAllSlots(): Promise<Slot[]> {
     const d = await dbPromise;
     return d.getAll('slots');
   },
-  async saveSlot(slot: AppDatabase['slots']) {
+  async saveSlot(slot: Slot) {
     const d = await dbPromise;
     return d.put('slots', slot);
   },

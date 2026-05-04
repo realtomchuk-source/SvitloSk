@@ -22,14 +22,16 @@ export const migrateFromLocalStorage = async () => {
   const oldSubs = JSON.parse(localStorage.getItem('sssk_subscriptions') || '[]');
   if (Array.isArray(oldSubs)) {
     for (const sub of oldSubs) {
-      if (sub && sub.active) {
+      if (sub && (sub.isActive || sub.active)) {
         const slot: Slot = {
-          id: crypto.randomUUID(),
-          locationName: sub.locationName || 'Локація',
-          group: sub.group || '1.1',
-          notifyTime: sub.notifyTime || 10,
+          id: sub.id || crypto.randomUUID(),
+          name: sub.locationName || sub.name || 'Локація',
+          subGroup: sub.group || sub.subGroup || '1.1',
+          notifyAdvance: sub.notifyTime || sub.notifyAdvance || 10,
+          notify247: !(sub.dndEnabled ?? false),
+          dndStart: sub.dndStart || '22:00',
+          dndEnd: sub.dndEnd || '08:00',
           isActive: true,
-          dndEnabled: true,
         };
         await db.saveSlot(slot);
       }

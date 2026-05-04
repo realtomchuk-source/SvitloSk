@@ -91,7 +91,6 @@ export const Cabinet: React.FC = () => {
                 slots={slots} 
                 isLocked={isAnon} 
                 onRequireAuth={() => setAuthSheetOpen(true)}
-                onAddSlot={() => { setEditingSlot(null); setEditorSheetOpen(true); }}
                 onEditSlot={(slot) => { setEditingSlot(slot); setEditorSheetOpen(true); }}
             />
             
