@@ -22,143 +22,160 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
     onSave,
     onDelete
 }) => {
-    const [locationName, setLocationName] = useState('');
-    const [group, setGroup] = useState('1.1');
-    const [notifyTime, setNotifyTime] = useState(10);
-    const [isActive, setIsActive] = useState(true);
-    const [dndEnabled, setDndEnabled] = useState(false);
+    const [name, setName] = useState('');
+    const [subGroup, setSubGroup] = useState('');
+    const [notifyAdvance, setNotifyAdvance] = useState(10);
+    const [notify247, setNotify247] = useState(true);
+    const [dndStart, setDndStart] = useState('22:00');
+    const [dndEnd, setDndEnd] = useState('08:00');
 
     useEffect(() => {
         if (isOpen && slot) {
-            setLocationName(slot.locationName);
-            setGroup(slot.group);
-            setNotifyTime(slot.notifyTime);
-            setIsActive(slot.isActive);
-            setDndEnabled(slot.dndEnabled);
-        } else if (isOpen && !slot) {
-            setLocationName('');
-            setGroup('1.1');
-            setNotifyTime(10);
-            setIsActive(true);
-            setDndEnabled(false);
+            setName(slot.name);
+            setSubGroup(slot.subGroup);
+            setNotifyAdvance(slot.notifyAdvance);
+            setNotify247(slot.notify247);
+            setDndStart(slot.dndStart);
+            setDndEnd(slot.dndEnd);
         }
     }, [isOpen, slot]);
 
     const handleSave = () => {
+        if (!slot) return;
         const updatedSlot: Slot = {
-            id: slot?.id || crypto.randomUUID(),
-            locationName: locationName || 'Нова локація',
-            group: group,
-            notifyTime: notifyTime,
-            isActive: isActive,
-            dndEnabled: dndEnabled
+            ...slot,
+            name: name || 'Локація',
+            subGroup: subGroup || '1.1',
+            notifyAdvance,
+            notify247,
+            dndStart,
+            dndEnd,
+            isActive: true
         };
         onSave(updatedSlot);
         onClose();
     };
 
+    const formatHour = (timeStr: string) => parseInt(timeStr.split(':')[0]);
+    
+    const updateHour = (setter: (val: string) => void, hour: number) => {
+        const formatted = `${hour.toString().padStart(2, '0')}:00`;
+        setter(formatted);
+    };
+
     return (
-        <BottomSheet isOpen={isOpen} onClose={onClose} title="Налаштування сповіщень">
+        <BottomSheet isOpen={isOpen} onClose={onClose} title="Налаштування пуш">
             <div style={{ padding: '0 16px 120px' }}>
-            <div className={styles.formGroup}>
-                <div className={styles.label}>Як назвемо локацію?</div>
-                <input 
-                    className={styles.input} 
-                    value={locationName} 
-                    onChange={e => setLocationName(e.target.value)} 
-                    placeholder="Наприклад: Дім" 
-                />
-                <div className={styles.chips}>
-                    {PRESET_LOCATIONS.map(loc => (
-                        <button key={loc} className={styles.chip} onClick={() => setLocationName(loc)}>
-                            {loc}
-                        </button>
-                    ))}
+                <div className={styles.formGroup}>
+                    <div className={styles.label}>Як назвемо локацію?</div>
+                    <input 
+                        className={styles.input} 
+                        value={name} 
+                        onChange={e => setName(e.target.value)} 
+                        placeholder="Дім" 
+                    />
+                    <div className={styles.chips}>
+                        {PRESET_LOCATIONS.map(tag => (
+                            <button key={tag} className={styles.chip} onClick={() => setName(tag)}>
+                                {tag}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            <div className={styles.formGroup}>
-                <div className={styles.label}>Оберіть підчергу</div>
-                <div className={styles.grid}>
-                    {GROUPS.map(g => (
-                        <button
-                            key={g}
-                            className={`${styles.gridBtn} ${group === g ? styles.gridBtnSelected : ''}`}
-                            onClick={() => setGroup(g)}
+                <div className={styles.formGroup}>
+                    <div className={styles.subgroupLabel}>Оберіть підчергу</div>
+                    <div className={styles.grid}>
+                        {GROUPS.map(g => (
+                            <button
+                                key={g}
+                                className={`${styles.gridBtn} ${subGroup === g ? styles.gridBtnSelected : ''}`}
+                                onClick={() => setSubGroup(g)}
+                            >
+                                {g}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className={styles.formGroup}>
+                    <div className={styles.label}>Попередити за</div>
+                    <div className={styles.selectWrap}>
+                        <select 
+                            className={styles.select} 
+                            value={notifyAdvance}
+                            onChange={e => setNotifyAdvance(Number(e.target.value))}
                         >
-                            {g}
-                        </button>
-                    ))}
+                            <option value={5}>5 хв</option>
+                            <option value={10}>10 хв</option>
+                            <option value={15}>15 хв</option>
+                        </select>
+                        <ChevronDown className={styles.selectIcon} size={18} />
+                    </div>
                 </div>
-            </div>
 
-            <div className={styles.formGroup}>
-                <div className={styles.label}>Попередити за</div>
-                <div className={styles.selectWrap}>
-                    <select 
-                        className={styles.select} 
-                        value={notifyTime}
-                        onChange={e => setNotifyTime(Number(e.target.value))}
-                    >
-                        <option value={5}>5 хв</option>
-                        <option value={10}>10 хв</option>
-                        <option value={15}>15 хв</option>
-                        <option value={30}>30 хв</option>
-                    </select>
-                    <ChevronDown className={styles.selectIcon} size={18} />
-                </div>
-            </div>
-
-            <div className={styles.formGroup} style={{ marginTop: 16 }}>
-                <div className={styles.dndRow}>
-                    <div className={styles.dndLabel}>Активувати сповіщення</div>
+                <div className={styles.toggleRow}>
+                    <div className={styles.toggleLabel}>Сповіщати 24/7</div>
                     <div 
                         style={{
                             width: 44, height: 24, borderRadius: 12, 
-                            background: isActive ? '#10b981' : '#e4e4e7',
+                            background: notify247 ? '#f97316' : '#9ca3af',
                             position: 'relative', cursor: 'pointer', transition: 'background 0.2s'
                         }}
-                        onClick={() => setIsActive(!isActive)}
+                        onClick={() => setNotify247(!notify247)}
                     >
                         <div style={{
                             width: 20, height: 20, borderRadius: '50%', background: '#fff',
-                            position: 'absolute', top: 2, left: isActive ? 22 : 2,
+                            position: 'absolute', top: 2, left: notify247 ? 22 : 2,
                             transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
                         }} />
                     </div>
                 </div>
 
-                <div className={styles.dndRow} style={{ marginTop: 12 }}>
-                    <div className={styles.dndLabel}>Режим "Не турбувати"</div>
-                    <div 
-                        style={{
-                            width: 44, height: 24, borderRadius: 12, 
-                            background: dndEnabled ? '#f97316' : '#e4e4e7',
-                            position: 'relative', cursor: 'pointer', transition: 'background 0.2s'
-                        }}
-                        onClick={() => setDndEnabled(!dndEnabled)}
-                    >
-                        <div style={{
-                            width: 20, height: 20, borderRadius: '50%', background: '#fff',
-                            position: 'absolute', top: 2, left: dndEnabled ? 22 : 2,
-                            transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-                        }} />
+                <div className={styles.sliderContainer}>
+                    <div className={styles.sliderRow}>
+                        <div className={styles.sliderLabel}>Початок</div>
+                        <input 
+                            type="range" 
+                            min="0" max="23" 
+                            value={formatHour(dndStart)}
+                            disabled={notify247}
+                            onChange={e => updateHour(setDndStart, parseInt(e.target.value))}
+                            className={styles.rangeInput}
+                        />
+                        <div className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}>
+                            {dndStart}
+                        </div>
+                    </div>
+
+                    <div className={styles.sliderRow}>
+                        <div className={styles.sliderLabel}>Кінець</div>
+                        <input 
+                            type="range" 
+                            min="0" max="23" 
+                            value={formatHour(dndEnd)}
+                            disabled={notify247}
+                            onChange={e => updateHour(setDndEnd, parseInt(e.target.value))}
+                            className={styles.rangeInput}
+                        />
+                        <div className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}>
+                            {dndEnd}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <button className={styles.saveBtn} onClick={handleSave}>
-                Зберегти
-            </button>
-            
-            {slot && (
-                <button className={styles.deleteBtn} onClick={() => {
-                    onDelete(slot.id);
-                    onClose();
-                }}>
-                    Видалити локацію
+                <button className={styles.saveBtn} onClick={handleSave}>
+                    Зберегти
                 </button>
-            )}
+                
+                {slot && (
+                    <button className={styles.deleteLink} onClick={() => {
+                        onDelete(slot.id);
+                        onClose();
+                    }}>
+                        Вимкнути локацію
+                    </button>
+                )}
             </div>
         </BottomSheet>
     );

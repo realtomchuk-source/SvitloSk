@@ -41,6 +41,11 @@ const DEFAULT_CONFIG: UserConfig = {
   dnd: { active: true, start: '22:00', end: '08:00' }
 };
 
+const EMPTY_SLOTS: Slot[] = [
+  { id: '1', name: '', subGroup: '', notifyAdvance: 10, notify247: true, dndStart: '22:00', dndEnd: '08:00', isActive: false },
+  { id: '2', name: '', subGroup: '', notifyAdvance: 10, notify247: true, dndStart: '22:00', dndEnd: '08:00', isActive: false },
+];
+
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -51,7 +56,7 @@ export const useStore = create<AppState>()(
       user: null,
       userConfig: DEFAULT_CONFIG,
       isAuthLoading: true,
-      slots: [],
+      slots: EMPTY_SLOTS,
 
       setSelectedGroup: (group) => set({ selectedGroup: group }),
       setScheduleData: (data) => set({ scheduleData: data }),
@@ -158,7 +163,7 @@ export const useStore = create<AppState>()(
             updated_at: new Date().toISOString()
           });
         }
-        set({ slots: [...get().slots, slot] });
+        set({ slots: get().slots.map(s => s.id === slot.id ? slot : s) });
       },
 
       updateSlot: async (slot) => {
@@ -176,12 +181,19 @@ export const useStore = create<AppState>()(
       },
 
       deleteSlot: async (id) => {
-        await db.deleteSlot(id);
+        // Instead of deleting, we reset it to empty
+        const resetSlot = EMPTY_SLOTS.find(s => s.id === id) || EMPTY_SLOTS[0];
+        await db.saveSlot(resetSlot);
         const { user } = get();
         if (user) {
-          await supabase.from('notification_slots').delete().eq('id', id);
+          await supabase.from('notification_slots').upsert({
+            id: resetSlot.id,
+            user_id: user.id,
+            data: resetSlot,
+            updated_at: new Date().toISOString()
+          });
         }
-        set({ slots: get().slots.filter(s => s.id !== id) });
+        set({ slots: get().slots.map(s => s.id === id ? resetSlot : s) });
       },
 
       loadUserData: async () => {
@@ -189,21 +201,30 @@ export const useStore = create<AppState>()(
         const localSlots = await db.getAllSlots();
         
         const { user } = get();
+        let currentSlots = [...EMPTY_SLOTS];
+
         if (user) {
           // 1. Load slots from Supabase
           const { data: remoteSlots } = await supabase
             .from('notification_slots')
-            .select('data')
+            .select('id, data')
             .eq('user_id', user.id);
             
           if (remoteSlots && remoteSlots.length > 0) {
-            const syncedSlots = remoteSlots.map(r => r.data as Slot);
-            set({ slots: syncedSlots });
+            // Merge remote slots into our fixed 1/2 structure
+            remoteSlots.forEach(r => {
+                const idx = currentSlots.findIndex(s => s.id === r.id);
+                if (idx !== -1) currentSlots[idx] = r.data as Slot;
+            });
             // Update local DB
-            for (const s of syncedSlots) await db.saveSlot(s);
+            for (const s of currentSlots) await db.saveSlot(s);
           } else if (localSlots.length > 0) {
-            // 2. Migration: Upload local slots to Supabase if remote is empty
-            for (const s of localSlots) {
+            // 2. Migration
+            localSlots.forEach(s => {
+                const idx = currentSlots.findIndex(cs => cs.id === s.id);
+                if (idx !== -1) currentSlots[idx] = s;
+            });
+            for (const s of currentSlots) {
               await supabase.from('notification_slots').upsert({
                 id: s.id,
                 user_id: user.id,
@@ -211,13 +232,16 @@ export const useStore = create<AppState>()(
                 updated_at: new Date().toISOString()
               });
             }
-            set({ slots: localSlots });
           }
-        } else {
-          set({ slots: localSlots || [] });
+        } else if (localSlots.length > 0) {
+           localSlots.forEach(s => {
+                const idx = currentSlots.findIndex(cs => cs.id === s.id);
+                if (idx !== -1) currentSlots[idx] = s;
+            });
         }
 
         set({ 
+          slots: currentSlots,
           userConfig: localConfig || DEFAULT_CONFIG,
           selectedGroup: localConfig?.startGroup || get().selectedGroup 
         });
@@ -229,3 +253,4 @@ export const useStore = create<AppState>()(
     }
   )
 );
+

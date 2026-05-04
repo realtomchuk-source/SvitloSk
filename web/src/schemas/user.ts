@@ -1,12 +1,14 @@
 import { z } from 'zod';
 
 export const SlotSchema = z.object({
-  id: z.string().uuid(),
-  locationName: z.string().min(1).max(20),
-  group: z.string(),
-  notifyTime: z.number().int().positive(),
+  id: z.string(),
+  name: z.string(),
+  subGroup: z.string(),
+  notifyAdvance: z.number().int().min(5).max(15),
+  notify247: z.boolean(),
+  dndStart: z.string().regex(/^\d{2}:\d{2}$/),
+  dndEnd: z.string().regex(/^\d{2}:\d{2}$/),
   isActive: z.boolean(),
-  dndEnabled: z.boolean(),
 });
 
 export const DndSettingsSchema = z.object({
