@@ -100,17 +100,16 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
 
                 <div className={styles.formGroup}>
                     <div className={styles.label}>Попередити за</div>
-                    <div className={styles.selectWrap}>
-                        <select 
-                            className={styles.select} 
-                            value={notifyAdvance}
-                            onChange={e => setNotifyAdvance(Number(e.target.value))}
-                        >
-                            <option value={5}>5 хв</option>
-                            <option value={10}>10 хв</option>
-                            <option value={15}>15 хв</option>
-                        </select>
-                        <ChevronDown className={styles.selectIcon} size={18} />
+                    <div className={styles.advanceRow}>
+                        {[5, 10, 15].map(mins => (
+                            <button
+                                key={mins}
+                                className={`${styles.advanceBtn} ${notifyAdvance === mins ? styles.advanceBtnSelected : ''}`}
+                                onClick={() => setNotifyAdvance(mins)}
+                            >
+                                {mins} хв
+                            </button>
+                        ))}
                     </div>
                 </div>
 
