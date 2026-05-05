@@ -1,7 +1,7 @@
 :root {
   --text: #6b6375;
   --text-h: #08060d;
-  --bg: #fff;
+  --bg: #f8fafc;
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
   --accent: #aa3bff;
@@ -20,10 +20,21 @@
   color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
-  font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -moz-osx-system-font-smoothing: grayscale;
+
+  /* SvitloSk Design Tokens */
+  --radius-main: 8px;
+  --radius-inner: 4px;
+  --radius-pill: 20px;
+  --gap-main: 6px;
+  --gap-small: 8px;
+  --color-orange: #EE7221;
+  --color-dark: #374151;
+  --color-bg-gray: #f4f4f5;
+  --color-border: #f1f1f4;
+  --color-text-dim: #71717a;
 
   @media (max-width: 1024px) {
     font-size: 16px;

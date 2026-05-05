@@ -1,5 +1,6 @@
 import React from 'react';
-import { Info, Share2, MessageSquare } from 'lucide-react';
+import { Info, Share2, MessageSquare, ChevronRight } from 'lucide-react';
+import { CabinetRow } from './CabinetPrimitives';
 import styles from '../Cabinet.module.css';
 
 interface AboutSectionProps {
@@ -11,35 +12,27 @@ interface AboutSectionProps {
 export const AboutSection: React.FC<AboutSectionProps> = ({ onShare, onFeedback, onAbout }) => {
     return (
         <div className={styles.section}>
-            <div className={styles.aboutList}>
+            <div className={styles.solidCard}>
+                <CabinetRow
+                    icon={<Info size={18} strokeWidth={2.5} />}
+                    label="Про застосунок"
+                    onClick={onAbout}
+                    rightElement={<ChevronRight size={16} color="#d4d4d8" />}
+                />
 
-                {/* Про застосунок */}
-                <div className={styles.infoItem} onClick={onAbout}>
-                    <div className={styles.infoLeft}>
-                        <Info size={18} />
-                        <span className={styles.infoLabel}>Про застосунок</span>
-                    </div>
-                    <span className={styles.infoChevron}>›</span>
-                </div>
+                <CabinetRow
+                    icon={<Share2 size={18} strokeWidth={2.5} />}
+                    label="Поділитись"
+                    onClick={onShare}
+                    rightElement={<ChevronRight size={16} color="#d4d4d8" />}
+                />
 
-                {/* Поділитись */}
-                <div className={styles.infoItem} onClick={onShare}>
-                    <div className={styles.infoLeft}>
-                        <Share2 size={18} />
-                        <span className={styles.infoLabel}>Поділитись</span>
-                    </div>
-                    <span className={styles.infoChevron}>›</span>
-                </div>
-
-                {/* Зворотній зв'язок */}
-                <div className={styles.infoItem} onClick={onFeedback}>
-                    <div className={styles.infoLeft}>
-                        <MessageSquare size={18} />
-                        <span className={styles.infoLabel}>Зворотній зв'язок</span>
-                    </div>
-                    <span className={styles.infoChevron}>›</span>
-                </div>
-
+                <CabinetRow
+                    icon={<MessageSquare size={18} strokeWidth={2.5} />}
+                    label="Зворотній зв'язок"
+                    onClick={onFeedback}
+                    rightElement={<ChevronRight size={16} color="#d4d4d8" />}
+                />
             </div>
         </div>
     );

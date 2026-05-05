@@ -1,6 +1,6 @@
 import React from 'react';
 import { BottomSheet } from '../../../components/ui/BottomSheet/BottomSheet';
-import { AppLogo } from '../../../components/ui/Icons/AppLogo';
+import { BrandIcon } from '../../../assets/brand/BrandIcon';
 
 interface AuthPromptSheetProps {
     isOpen: boolean;
@@ -14,17 +14,17 @@ export const AuthPromptSheet: React.FC<AuthPromptSheetProps> = ({ isOpen, onClos
             <div style={{ textAlign: 'center', padding: '32px 16px 120px' }}>
                 
                 {/* Branded Identity - Bulb */}
-                <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'center' }}>
+                <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'center' }}>
                     <div style={{ 
-                        width: 72, 
-                        height: 72, 
-                        background: '#e4e4e7', 
-                        borderRadius: '18px', 
+                        width: 80, 
+                        height: 80, 
+                        background: '#f4f4f5', 
+                        borderRadius: '12px', 
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center' 
                     }}>
-                        <AppLogo size={50} />
+                        <BrandIcon variant="logo" size={48} color="#EE7221" />
                     </div>
                 </div>
 
@@ -49,7 +49,7 @@ export const AuthPromptSheet: React.FC<AuthPromptSheetProps> = ({ isOpen, onClos
                         background: '#ffffff',
                         color: '#1a1a1c',
                         border: '1px solid #e4e4e7',
-                        borderRadius: '14px',
+                        borderRadius: '12px',
                         padding: '16px',
                         fontSize: '16px',
                         fontWeight: '600',

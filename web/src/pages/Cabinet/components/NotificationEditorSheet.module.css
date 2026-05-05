@@ -1,197 +1,222 @@
 .formGroup {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: #4b5563;
+    color: var(--color-text-dim);
+    margin-bottom: 8px;
+    padding: 0 4px;
+}
+
+.subgroupLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-orange);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     margin-bottom: 12px;
+    padding: 0 4px;
 }
 
 .input {
     width: 100%;
     height: 52px;
     padding: 0 16px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    background: var(--color-bg-gray);
+    border: 1px solid transparent;
+    border-radius: var(--radius-main);
     font-size: 16px;
-    color: #1f2937;
-    margin-bottom: 12px;
+    color: #1a1a1c;
+    transition: all 0.2s;
 }
 
 .input:focus {
+    background: #ffffff;
+    border-color: var(--color-orange);
     outline: none;
-    border-color: #f97316;
 }
 
 .chips {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
+    margin-top: 10px;
+    overflow-x: auto;
+    padding: 4px 0;
 }
 
 .chip {
-    padding: 6px 16px;
-    background: #f3f4f6;
+    padding: 8px 16px;
+    background: var(--color-bg-gray);
     border: none;
-    border-radius: 100px;
+    border-radius: var(--radius-pill);
     font-size: 13px;
     font-weight: 500;
-    color: #4b5563;
+    color: #52525b;
     cursor: pointer;
-    transition: all 0.2s;
+    white-space: nowrap;
 }
 
-.chip:hover {
-    background: #e5e7eb;
-}
-
-.subgroupLabel {
-    font-size: 16px;
-    font-weight: 700;
-    color: #f97316;
-    margin-bottom: 12px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 12px;
-}
-
-.gridBtn {
-    height: 44px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #4b5563;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.gridBtnSelected {
-    background: #f97316;
-    border-color: #f97316;
-    color: #ffffff;
-}
-
-.advanceRow {
+/* Segmented Control iOS Style */
+.segmentedControl {
     display: flex;
-    gap: 12px;
+    background: var(--color-bg-gray);
+    border-radius: var(--radius-main);
+    padding: 3px;
+    gap: 3px;
 }
 
-.advanceBtn {
+.segmentedOption {
     flex: 1;
-    height: 48px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    border-radius: calc(var(--radius-main) - 2px);
     font-size: 14px;
     font-weight: 600;
-    color: #4b5563;
+    color: var(--color-text-dim);
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.advanceBtnSelected {
-    background: #f97316;
-    border-color: #f97316;
-    color: #ffffff;
+.segmentedActive {
+    background: #ffffff;
+    color: var(--color-orange);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .toggleRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 24px;
+    padding: 12px 4px;
+    margin-top: 8px;
 }
 
 .toggleLabel {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    color: #4b5563;
+    color: #1a1a1c;
+}
+
+.toggleSwitch {
+    width: 44px;
+    height: 24px;
+    background: #9ca3af;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.toggleActive {
+    background: var(--color-orange);
+}
+
+.toggleThumb {
+    width: 20px;
+    height: 20px;
+    background: #ffffff;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.toggleActive .toggleThumb {
+    left: 22px;
 }
 
 .sliderContainer {
-    margin-top: 24px;
-    padding: 0 4px;
+    margin-top: 16px;
+    background: var(--color-bg-gray);
+    border-radius: var(--gap-main);
+    padding: 16px;
 }
 
 .sliderRow {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: var(--gap-main);
+}
+
+.sliderRow:not(:last-child) {
     margin-bottom: 20px;
 }
 
 .sliderLabel {
-    font-size: 14px;
-    font-weight: 500;
-    color: #6b7280;
-    width: 80px;
+    width: 60px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-dim);
 }
 
 .rangeInput {
     flex: 1;
-    margin: 0 16px;
-    accent-color: #f97316;
     height: 4px;
-    cursor: pointer;
+    -webkit-appearance: none;
+    background: #e4e4e7;
+    border-radius: 2px;
+    outline: none;
 }
 
-.rangeInput:disabled {
-    accent-color: #e5e7eb;
-    cursor: not-allowed;
+.rangeInput::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--color-orange);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.rangeInput:disabled::-webkit-slider-thumb {
+    background: #a1a1aa;
 }
 
 .timeDisplay {
+    width: 45px;
     font-size: 14px;
     font-weight: 700;
-    color: #f97316;
-    width: 50px;
+    color: #1a1a1c;
     text-align: right;
 }
 
 .timeDisplayDisabled {
-    color: #d1d5db;
+    color: #a1a1aa;
 }
 
 .saveBtn {
     width: 100%;
     height: 56px;
-    background: #f97316;
-    border: none;
-    border-radius: 14px;
+    background: var(--color-orange);
     color: #ffffff;
+    border: none;
+    border-radius: var(--radius-main);
     font-size: 16px;
     font-weight: 700;
     margin-top: 32px;
     cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
-    transition: all 0.2s;
+    transition: opacity 0.2s;
 }
 
 .saveBtn:active {
-    transform: scale(0.98);
+    opacity: 0.8;
 }
 
 .deleteLink {
     display: block;
     width: 100%;
-    text-align: center;
     margin-top: 20px;
+    padding: 12px;
+    background: transparent;
+    border: none;
     color: #ef4444;
     font-size: 14px;
     font-weight: 600;
-    background: none;
-    border: none;
     cursor: pointer;
+    text-align: center;
 }

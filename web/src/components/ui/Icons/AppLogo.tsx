@@ -3,9 +3,10 @@ import React from 'react';
 interface AppLogoProps {
     size?: number;
     className?: string;
+    style?: React.CSSProperties;
 }
 
-export const AppLogo: React.FC<AppLogoProps> = ({ size = 24, className }) => {
+export const AppLogo: React.FC<AppLogoProps> = ({ size = 24, className, style }) => {
     return (
         <svg 
             width={size} 
@@ -14,6 +15,7 @@ export const AppLogo: React.FC<AppLogoProps> = ({ size = 24, className }) => {
             fill="none" 
             xmlns="http://www.w3.org/2000/svg"
             className={className}
+            style={style}
             preserveAspectRatio="xMidYMid meet"
         >
             {/* Нижняя часть лампочки */}

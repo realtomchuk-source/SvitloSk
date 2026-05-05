@@ -1,6 +1,6 @@
 import React from 'react';
 import { BottomSheet } from '../../../components/ui/BottomSheet/BottomSheet';
-import styles from './SubGroupSheet.module.css';
+import { SubgroupGrid } from '../../../components/ui/SubgroupGrid/SubgroupGrid';
 
 interface SubGroupSheetProps {
     isOpen: boolean;
@@ -8,12 +8,6 @@ interface SubGroupSheetProps {
     selectedGroup: string;
     onSelectGroup: (group: string) => void;
 }
-
-const GROUPS = [
-    '1.1', '1.2', '2.1', '2.2', 
-    '3.1', '3.2', '4.1', '4.2', 
-    '5.1', '5.2', '6.1', '6.2'
-];
 
 export const SubGroupSheet: React.FC<SubGroupSheetProps> = ({ 
     isOpen, 
@@ -24,20 +18,13 @@ export const SubGroupSheet: React.FC<SubGroupSheetProps> = ({
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Оберіть підчергу">
             <div style={{ padding: '16px 16px 120px' }}>
-                <div className={styles.grid}>
-                    {GROUPS.map(group => (
-                        <button
-                            key={group}
-                            className={`${styles.button} ${selectedGroup === group ? styles.buttonSelected : ''}`}
-                            onClick={() => {
-                                onSelectGroup(group);
-                                onClose();
-                            }}
-                        >
-                            {group}
-                        </button>
-                    ))}
-                </div>
+                <SubgroupGrid 
+                    selectedGroup={selectedGroup} 
+                    onSelect={(g) => {
+                        onSelectGroup(g);
+                        onClose();
+                    }} 
+                />
             </div>
         </BottomSheet>
     );

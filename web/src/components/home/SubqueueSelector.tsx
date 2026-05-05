@@ -83,7 +83,7 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
       <div 
         style={{
           border: '1px solid #FF7A00',
-          borderRadius: '24px',
+          borderRadius: '8px',
           padding: '16px 0',
           background: '#FFFFFF',
           position: 'relative',
@@ -128,13 +128,13 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
                 style={{
                   flex: `0 0 ${cardWidth}px`,
                   height: `${cardWidth}px`, // Perfectly square
-                  borderRadius: '16px',
+                  borderRadius: '4px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: '#FFFFFF',
-                  border: isActive ? '2.5px solid #FF7A00' : '1px solid rgba(0,0,0,0.1)',
+                  background: isActive ? '#FFFFFF' : '#f4f4f5',
+                  border: isActive ? '2.5px solid #FF7A00' : '1px solid rgba(0,0,0,0.05)',
                   boxShadow: isActive ? '0 0 20px rgba(255, 122, 0, 0.4)' : 'none',
                   transform: isActive ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',

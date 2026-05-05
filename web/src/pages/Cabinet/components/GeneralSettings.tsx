@@ -1,5 +1,6 @@
 import React from 'react';
-import { LayoutGrid, Calendar } from 'lucide-react';
+import { LayoutGrid, Calendar, ChevronRight } from 'lucide-react';
+import { CabinetRow } from './CabinetPrimitives';
 import styles from '../Cabinet.module.css';
 
 interface GeneralSettingsProps {
@@ -23,37 +24,29 @@ export const GeneralSettings: React.FC<GeneralSettingsProps> = ({
     return (
         <div className={styles.section}>
             <div className={styles.solidCard}>
+                <CabinetRow
+                    icon={<LayoutGrid size={18} strokeWidth={2.5} />}
+                    label="Стартова підчерга"
+                    onClick={onChangeStartGroup}
+                    rightElement={
+                        <>
+                            <span className={styles.settingValueOrange}>{config.startGroup}</span>
+                            <ChevronRight size={16} color="#d4d4d8" />
+                        </>
+                    }
+                />
 
-                {/* Стартова підчерга */}
-                <div className={styles.settingItem} onClick={onChangeStartGroup}>
-                    <div className={styles.settingLeft}>
-                        <div className={styles.settingIconWrap}>
-                            <LayoutGrid size={18} />
-                        </div>
-                        <span className={styles.settingLabel}>Стартова підчерга</span>
-                    </div>
-                    <div className={styles.settingRight}>
-                        <span className={styles.settingValueOrange}>{config.startGroup}</span>
-                        <span className={styles.settingChevron}>›</span>
-                    </div>
-                </div>
-
-                {/* Графік на завтра */}
-                <div 
-                    className={styles.settingItem} 
+                <CabinetRow
+                    icon={<Calendar size={18} strokeWidth={2.5} />}
+                    label="Графік на завтра"
                     onClick={isLocked ? onRequireAuth : onToggleTomorrow}
-                >
-                    <div className={styles.settingLeft}>
-                        <div className={styles.settingIconWrap}>
-                            <Calendar size={18} />
-                        </div>
-                        <span className={styles.settingLabel}>Графік на завтра</span>
-                    </div>
-                    <div
-                        className={`${styles.toggle} ${config.tomorrowPush ? styles.toggleActive : ''}`}
-                    />
-                </div>
-
+                    rightElement={
+                        <div
+                            className={`${styles.toggle} ${config.tomorrowPush ? styles.toggleActive : ''}`}
+                            style={{ background: config.tomorrowPush ? '#EE7221' : '#374151' }}
+                        />
+                    }
+                />
             </div>
         </div>
     );

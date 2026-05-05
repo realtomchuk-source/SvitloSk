@@ -51,9 +51,8 @@ export const Home: React.FC = () => {
   return (
     <div className="page-home">
       <section id="home-section" className="animate-in fade-in duration-700">
-        <div className="pwa-page-label" style={{ color: '#8E8E93', letterSpacing: '4px', fontWeight: 700, fontSize: '10px' }}>
-          STARKON СВІТЛО
-        </div>
+        <div style={{ height: '16px' }} />
+
 
         <HeroCard 
           isOn={isOn}

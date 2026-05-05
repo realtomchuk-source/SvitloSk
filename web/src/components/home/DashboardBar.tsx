@@ -17,7 +17,7 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime }) => {
       justifyContent: 'space-between',
       alignItems: 'center',
       background: '#FFFFFF',
-      borderRadius: '20px',
+      borderRadius: '8px',
       padding: '16px 24px',
       margin: '12px 20px',
       boxShadow: '0 8px 24px rgba(0,0,0,0.04)',

@@ -18,11 +18,13 @@ export const NotificationSlots: React.FC<NotificationSlotsProps> = ({ slots, isL
 
         if (isNotConfigured) {
             return (
-                <div className={styles.slotCard}>
+                <div className={styles.slotCard} style={{ opacity: 0.6 }}>
                     <div className={styles.slotTopRow}>
                         <div className={styles.slotTitleWrap}>
                             <span className={styles.slotTitle} style={{ color: '#a1a1aa' }}>Локація не налаштована</span>
+                            <span className={styles.slotTimeText} style={{ color: '#d4d4d8' }}>за -- хв. до змін</span>
                         </div>
+                        <div className={styles.slotGroup} style={{ color: '#d4d4d8' }}>0.0</div>
                     </div>
                     <div className={styles.slotBottomRow}>
                         <span className={styles.slotDnd} style={{ color: '#a1a1aa' }}>Натисніть для налаштування</span>

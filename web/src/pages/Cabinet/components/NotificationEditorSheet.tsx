@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { BottomSheet } from '../../../components/ui/BottomSheet/BottomSheet';
+import { HourPickerSheet } from './HourPickerSheet';
+import { SubgroupGrid } from '../../../components/ui/SubgroupGrid/SubgroupGrid';
 import type { Slot } from '@/schemas/user';
 import styles from './NotificationEditorSheet.module.css';
 
@@ -13,7 +15,6 @@ interface NotificationEditorSheetProps {
 }
 
 const PRESET_LOCATIONS = ['Дім', 'Робота', 'Офіс'];
-const GROUPS = ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2', '5.1', '5.2', '6.1', '6.2'];
 
 export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = ({
     isOpen,
@@ -28,6 +29,8 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
     const [notify247, setNotify247] = useState(true);
     const [dndStart, setDndStart] = useState('22:00');
     const [dndEnd, setDndEnd] = useState('08:00');
+    const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
+    const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen && slot) {
@@ -85,26 +88,19 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
 
                 <div className={styles.formGroup}>
                     <div className={styles.subgroupLabel}>Оберіть підчергу</div>
-                    <div className={styles.grid}>
-                        {GROUPS.map(g => (
-                            <button
-                                key={g}
-                                className={`${styles.gridBtn} ${subGroup === g ? styles.gridBtnSelected : ''}`}
-                                onClick={() => setSubGroup(g)}
-                            >
-                                {g}
-                            </button>
-                        ))}
-                    </div>
+                    <SubgroupGrid 
+                        selectedGroup={subGroup} 
+                        onSelect={setSubGroup} 
+                    />
                 </div>
 
                 <div className={styles.formGroup}>
                     <div className={styles.label}>Попередити за</div>
-                    <div className={styles.advanceRow}>
+                    <div className={styles.segmentedControl}>
                         {[5, 10, 15].map(mins => (
                             <button
                                 key={mins}
-                                className={`${styles.advanceBtn} ${notifyAdvance === mins ? styles.advanceBtnSelected : ''}`}
+                                className={`${styles.segmentedOption} ${notifyAdvance === mins ? styles.segmentedActive : ''}`}
                                 onClick={() => setNotifyAdvance(mins)}
                             >
                                 {mins} хв
@@ -116,18 +112,10 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
                 <div className={styles.toggleRow}>
                     <div className={styles.toggleLabel}>Сповіщати 24/7</div>
                     <div 
-                        style={{
-                            width: 44, height: 24, borderRadius: 12, 
-                            background: notify247 ? '#f97316' : '#9ca3af',
-                            position: 'relative', cursor: 'pointer', transition: 'background 0.2s'
-                        }}
+                        className={`${styles.toggleSwitch} ${notify247 ? styles.toggleActive : ''}`}
                         onClick={() => setNotify247(!notify247)}
                     >
-                        <div style={{
-                            width: 20, height: 20, borderRadius: '50%', background: '#fff',
-                            position: 'absolute', top: 2, left: notify247 ? 22 : 2,
-                            transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-                        }} />
+                        <div className={styles.toggleThumb} />
                     </div>
                 </div>
 
@@ -142,7 +130,11 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
                             onChange={e => updateHour(setDndStart, parseInt(e.target.value))}
                             className={styles.rangeInput}
                         />
-                        <div className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}>
+                        <div 
+                            className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
+                            onClick={() => !notify247 && setIsStartPickerOpen(true)}
+                            style={{ cursor: notify247 ? 'default' : 'pointer' }}
+                        >
                             {dndStart}
                         </div>
                     </div>
@@ -157,11 +149,31 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
                             onChange={e => updateHour(setDndEnd, parseInt(e.target.value))}
                             className={styles.rangeInput}
                         />
-                        <div className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}>
+                        <div 
+                            className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
+                            onClick={() => !notify247 && setIsEndPickerOpen(true)}
+                            style={{ cursor: notify247 ? 'default' : 'pointer' }}
+                        >
                             {dndEnd}
                         </div>
                     </div>
                 </div>
+
+                <HourPickerSheet 
+                    isOpen={isStartPickerOpen}
+                    onClose={() => setIsStartPickerOpen(false)}
+                    selectedHour={formatHour(dndStart)}
+                    onSelectHour={(h) => updateHour(setDndStart, h)}
+                    title="Час початку"
+                />
+
+                <HourPickerSheet 
+                    isOpen={isEndPickerOpen}
+                    onClose={() => setIsEndPickerOpen(false)}
+                    selectedHour={formatHour(dndEnd)}
+                    onSelectHour={(h) => updateHour(setDndEnd, h)}
+                    title="Час закінчення"
+                />
 
                 <button className={styles.saveBtn} onClick={handleSave}>
                     Зберегти

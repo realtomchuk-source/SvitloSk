@@ -4,7 +4,7 @@
     align-items: center;
     margin-top: 24px;
     width: 100%;
-    gap: 8px;
+    gap: var(--gap-small);
     height: 60px;
 }
 
@@ -24,13 +24,13 @@
     gap: 15px;
     padding: 12px;
     background: rgba(0, 0, 0, 0.03);
-    border-radius: 16px;
+    border-radius: var(--radius-main);
 }
 
 .legend-color-p {
     width: 40px;
     height: 40px;
-    border-radius: 12px;
+    border-radius: var(--radius-inner);
     flex-shrink: 0;
 }
 
@@ -89,7 +89,7 @@
     min-width: 156px;
     height: 52px;
     padding: 6px 14px 6px 6px;
-    border-radius: 14px;
+    border-radius: var(--radius-main);
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -138,7 +138,7 @@
     min-width: 58px;
     padding: 0 10px;
     height: 40px;
-    border-radius: 10px;
+    border-radius: var(--radius-inner);
     box-shadow: 0 0 15px rgba(255, 149, 0, 0.4);
     animation: pulse-orange 2.5s infinite ease-in-out;
 }
@@ -463,7 +463,7 @@
         backdrop-filter: blur(25px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
         border: 1px solid rgba(255, 255, 255, 0.45) !important;
-        border-radius: 28px !important;
+        border-radius: 8px !important;
         padding: 24px !important;
         box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3) !important;
         transform: translateY(20px) !important;
@@ -512,13 +512,13 @@
     .group-grid {
         display: grid !important;
         grid-template-columns: repeat(3, 1fr) !important;
-        gap: 10px !important;
+        gap: var(--gap-small) !important;
     }
 
     .group-btn {
         background: rgba(0, 0, 0, 0.05) !important;
         border: 1px solid rgba(0, 0, 0, 0.06) !important;
-        border-radius: 14px !important;
+        border-radius: 8px !important;
         height: 48px !important;
         display: flex !important;
         flex-direction: row !important;
@@ -580,7 +580,7 @@
             linear-gradient(135deg, #abb2b9 0%, #2d3436 40%, #ffffff 50%, #2d3436 60%, #abb2b9 100%) border-box;
         border: 1px solid transparent;
         /* The frame thickness (reduced to match hero-card) */
-        border-radius: 12px;
+        border-radius: var(--radius-main);
         margin: 8px 0 10px 0;
         padding: 12px 6px;
         /* Reduced from 18px to close side gaps */
@@ -604,7 +604,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border-radius: 11px;
+        border-radius: 7px;
         /* Adjusted for thinner border */
         border: 1px solid rgba(187, 207, 0, 0.3);
         /* Lightened green line to match lighter feel */

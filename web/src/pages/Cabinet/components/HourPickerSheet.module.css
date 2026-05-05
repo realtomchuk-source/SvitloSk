@@ -1,15 +1,14 @@
 .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    padding-bottom: 24px;
+    gap: var(--gap-small);
 }
 
-.button {
+.hourBtn {
     height: 48px;
-    background: #f4f4f5;
+    background: var(--color-bg-gray);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-main);
     font-size: 15px;
     font-weight: 600;
     color: #1a1a1c;
@@ -17,11 +16,11 @@
     transition: all 0.2s;
 }
 
-.button:active {
-    background: #e4e4e7;
+.hourBtnActive {
+    background: var(--color-orange);
+    color: #ffffff;
 }
 
-.buttonSelected {
-    background: #f97316;
-    color: #ffffff;
+.hourBtn:active {
+    opacity: 0.8;
 }

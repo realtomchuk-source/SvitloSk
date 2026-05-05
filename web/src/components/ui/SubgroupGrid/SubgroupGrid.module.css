@@ -1,0 +1,33 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 4px;
+}
+
+.groupBtn {
+    height: 52px;
+    background: #f1f1f4; /* Clearly visible gray */
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #3f3f46; /* High contrast dark gray */
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.groupBtnActive {
+    background: #f97316 !important; /* Vibrant Orange */
+    color: #ffffff !important; /* Pure White Text */
+    border-color: #ea580c !important;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+}
+
+.groupBtn:active {
+    transform: scale(0.95);
+    opacity: 0.9;
+}

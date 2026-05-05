@@ -16,7 +16,7 @@
   --accent-on: #FF7A00;
   --accent-off: #9AA0A6;
   --color-track: rgba(0, 0, 0, 0.08);
-  --hero-radius: 24px;
+  --hero-radius: var(--radius-main);
   --font-family-hero: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Glass backgrounds (Legacy) */
@@ -277,7 +277,7 @@
   row-gap: 2px !important;
   padding: 16px 14px 18px !important;
   height: 160px !important;
-  border-radius: var(--hero-radius) !important;
+  border-radius: 8px !important;
   background: var(--hero-bg) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
@@ -291,7 +291,7 @@
 }
 
 .hero-card.status-on {
-  border-color: rgba(238, 114, 33, 0.4) !important;
+  border-color: #FF7A00 !important;
 }
 
 .hero-card.status-off {
@@ -593,7 +593,7 @@
   align-items: center !important; 
   margin: 12px 20px 24px !important;
   padding: 10px 18px !important;
-  border-radius: 16px !important;
+  border-radius: var(--radius-main) !important;
   will-change: backdrop-filter, transform !important;
   transform: translateZ(0) !important;
   backdrop-filter: blur(var(--dash-blur)) !important;

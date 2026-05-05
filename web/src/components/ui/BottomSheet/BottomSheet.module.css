@@ -23,8 +23,8 @@
     background: #ffffff;
     width: 100%;
     max-width: 480px; /* To match app max-width */
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
     padding: 24px 20px;
     box-sizing: border-box;
     transform: translateY(100%);

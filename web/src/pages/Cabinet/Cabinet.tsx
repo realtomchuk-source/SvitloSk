@@ -84,7 +84,7 @@ export const Cabinet: React.FC = () => {
     };
 
     return (
-        <div className={styles.container}>
+        <div className={styles.cabinetRoot}>
             <ProfileCard user={profile} onClick={() => setAuthSheetOpen(true)} />
             
             <NotificationSlots 

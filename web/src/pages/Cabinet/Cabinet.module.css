@@ -2,11 +2,21 @@
    Cabinet — User's Desired Design
    ============================================ */
 
-.container {
+.cabinetRoot {
+    --cb-anchor-x: 16px;          /* Point of origin for 'The Red Line' */
+    --cb-icon-box-size: 28px;     /* Slightly smaller for tighter alignment */
+    --cb-icon-gap: 8px;          /* Tightened gap */
+    --cb-brand-orange: #EE7221;
+    --cb-bg-gray: #f4f4f5;
+    --cb-item-radius: 8px;
+    
+    /* Root padding is 16px, Card padding is 16px. Total left anchor = 32px from screen edge. */
+    --cb-text-align-x: 0px; /* No extra padding needed for text in slots anymore */
+
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 20px 16px 100px 16px;
+    gap: 6px;
+    padding: 12px 16px 100px 16px;
     max-width: 480px;
     margin: 0 auto;
     width: 100%;
@@ -21,7 +31,7 @@
 .section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
 }
 
 .sectionTitle {
@@ -29,9 +39,10 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #a1a1aa;
-    padding: 0 4px;
-    margin-bottom: -4px;
+    color: #71717a;
+    padding: 0 16px; /* Align with internal card content (16px from card edge) */
+    margin-top: 12px;
+    margin-bottom: 2px;
 }
 
 /* ============================================
@@ -39,8 +50,9 @@
    ============================================ */
 .solidCard {
     background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    border-radius: var(--radius-main);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
     overflow: hidden;
 }
 
@@ -51,18 +63,25 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 16px;
+    padding: 16px; /* Standard 16px padding */
 }
 
 .avatarWrap {
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background: #e4e4e7;
+    background: #f4f4f5;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.avatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .avatarIcon {
@@ -76,9 +95,9 @@
 }
 
 .profileName {
-    font-size: 17px;
-    font-weight: 600;
-    color: #1a1a1c;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-dark);
 }
 
 .profileSub {
@@ -86,14 +105,32 @@
     color: #71717a;
 }
 
+.brandIconWrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(238, 114, 33, 0.08); /* 8% Orange Tint */
+    border: 1.5px solid #EE7221;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    color: #EE7221;
+}
+
 /* ============================================
    NOTIFICATION SLOTS
    ============================================ */
 .slotCard {
+    padding: 16px; /* Unified internal padding */
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 16px;
+    gap: 10px;
+}
+
+/* This wrapper creates the 'Phantom Gap' to align text with the icons below */
+.slotContent {
+    padding-left: var(--cb-text-align-x);
 }
 
 .slotTopRow {
@@ -116,7 +153,7 @@
 .slotTimeText {
     font-size: 12px;
     font-weight: 500;
-    color: #f97316; /* Orange */
+    color: var(--color-orange);
 }
 
 .slotGroup {
@@ -139,82 +176,63 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: #f97316;
-}
-
-/* Add Button */
-.addButton {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 16px;
-    background: #ffffff;
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-    color: #1a1a1c;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-.addButton:active {
-    opacity: 0.8;
+    background-color: var(--color-orange);
 }
 
 /* ============================================
-   GENERAL SETTINGS
+   PRIMITIVES & ROWS
    ============================================ */
-.settingItem {
+.cabinetRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px;
+    padding: 16px; /* Unified 16px padding */
     cursor: pointer;
     position: relative;
+    min-height: 64px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
-.settingItem:not(:last-child)::after {
+.cabinetRow:not(:last-child)::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 48px;
+    left: calc(var(--cb-anchor-x) + var(--cb-icon-box-size) + var(--cb-icon-gap)); 
     right: 0;
     height: 1px;
     background: #f4f4f5;
 }
 
-.settingLeft {
+.rowLeft {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--cb-icon-gap);
 }
 
-.settingIconWrap {
-    color: #a1a1aa;
+.iconBox {
+    width: var(--cb-icon-box-size);
+    height: var(--cb-icon-box-size);
+    background: rgba(238, 114, 33, 0.08); /* Soft Orange Tint */
+    border: none; /* Removed heavy border */
+    border-radius: var(--cb-item-radius);
     display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cb-brand-orange);
+    flex-shrink: 0;
 }
 
-.settingLabel {
+.rowLabel {
     font-size: 15px;
     color: #1a1a1c;
+    line-height: 1.4;
 }
 
-.settingRight {
+.rowRight {
     display: flex;
     align-items: center;
     gap: 8px;
-}
-
-.settingValueOrange {
-    font-size: 15px;
-    font-weight: 600;
-    color: #f97316;
-}
-
-.settingChevron {
-    color: #d4d4d8;
-    font-size: 16px;
 }
 
 /* Toggle */
@@ -227,7 +245,7 @@
     transition: background 0.2s;
 }
 .toggleActive {
-    background: #10b981; /* Green */
+    background: var(--cb-brand-orange); 
 }
 .toggle::after {
     content: '';
@@ -245,34 +263,8 @@
     transform: translateX(20px);
 }
 
-/* ============================================
-   ABOUT SECTION (Floating items)
-   ============================================ */
-.aboutList {
-    display: flex;
-    flex-direction: column;
-    padding: 0 8px;
-}
-
-.infoItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 8px;
-    cursor: pointer;
-}
-
-.infoLeft {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #52525b;
-}
-
-.infoLabel {
+.settingValueOrange {
     font-size: 15px;
-}
-
-.infoChevron {
-    color: #d4d4d8;
+    font-weight: 600;
+    color: var(--cb-brand-orange);
 }
