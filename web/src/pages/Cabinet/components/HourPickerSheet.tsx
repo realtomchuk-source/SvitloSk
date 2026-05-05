@@ -17,7 +17,7 @@ export const HourPickerSheet: React.FC<HourPickerSheetProps> = ({
     onSelectHour,
     title
 }) => {
-    const hours = Array.from({ length: 24 }, (_, i) => i);
+
 
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title={title}>
