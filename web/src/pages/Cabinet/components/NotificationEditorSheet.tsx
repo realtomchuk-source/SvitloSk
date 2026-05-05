@@ -66,127 +66,130 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
     };
 
     return (
-        <BottomSheet isOpen={isOpen} onClose={onClose} title="Налаштування пуш">
-            <div style={{ padding: '0 16px 120px' }}>
-                <div className={styles.formGroup}>
-                    <div className={styles.label}>Як назвемо локацію?</div>
-                    <input 
-                        className={styles.input} 
-                        value={name} 
-                        onChange={e => setName(e.target.value)} 
-                        placeholder="Дім" 
-                    />
-                    <div className={styles.chips}>
-                        {PRESET_LOCATIONS.map(tag => (
-                            <button key={tag} className={styles.chip} onClick={() => setName(tag)}>
-                                {tag}
-                            </button>
-                        ))}
+        <>
+            <BottomSheet isOpen={isOpen} onClose={onClose} title="Налаштування пуш">
+                <div style={{ padding: '0 16px 120px' }}>
+                    <div className={styles.formGroup}>
+                        <div className={styles.label}>Як назвемо локацію?</div>
+                        <input 
+                            className={styles.input} 
+                            value={name} 
+                            onChange={e => setName(e.target.value)} 
+                            placeholder="Дім" 
+                        />
+                        <div className={styles.chips}>
+                            {PRESET_LOCATIONS.map(tag => (
+                                <button key={tag} className={styles.chip} onClick={() => setName(tag)}>
+                                    {tag}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                <div className={styles.formGroup}>
-                    <div className={styles.subgroupLabel}>Оберіть підчергу</div>
-                    <SubgroupGrid 
-                        selectedGroup={subGroup} 
-                        onSelect={setSubGroup} 
-                    />
-                </div>
+                    <div className={styles.formGroup}>
+                        <div className={styles.subgroupLabel}>Оберіть підчергу</div>
+                        <SubgroupGrid 
+                            selectedGroup={subGroup} 
+                            onSelect={setSubGroup} 
+                        />
+                    </div>
 
-                <div className={styles.formGroup}>
-                    <div className={styles.label}>Попередити за</div>
-                    <div className={styles.segmentedControl}>
-                        {[5, 10, 15].map(mins => (
-                            <button
-                                key={mins}
-                                className={`${styles.segmentedOption} ${notifyAdvance === mins ? styles.segmentedActive : ''}`}
-                                onClick={() => setNotifyAdvance(mins)}
+                    <div className={styles.formGroup}>
+                        <div className={styles.label}>Попередити за</div>
+                        <div className={styles.segmentedControl}>
+                            {[5, 10, 15].map(mins => (
+                                <button
+                                    key={mins}
+                                    type="button"
+                                    className={`${styles.segmentedOption} ${notifyAdvance === mins ? styles.segmentedActive : ''}`}
+                                    onClick={() => setNotifyAdvance(mins)}
+                                >
+                                    {mins} хв
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className={styles.toggleRow}>
+                        <div className={styles.toggleLabel}>Сповіщати 24/7</div>
+                        <div 
+                            className={`${styles.toggleSwitch} ${notify247 ? styles.toggleActive : ''}`}
+                            onClick={() => setNotify247(!notify247)}
+                        >
+                            <div className={styles.toggleThumb} />
+                        </div>
+                    </div>
+
+                    <div className={styles.sliderContainer}>
+                        <div className={styles.sliderRow}>
+                            <div className={styles.sliderLabel}>Початок</div>
+                            <input 
+                                type="range" 
+                                min="0" max="23" 
+                                value={formatHour(dndStart)}
+                                disabled={notify247}
+                                onChange={e => updateHour(setDndStart, parseInt(e.target.value))}
+                                className={styles.rangeInput}
+                            />
+                            <div 
+                                className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
+                                onClick={() => !notify247 && setIsStartPickerOpen(true)}
+                                style={{ cursor: notify247 ? 'default' : 'pointer' }}
                             >
-                                {mins} хв
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                                {dndStart}
+                            </div>
+                        </div>
 
-                <div className={styles.toggleRow}>
-                    <div className={styles.toggleLabel}>Сповіщати 24/7</div>
-                    <div 
-                        className={`${styles.toggleSwitch} ${notify247 ? styles.toggleActive : ''}`}
-                        onClick={() => setNotify247(!notify247)}
-                    >
-                        <div className={styles.toggleThumb} />
-                    </div>
-                </div>
-
-                <div className={styles.sliderContainer}>
-                    <div className={styles.sliderRow}>
-                        <div className={styles.sliderLabel}>Початок</div>
-                        <input 
-                            type="range" 
-                            min="0" max="23" 
-                            value={formatHour(dndStart)}
-                            disabled={notify247}
-                            onChange={e => updateHour(setDndStart, parseInt(e.target.value))}
-                            className={styles.rangeInput}
-                        />
-                        <div 
-                            className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
-                            onClick={() => !notify247 && setIsStartPickerOpen(true)}
-                            style={{ cursor: notify247 ? 'default' : 'pointer' }}
-                        >
-                            {dndStart}
+                        <div className={styles.sliderRow}>
+                            <div className={styles.sliderLabel}>Кінець</div>
+                            <input 
+                                type="range" 
+                                min="0" max="23" 
+                                value={formatHour(dndEnd)}
+                                disabled={notify247}
+                                onChange={e => updateHour(setDndEnd, parseInt(e.target.value))}
+                                className={styles.rangeInput}
+                            />
+                            <div 
+                                className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
+                                onClick={() => !notify247 && setIsEndPickerOpen(true)}
+                                style={{ cursor: notify247 ? 'default' : 'pointer' }}
+                            >
+                                {dndEnd}
+                            </div>
                         </div>
                     </div>
 
-                    <div className={styles.sliderRow}>
-                        <div className={styles.sliderLabel}>Кінець</div>
-                        <input 
-                            type="range" 
-                            min="0" max="23" 
-                            value={formatHour(dndEnd)}
-                            disabled={notify247}
-                            onChange={e => updateHour(setDndEnd, parseInt(e.target.value))}
-                            className={styles.rangeInput}
-                        />
-                        <div 
-                            className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
-                            onClick={() => !notify247 && setIsEndPickerOpen(true)}
-                            style={{ cursor: notify247 ? 'default' : 'pointer' }}
-                        >
-                            {dndEnd}
-                        </div>
-                    </div>
-                </div>
-
-                <HourPickerSheet 
-                    isOpen={isStartPickerOpen}
-                    onClose={() => setIsStartPickerOpen(false)}
-                    selectedHour={formatHour(dndStart)}
-                    onSelectHour={(h) => updateHour(setDndStart, h)}
-                    title="Час початку"
-                />
-
-                <HourPickerSheet 
-                    isOpen={isEndPickerOpen}
-                    onClose={() => setIsEndPickerOpen(false)}
-                    selectedHour={formatHour(dndEnd)}
-                    onSelectHour={(h) => updateHour(setDndEnd, h)}
-                    title="Час закінчення"
-                />
-
-                <button className={styles.saveBtn} onClick={handleSave}>
-                    Зберегти
-                </button>
-                
-                {slot && (
-                    <button className={styles.deleteLink} onClick={() => {
-                        onDelete(slot.id);
-                        onClose();
-                    }}>
-                        Вимкнути локацію
+                    <button className={styles.saveBtn} onClick={handleSave}>
+                        Зберегти
                     </button>
-                )}
-            </div>
-        </BottomSheet>
+                    
+                    {slot && (
+                        <button className={styles.deleteLink} onClick={() => {
+                            onDelete(slot.id);
+                            onClose();
+                        }}>
+                            Вимкнути локацію
+                        </button>
+                    )}
+                </div>
+            </BottomSheet>
+
+            <HourPickerSheet 
+                isOpen={isStartPickerOpen}
+                onClose={() => setIsStartPickerOpen(false)}
+                selectedHour={formatHour(dndStart)}
+                onSelectHour={(h) => updateHour(setDndStart, h)}
+                title="Час початку"
+            />
+
+            <HourPickerSheet 
+                isOpen={isEndPickerOpen}
+                onClose={() => setIsEndPickerOpen(false)}
+                selectedHour={formatHour(dndEnd)}
+                onSelectHour={(h) => updateHour(setDndEnd, h)}
+                title="Час закінчення"
+            />
+        </>
     );
 };

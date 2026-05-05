@@ -1,24 +1,29 @@
 .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--gap-small);
+    gap: 8px;
 }
 
 .hourBtn {
     height: 48px;
-    background: var(--color-bg-gray);
-    border: none;
-    border-radius: var(--radius-main);
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
     font-size: 15px;
     font-weight: 600;
-    color: #1a1a1c;
+    color: #18181b;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hourBtnActive {
-    background: var(--color-orange);
+    background: var(--cb-brand-orange);
+    border-color: var(--cb-brand-orange);
     color: #ffffff;
+    box-shadow: 0 4px 12px rgba(238, 114, 33, 0.2);
 }
 
 .hourBtn:active {
