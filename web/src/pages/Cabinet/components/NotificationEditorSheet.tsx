@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { BottomSheet } from '../../../components/ui/BottomSheet/BottomSheet';
 import { HourPickerSheet } from './HourPickerSheet';
 import { SubgroupGrid } from '../../../components/ui/SubgroupGrid/SubgroupGrid';
