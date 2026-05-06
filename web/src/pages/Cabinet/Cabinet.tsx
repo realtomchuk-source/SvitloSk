@@ -9,6 +9,7 @@ import { NotificationEditorSheet } from './components/NotificationEditorSheet';
 import { AuthPromptSheet } from './components/AuthPromptSheet';
 import { AboutSheet } from './components/AboutSheet';
 import type { Slot } from '@/schemas/user';
+import { clsx } from 'clsx';
 import styles from './Cabinet.module.css';
 
 export const Cabinet: React.FC = () => {
@@ -84,7 +85,7 @@ export const Cabinet: React.FC = () => {
     };
 
     return (
-        <div className={styles.cabinetRoot}>
+        <div className={clsx(styles.cabinetRoot, 'page-cabinet')}>
             <ProfileCard user={profile} onClick={() => setAuthSheetOpen(true)} />
             
             <NotificationSlots 

@@ -35,11 +35,12 @@ export const convertToIntervals = (scheduleString: string): TimeInterval[] => {
 };
 
 /**
- * Calculates current status and time until next change
+ * Calculates status and time until next change relative to a reference date.
+ * Useful for 'Time Machine' scrubbing.
  */
-export const getStatusInfo = (scheduleString: string) => {
-  const now = new Date();
-  const currentHour = now.getHours();
+export const getStatusInfo = (scheduleString: string, referenceDate?: Date) => {
+  const baseTime = referenceDate || new Date();
+  const currentHour = baseTime.getHours();
   const isCurrentlyOn = scheduleString[currentHour] === '1';
   
   let nextChangeHour = 24;
@@ -50,9 +51,11 @@ export const getStatusInfo = (scheduleString: string) => {
     }
   }
 
-  const nextTime = new Date();
+  const nextTime = new Date(baseTime);
   nextTime.setHours(nextChangeHour, 0, 0, 0);
-  const diffMs = nextTime.getTime() - now.getTime();
+  
+  // Calculate difference in minutes from the reference point
+  const diffMs = nextTime.getTime() - baseTime.getTime();
   const minutesRemaining = Math.max(0, Math.floor(diffMs / 60000));
 
   return {

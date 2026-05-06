@@ -128,7 +128,7 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
                 style={{
                   flex: `0 0 ${cardWidth}px`,
                   height: `${cardWidth}px`, // Perfectly square
-                  borderRadius: '4px',
+                  borderRadius: '8px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -144,7 +144,7 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
                 }}
               >
                 <span style={{ 
-                  fontSize: isActive ? '22px' : '18px', 
+                  fontSize: isActive ? '22px' : '20px', 
                   fontWeight: isActive ? 800 : 700, 
                   color: isActive ? '#111' : '#6B7280',
                   lineHeight: 1
@@ -153,17 +153,19 @@ export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({
                 </span>
                 
                 {/* Preserve space for the label even if inactive to maintain geometry */}
-                <span style={{ 
-                  fontSize: '8px', 
-                  fontWeight: 600, 
-                  color: '#888', 
-                  marginTop: '2px', 
-                  letterSpacing: '0.2px',
-                  opacity: isActive ? 1 : 0,
-                  transition: 'opacity 0.2s'
-                }}>
-                  підчерга
-                </span>
+                {isActive && (
+                  <span style={{ 
+                    fontSize: '8px', 
+                    fontWeight: 600, 
+                    color: '#888', 
+                    marginTop: '2px', 
+                    letterSpacing: '0.2px',
+                    opacity: 1,
+                    transition: 'opacity 0.2s'
+                  }}>
+                    підчерга
+                  </span>
+                )}
               </div>
             );
           })}

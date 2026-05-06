@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { clsx } from 'clsx';
 import { useStore } from '@/store/useStore';
 import { getStatusInfo } from '@/services/scheduleService';
 import { HeroCard } from '@/components/home/HeroCard';
@@ -28,19 +29,29 @@ export const Home: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // REAL TIME STATUS (Always facts for now)
-  const currentHour = realTime.getHours();
-  const isOn = currentQueuesStr[currentHour] === '1';
-  
-  let nextChangeHour = 24;
-  for (let i = currentHour + 1; i < 24; i++) {
-    if (currentQueuesStr[i] !== (isOn ? '1' : '0')) {
-      nextChangeHour = i;
-      break;
+  // CENTRALIZED DISPLAY CONTEXT (The 'Time Machine' Hub)
+  const displayContext = React.useMemo(() => {
+    // Determine the reference time (Real or Virtual)
+    let referenceDate = new Date(realTime);
+    
+    if (scrubSlot !== null) {
+      // Set to virtual time (slot 0 = 00:00, slot 1 = 00:30, etc.)
+      const vHour = Math.floor(scrubSlot / 2);
+      const vMin = (scrubSlot % 2) * 30;
+      referenceDate.setHours(vHour, vMin, 0, 0);
     }
-  }
 
-  const { h: timeH, m: timeM } = getStatusInfo(currentQueuesStr);
+    const info = getStatusInfo(currentQueuesStr, referenceDate);
+    
+    return {
+      referenceDate,
+      isVirtual: scrubSlot !== null,
+      isOn: info.isCurrentlyOn,
+      timeH: info.h,
+      timeM: info.m,
+      nextChangeHour: info.nextChangeHour
+    };
+  }, [realTime, scrubSlot, currentQueuesStr]);
   
   // VIRTUAL POINTER PERCENT
   // Use SLOTS_COUNT - 1 (47) to perfectly align 100% with the right edge
@@ -49,21 +60,21 @@ export const Home: React.FC = () => {
     : ((realTime.getHours() * 60 + realTime.getMinutes()) / 1440) * 100;
 
   return (
-    <div className="page-home">
+    <div className={clsx("page-home", !displayContext.isOn && "status-off")}>
       <section id="home-section" className="animate-in fade-in duration-700">
-        <div style={{ height: '16px' }} />
-
-
         <HeroCard 
-          isOn={isOn}
-          timeH={timeH}
-          timeM={timeM}
-          nextChangeHour={nextChangeHour}
+          isOn={displayContext.isOn}
+          timeH={displayContext.timeH}
+          timeM={displayContext.timeM}
+          nextChangeHour={displayContext.nextChangeHour}
           queuesStr={currentQueuesStr}
           currentTimePercent={pointerPercent}
         />
 
-        <DashboardBar isOn={isOn} realTime={realTime} />
+        <DashboardBar 
+          isOn={displayContext.isOn} 
+          realTime={displayContext.referenceDate} 
+        />
         
         <InteractiveTimeline 
           queuesStr={currentQueuesStr} 
@@ -74,9 +85,6 @@ export const Home: React.FC = () => {
           selectedGroup={selectedGroup}
           onSelect={setSelectedGroup}
         />
-        
-        {/* Spacer for bottom nav */}
-        <div style={{ height: '100px' }} />
       </section>
     </div>
   );

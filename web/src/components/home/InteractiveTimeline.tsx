@@ -39,11 +39,11 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
     setIsDragging(false);
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     
-    // Auto-return after 3 seconds of idle time
+    // Auto-return after 5 seconds of idle time
     setTimeout(() => {
       setSelectedSlot(null);
       if (onScrub) onScrub(null);
-    }, 3000);
+    }, 5000);
   };
 
   const updatePosition = (clientX: number) => {
@@ -161,13 +161,20 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
         >
           {Array.from({ length: 48 }).map((_, i) => {
             const isAvailable = queuesStr[Math.floor(i / 2)] === '1';
+            const realSlot = getCurrentSlot();
+            const isPast = i < realSlot;
+            
+            // Muted colors for history (fixed to real time)
+            const availableColor = isPast ? '#FFB380' : '#FF7A00'; 
+            const unavailableColor = isPast ? 'rgba(232, 232, 237, 0.4)' : 'transparent';
+
             return (
               <div 
                 key={i} 
                 className={clsx("track__segment", isAvailable ? "track__segment--available" : "track__segment--unavailable")}
                 style={{ 
                   flex: 1, 
-                  background: isAvailable ? '#FF7A00' : 'transparent',
+                  background: isAvailable ? availableColor : unavailableColor,
                   height: '100%' 
                 }} 
               />

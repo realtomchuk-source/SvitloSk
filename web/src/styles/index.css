@@ -2,6 +2,92 @@
 
 :root {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  
+  /* SvitloSk Design Tokens */
+  --radius-main: 8px;
+  --radius-inner: 6px;
+  --page-top-gap: 20px;
+  
+  /* Tab Bar Tokens */
+  --nav-bg: rgba(255, 255, 255, 0.95);
+  --nav-active-pill: rgba(255, 122, 0, 0.1);
+  --nav-accent: #FF7A00;
+  --nav-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Floating Navigation Bar V4 */
+.floating-nav-v4 {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 410px;
+  height: 64px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 32px;
+  box-shadow: var(--nav-shadow);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 12px;
+  z-index: 1000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-item-v4 {
+  text-decoration: none;
+  color: #8E8E93;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item-v4 .pill-bg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.nav-item-v4.active {
+  color: var(--nav-accent);
+}
+
+.nav-item-v4.active .pill-bg {
+  background: var(--nav-active-pill);
+  padding: 8px 16px;
+}
+
+.nav-text-v4 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  animation: slide-in-text 0.3s ease-out;
+}
+
+.nav-icon {
+  transition: transform 0.2s ease;
+}
+
+.nav-item-v4:active .nav-icon {
+  transform: scale(0.9);
+}
+
+@keyframes slide-in-text {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 body {

@@ -16,8 +16,8 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 12px 16px 100px 16px;
-    max-width: 480px;
+    padding: 0 16px 100px 16px;
+    max-width: 450px;
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
@@ -40,9 +40,9 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #71717a;
-    padding: 0 16px; /* Align with internal card content (16px from card edge) */
-    margin-top: 12px;
-    margin-bottom: 2px;
+    padding: 0 12px; /* Align with internal card content (12px from card edge) */
+    margin-top: 8px;
+    margin-bottom: 0px;
 }
 
 /* ============================================
@@ -63,7 +63,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 16px; /* Standard 16px padding */
+    padding: 12px; /* Standard 12px padding */
 }
 
 .avatarWrap {
@@ -122,10 +122,10 @@
    NOTIFICATION SLOTS
    ============================================ */
 .slotCard {
-    padding: 16px; /* Unified internal padding */
+    padding: 12px; /* Unified internal padding */
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
 /* This wrapper creates the 'Phantom Gap' to align text with the icons below */
@@ -186,10 +186,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px; /* Unified 16px padding */
+    padding: 12px; /* Unified 12px padding */
     cursor: pointer;
     position: relative;
-    min-height: 64px;
+    min-height: 52px;
     box-sizing: border-box;
     width: 100%;
 }
