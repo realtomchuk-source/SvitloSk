@@ -17,7 +17,7 @@ export const SubGroupSheet: React.FC<SubGroupSheetProps> = ({
 }) => {
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Оберіть підчергу">
-            <div style={{ padding: '4px 16px 80px' }}>
+            <div style={{ padding: '4px 16px 16px' }}>
                 <SubgroupGrid 
                     selectedGroup={selectedGroup} 
                     onSelect={(g) => {

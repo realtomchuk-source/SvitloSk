@@ -12,6 +12,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-end;
+    padding: 12px;
 }
 
 .backdropVisible {
@@ -23,9 +24,9 @@
     background: #ffffff;
     width: 100%;
     max-width: 480px;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    padding: 16px 20px calc(16px + var(--nav-bottom-buffer)) 20px;
+    border-radius: 24px;
+    margin-bottom: var(--nav-bottom-buffer);
+    padding: 16px 20px 24px 20px;
     box-sizing: border-box;
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);

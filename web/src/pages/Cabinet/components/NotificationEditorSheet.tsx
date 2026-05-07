@@ -68,7 +68,7 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
     return (
         <>
             <BottomSheet isOpen={isOpen} onClose={onClose} title="Налаштування пуш">
-                <div style={{ padding: '0 16px 120px' }}>
+                <div style={{ padding: '0 16px 16px' }}>
                     <div className={styles.formGroup}>
                         <div className={styles.label}>Як назвемо локацію?</div>
                         <input 

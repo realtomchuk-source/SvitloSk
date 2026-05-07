@@ -11,7 +11,7 @@ interface AuthPromptSheetProps {
 export const AuthPromptSheet: React.FC<AuthPromptSheetProps> = ({ isOpen, onClose, onLogin }) => {
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Потрібна реєстрація">
-            <div style={{ textAlign: 'center', padding: '8px 16px 100px' }}>
+            <div style={{ textAlign: 'center', padding: '8px 16px 32px' }}>
                 
                 {/* Branded Identity - Glass Hero Icon */}
                 <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>

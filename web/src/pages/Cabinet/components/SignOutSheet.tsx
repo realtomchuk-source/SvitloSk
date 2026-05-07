@@ -17,7 +17,7 @@ export const SignOutSheet: React.FC<SignOutSheetProps> = ({ isOpen, onClose, onC
 
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Вийти з акаунту?">
-            <div style={{ padding: '0 0 24px' }}>
+            <div>
 
                 <p style={{ fontSize: '15px', color: '#71717a', textAlign: 'center', margin: '0 0 24px', lineHeight: 1.5 }}>
                     Ви виходите з акаунту{' '}

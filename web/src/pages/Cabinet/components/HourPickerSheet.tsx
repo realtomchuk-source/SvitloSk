@@ -21,7 +21,7 @@ export const HourPickerSheet: React.FC<HourPickerSheetProps> = ({
 
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title={title}>
-            <div style={{ padding: '16px 16px 120px' }}>
+            <div style={{ padding: '16px 16px 16px' }}>
                 <div className={styles.grid}>
                     {Array.from({ length: 24 }).map((_, hour) => (
                         <button
