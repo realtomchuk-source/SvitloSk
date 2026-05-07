@@ -104,55 +104,55 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
 
                     <div className={styles.formGroup}>
                         <div className={styles.sectionTitle}>Режим тиші</div>
+                        <div className={styles.sliderContainer}>
+                            <div className={styles.sliderRow}>
+                                <div className={styles.sliderLabel}>Початок</div>
+                                <input 
+                                    type="range" 
+                                    min="0" max="23" 
+                                    value={formatHour(dndStart)}
+                                    disabled={notify247}
+                                    onChange={e => updateHour(setDndStart, parseInt(e.target.value))}
+                                    className={styles.rangeInput}
+                                />
+                                <div 
+                                    className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
+                                    onClick={() => !notify247 && setIsStartPickerOpen(true)}
+                                    style={{ cursor: notify247 ? 'default' : 'pointer' }}
+                                >
+                                    {dndStart}
+                                </div>
+                            </div>
+
+                            <div className={styles.sliderRow}>
+                                <div className={styles.sliderLabel}>Кінець</div>
+                                <input 
+                                    type="range" 
+                                    min="0" max="23" 
+                                    value={formatHour(dndEnd)}
+                                    disabled={notify247}
+                                    onChange={e => updateHour(setDndEnd, parseInt(e.target.value))}
+                                    className={styles.rangeInput}
+                                />
+                                <div 
+                                    className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
+                                    onClick={() => !notify247 && setIsEndPickerOpen(true)}
+                                    style={{ cursor: notify247 ? 'default' : 'pointer' }}
+                                >
+                                    {dndEnd}
+                                </div>
+                            </div>
+                        </div>
+
                         <div className={styles.toggleRow}>
-                        <div className={styles.toggleLabel}>Сповіщати 24/7</div>
-                        <div 
-                            className={`${styles.toggleSwitch} ${notify247 ? styles.toggleActive : ''}`}
-                            onClick={() => setNotify247(!notify247)}
-                        >
-                            <div className={styles.toggleThumb} />
-                        </div>
-                    </div>
-
-                    <div className={styles.sliderContainer}>
-                        <div className={styles.sliderRow}>
-                            <div className={styles.sliderLabel}>Початок</div>
-                            <input 
-                                type="range" 
-                                min="0" max="23" 
-                                value={formatHour(dndStart)}
-                                disabled={notify247}
-                                onChange={e => updateHour(setDndStart, parseInt(e.target.value))}
-                                className={styles.rangeInput}
-                            />
+                            <div className={styles.toggleLabel}>Сповіщати 24/7</div>
                             <div 
-                                className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
-                                onClick={() => !notify247 && setIsStartPickerOpen(true)}
-                                style={{ cursor: notify247 ? 'default' : 'pointer' }}
+                                className={`${styles.toggleSwitch} ${notify247 ? styles.toggleActive : ''}`}
+                                onClick={() => setNotify247(!notify247)}
                             >
-                                {dndStart}
+                                <div className={styles.toggleThumb} />
                             </div>
                         </div>
-
-                        <div className={styles.sliderRow}>
-                            <div className={styles.sliderLabel}>Кінець</div>
-                            <input 
-                                type="range" 
-                                min="0" max="23" 
-                                value={formatHour(dndEnd)}
-                                disabled={notify247}
-                                onChange={e => updateHour(setDndEnd, parseInt(e.target.value))}
-                                className={styles.rangeInput}
-                            />
-                            <div 
-                                className={`${styles.timeDisplay} ${notify247 ? styles.timeDisplayDisabled : ''}`}
-                                onClick={() => !notify247 && setIsEndPickerOpen(true)}
-                                style={{ cursor: notify247 ? 'default' : 'pointer' }}
-                            >
-                                {dndEnd}
-                            </div>
-                        </div>
-                    </div>
                     </div>
 
                     <button className={styles.saveBtn} onClick={handleSave}>
