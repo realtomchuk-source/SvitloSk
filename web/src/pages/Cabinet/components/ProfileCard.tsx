@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrandIcon } from '../../../assets/brand/BrandIcon';
+import { Plus, Minus } from 'lucide-react';
 import styles from '../Cabinet.module.css';
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────────
@@ -58,23 +59,24 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
                             <img src={user.avatarUrl} alt="Avatar" className={styles.avatarImg} />
                         ) : (
                             isAnon
-                                ? <BrandIcon variant="solid" size={32} />
+                                ? <div className={styles.brandIconInner}><BrandIcon variant="solid" size={42} /></div>
                                 : <span style={{ fontSize: '22px' }}>👤</span>
                         )}
                     </div>
 
                     {/* Name block */}
                     <div className={styles.profileText}>
+                        <div className={`${styles.statusIconWrap} ${isAnon ? styles.statusIconAnon : styles.statusIconReg}`}>
+                            {isAnon 
+                                ? <Minus size={16} strokeWidth={3} /> 
+                                : <Plus size={16} strokeWidth={3} />
+                            }
+                        </div>
                         <div className={styles.profileName}>
                             {isAnon && user.id
                                 ? `Користувач #${user.id.slice(-4).toUpperCase()}`
                                 : user.name}
                         </div>
-                        {isAnon && (
-                            <div className={`${styles.profileSub} ${styles.settingValueOrange}`}>
-                                Натисніть, щоб авторизуватись
-                            </div>
-                        )}
                     </div>
 
                     {/* Sync icons — always in top-right */}

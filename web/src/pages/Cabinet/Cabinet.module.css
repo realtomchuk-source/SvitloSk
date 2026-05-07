@@ -41,7 +41,7 @@
     letter-spacing: 0.05em;
     color: #71717a;
     padding: 0 12px; /* Align with internal card content (12px from card edge) */
-    margin-top: 8px;
+    margin-top: 4px;
     margin-bottom: 0px;
 }
 
@@ -56,19 +56,35 @@
     overflow: hidden;
 }
 
+.standaloneRowWrap {
+    margin-top: 4px;
+    margin-bottom: 0px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.standaloneRowWrap:active {
+    opacity: 0.7;
+    transform: scale(0.99);
+}
+
+.controlPanelRow {
+    padding-left: 16px !important;
+}
+
 /* ============================================
    PROFILE CARD
    ============================================ */
 .profileHeader {
     display: flex;
-    align-items: center;
-    gap: 12px; /* Tightened from 16px */
-    padding: 10px 12px; /* Compact vertical padding */
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px;
 }
 
 .avatarWrap {
-    width: 52px;
-    height: 52px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     background: #ffffff; /* Inner ring gap */
     display: flex;
@@ -76,8 +92,8 @@
     justify-content: center;
     flex-shrink: 0;
     overflow: hidden;
-    padding: 2px; /* The 'Double Ring' gap */
-    border: 1px solid #e4e4e7; /* Outer ring */
+    padding: 2.5px; /* Double Ring gap */
+    border: 1px solid #e4e4e7; /* Restored grey outer ring */
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
@@ -96,7 +112,31 @@
 .profileText {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    justify-content: space-between;
+    height: 64px; /* Match new 64px standard */
+}
+
+.statusIconWrap {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.statusIconAnon {
+    background: rgba(113, 113, 122, 0.08);
+    border: 1px solid rgba(113, 113, 122, 0.15);
+    color: #71717a;
+}
+
+.statusIconReg {
+    background: rgba(238, 114, 33, 0.08);
+    border: 1px solid rgba(238, 114, 33, 0.2);
+    color: #EE7221;
 }
 
 .profileName {
@@ -106,29 +146,31 @@
     line-height: 1.2;
 }
 
-.profileSub {
-    font-size: 13px;
-    color: #71717a;
-}
 
 .brandIconWrap {
-    width: 52px;
-    height: 52px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    /* Glassmorphism Effect */
-    background: linear-gradient(135deg, rgba(238, 114, 33, 0.15) 0%, rgba(238, 114, 33, 0.05) 100%);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    
-    border: 1.5px solid #EE7221;
+    background: #ffffff; /* Consistent inner white ring */
+    padding: 2.5px;
+    border: 1px solid #e4e4e7; /* Restored grey outer ring for sync */
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
     color: #EE7221;
-    
-    /* Subtle Outer Glow */
-    box-shadow: 0 0 10px rgba(238, 114, 33, 0.1);
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.brandIconInner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(238, 114, 33, 0.1) 0%, rgba(238, 114, 33, 0.05) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ============================================
@@ -229,6 +271,13 @@
     min-height: 52px;
     box-sizing: border-box;
     width: 100%;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cabinetRow:active {
+    opacity: 0.7;
+    transform: scale(0.99);
 }
 
 .cabinetRow:not(:last-child)::after {

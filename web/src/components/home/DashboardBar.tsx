@@ -21,12 +21,14 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      background: '#FFFFFF',
-      borderRadius: '8px',
+      background: 'rgba(255, 255, 255, 0.85)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      borderRadius: '16px',
       padding: '16px 24px',
       margin: '12px 20px',
-      boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
-      border: '1px solid rgba(0,0,0,0.02)',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
+      border: '1px solid rgba(238, 114, 33, 0.15)',
       transition: 'all 0.3s ease'
     }}>
       {/* Date Segment */}
