@@ -229,6 +229,11 @@ def main():
     # 2. Multi-stage Trigger
     should_scan, reason, html_hash, img_url = check_for_changes(state)
     
+    # Check for --force flag in command line
+    is_forced = "--force" in sys.argv
+    if is_forced:
+        logger.info("FORCED run detected via command line flag.")
+    
     # Forced run every 2 hours
     last_run_str = state.get("last_run")
     last_run = datetime.fromisoformat(last_run_str) if last_run_str else now - timedelta(hours=5)
@@ -236,8 +241,8 @@ def main():
         last_run = TZ.localize(last_run)
     force_heavy = (now - last_run).total_seconds() / 3600 >= 2
 
-    if should_scan or force_heavy or is_aggressive:
-        logger.info(f"Executing heavy scan. Reason: {reason if should_scan else 'forced/aggressive'}")
+    if should_scan or force_heavy or is_aggressive or is_forced:
+        logger.info(f"Executing heavy scan. Reason: {reason if should_scan else ('forced' if is_forced else 'interval/aggressive')}")
         
         site_res = run_site_parser(state)
         if site_res:

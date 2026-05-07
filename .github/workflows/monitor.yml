@@ -8,10 +8,10 @@ on:
     - cron: '0 */5 * * *'
   workflow_dispatch:
     inputs:
-      source:
-        description: 'Force source (site/manual)'
-        required: false
-        default: 'site'
+      force:
+        description: 'Force heavy scan (bypass triggers)'
+        type: boolean
+        default: false
 
 jobs:
   parse:
@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y tesseract-ocr
+          sudo apt-get update && sudo apt-get install -y tesseract-ocr sqlite3
           cd parser
           pip install -r requirements.txt
           playwright install --with-deps chromium
@@ -42,7 +42,11 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           cd parser/src
-          python parse_schedule.py
+          if [ "${{ github.event.inputs.force }}" == "true" ]; then
+            python parse_schedule.py --force
+          else
+            python parse_schedule.py
+          fi
 
       # ===== Chain 2: PWA pipeline (stable, keeps the app alive) =====
       - name: Run History Crawler (JSON pipeline)
@@ -54,6 +58,16 @@ jobs:
         run: |
           cd parser/src
           python generate_today.py
+
+      # ===== Debug: Check what was generated =====
+      - name: Debug Workspace
+        run: |
+          ls -R parser/data
+          if [ -f parser/data/schedules.db ]; then
+            sqlite3 parser/data/schedules.db "SELECT 'SQLite Rows: ' || count(*) FROM schedules;"
+          else
+            echo "SQLite DB not found - normal if no heavy scan occurred yet."
+          fi
 
       # ===== Commit results =====
       - name: Commit and Push
