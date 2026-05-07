@@ -13,7 +13,6 @@ interface NotificationEditorSheetProps {
     onDelete: (id: string) => void;
 }
 
-const PRESET_LOCATIONS = ['Дім', 'Робота', 'Офіс'];
 
 export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = ({
     isOpen,
@@ -70,24 +69,17 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
             <BottomSheet isOpen={isOpen} onClose={onClose} title="Налаштування пуш">
                 <div style={{ padding: '0 16px 16px' }}>
                     <div className={styles.formGroup}>
-                        <div className={styles.label}>Як назвемо локацію?</div>
+                        <div className={styles.sectionTitle}>Назва локації</div>
                         <input 
                             className={styles.input} 
                             value={name} 
                             onChange={e => setName(e.target.value)} 
-                            placeholder="Дім" 
+                            placeholder="Введіть назву локації" 
                         />
-                        <div className={styles.chips}>
-                            {PRESET_LOCATIONS.map(tag => (
-                                <button key={tag} className={styles.chip} onClick={() => setName(tag)}>
-                                    {tag}
-                                </button>
-                            ))}
-                        </div>
                     </div>
 
                     <div className={styles.formGroup}>
-                        <div className={styles.subgroupLabel}>Оберіть підчергу</div>
+                        <div className={styles.sectionTitle}>Оберіть підчергу</div>
                         <SubgroupGrid 
                             selectedGroup={subGroup} 
                             onSelect={setSubGroup} 
@@ -95,7 +87,7 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
                     </div>
 
                     <div className={styles.formGroup}>
-                        <div className={styles.label}>Попередити за</div>
+                        <div className={styles.sectionTitle}>Попередити за</div>
                         <div className={styles.segmentedControl}>
                             {[5, 10, 15].map(mins => (
                                 <button
@@ -110,7 +102,9 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
                         </div>
                     </div>
 
-                    <div className={styles.toggleRow}>
+                    <div className={styles.formGroup}>
+                        <div className={styles.sectionTitle}>Режим тиші</div>
+                        <div className={styles.toggleRow}>
                         <div className={styles.toggleLabel}>Сповіщати 24/7</div>
                         <div 
                             className={`${styles.toggleSwitch} ${notify247 ? styles.toggleActive : ''}`}
@@ -158,6 +152,7 @@ export const NotificationEditorSheet: React.FC<NotificationEditorSheetProps> = (
                                 {dndEnd}
                             </div>
                         </div>
+                    </div>
                     </div>
 
                     <button className={styles.saveBtn} onClick={handleSave}>

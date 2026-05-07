@@ -13,20 +13,17 @@ export const AuthPromptSheet: React.FC<AuthPromptSheetProps> = ({ isOpen, onClos
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Потрібна реєстрація">
             <div style={{ textAlign: 'center', padding: '8px 16px 32px' }}>
                 
-                {/* Branded Identity - Glass Hero Icon */}
-                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+                <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}>
                     <div style={{ 
                         width: 80, 
                         height: 80, 
-                        background: 'linear-gradient(135deg, rgba(238, 114, 33, 0.12) 0%, rgba(238, 114, 33, 0.06) 100%)', 
-                        backdropFilter: 'blur(10px)',
-                        borderRadius: '50%', 
+                        background: '#f4f4f5', 
+                        borderRadius: '12px', 
                         display: 'flex', 
                         alignItems: 'center', 
-                        justifyContent: 'center',
-                        border: '1.5px solid rgba(238, 114, 33, 0.15)'
+                        justifyContent: 'center'
                     }}>
-                        <BrandIcon variant="contour" size={60} color="#EE7221" />
+                        <BrandIcon variant="logo" size={48} color="#EE7221" />
                     </div>
                 </div>
 
