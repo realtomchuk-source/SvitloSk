@@ -13,6 +13,7 @@
   --nav-active-pill: rgba(238, 114, 33, 0.1);
   --nav-accent: #EE7221;
   --nav-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  --nav-bottom-buffer: 90px;
 }
 
 /* Floating Navigation Bar V4 */
