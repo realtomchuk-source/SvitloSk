@@ -10,8 +10,8 @@
   
   /* Tab Bar Tokens */
   --nav-bg: rgba(255, 255, 255, 0.95);
-  --nav-active-pill: rgba(255, 122, 0, 0.1);
-  --nav-accent: #FF7A00;
+  --nav-active-pill: rgba(238, 114, 33, 0.1);
+  --nav-accent: #EE7221;
   --nav-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
 }
 
@@ -27,7 +27,7 @@
   background: var(--nav-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 32px;
+  border-radius: 20px;
   box-shadow: var(--nav-shadow);
   display: flex;
   justify-content: space-around;
@@ -51,7 +51,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: 14px;
   transition: all 0.3s ease;
 }
 

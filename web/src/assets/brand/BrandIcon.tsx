@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type BrandIconVariant = 'logo' | 'status-on' | 'status-off' | 'contour';
+export type BrandIconVariant = 'logo' | 'status-on' | 'status-off' | 'contour' | 'solid';
 
 interface BrandIconProps {
     variant?: BrandIconVariant;
@@ -22,6 +22,8 @@ export const BrandIcon: React.FC<BrandIconProps> = ({
     color
 }) => {
     const iconColor = color || 'currentColor';
+    const uniqueId = React.useId().replace(/:/g, '');
+    const gradientId = `bulbGradient-${uniqueId}`;
 
     const renderVariant = () => {
         switch (variant) {
@@ -41,8 +43,6 @@ export const BrandIcon: React.FC<BrandIconProps> = ({
                     </svg>
                 );
             case 'status-off':
-                // Note: Simplified for now as status_off usually just changes color or has minor path diffs.
-                // If status_off.svg has different paths, we would add them here.
                 return (
                     <svg viewBox="0 0 358.9 495.1" width="100%" height="100%">
                         <path fill={iconColor} d="M269.45,420.1c0,41.44-33.56,75-75,75h-30c-41.44,0-75-33.56-75-75v-15h180v15Z"/>
@@ -50,15 +50,28 @@ export const BrandIcon: React.FC<BrandIconProps> = ({
                     </svg>
                 );
             case 'contour':
+            case 'solid':
                 return (
                     <svg viewBox="0 0 512 512" width="100%" height="100%">
+                        <defs>
+                            <radialGradient id={gradientId} cx="50%" cy="40%" r="50%" fx="50%" fy="40%">
+                                <stop offset="0%" stopColor="#fff" stopOpacity="0.4" />
+                                <stop offset="100%" stopColor={iconColor} stopOpacity="0" />
+                            </radialGradient>
+                        </defs>
                         <path 
                             d="M171.91 356H244.66V278.23C204.38 270.82 189.03 233.61 193.14 195.47C179.44 195.42 179.44 174.57 193.14 174.52H214.09V143.09C214.09 137.3 218.77 132.61 224.57 132.61C230.37 132.61 235.05 137.29 235.05 143.09V174.52H276.95V143.09C276.95 137.3 281.63 132.61 287.43 132.61C293.23 132.61 297.91 137.29 297.91 143.09V174.52H318.86C332.56 174.57 332.56 195.42 318.86 195.47C322.98 233.61 307.59 270.84 267.34 278.23V356H340.09C346.17 337.42 358.34 320.58 372.09 306.08C468.46 211.41 393.29 31.22 256.01 36C118.69 31.25 43.56 211.41 139.92 306.09C153.66 320.59 165.91 337.42 171.91 356Z" 
-                            stroke={iconColor} strokeWidth="12" fill="none"
+                            stroke={iconColor} strokeWidth="12" fill={variant === 'solid' ? iconColor : 'none'}
                         />
+                        {variant === 'solid' && (
+                            <path 
+                                d="M171.91 356H244.66V278.23C204.38 270.82 189.03 233.61 193.14 195.47C179.44 195.42 179.44 174.57 193.14 174.52H214.09V143.09C214.09 137.3 218.77 132.61 224.57 132.61C230.37 132.61 235.05 137.29 235.05 143.09V174.52H276.95V143.09C276.95 137.3 281.63 132.61 287.43 132.61C293.23 132.61 297.91 137.29 297.91 143.09V174.52H318.86C332.56 174.57 332.56 195.42 318.86 195.47C322.98 233.61 307.59 270.84 267.34 278.23V356H340.09C346.17 337.42 358.34 320.58 372.09 306.08C468.46 211.41 393.29 31.22 256.01 36C118.69 31.25 43.56 211.41 139.92 306.09C153.66 320.59 165.91 337.42 171.91 356Z" 
+                                fill={`url(#${gradientId})`}
+                            />
+                        )}
                         <path 
                             d="M336 409.33C334.83 508.55 159.82 495.2 176 396H336V409.33Z" 
-                            stroke={iconColor} strokeWidth="12" strokeLinecap="round" fill="none"
+                            stroke={iconColor} strokeWidth="12" strokeLinecap="round" fill={variant === 'solid' ? iconColor : 'none'}
                         />
                     </svg>
                 );

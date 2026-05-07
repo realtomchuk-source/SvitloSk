@@ -28,6 +28,7 @@ interface AppState {
   // User Actions
   initAuth: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
   updateUserConfig: (config: Partial<UserConfig>) => Promise<void>;
   addSlot: (slot: Slot) => Promise<void>;
   updateSlot: (slot: Slot) => Promise<void>;
@@ -131,6 +132,11 @@ export const useStore = create<AppState>()(
           }
         });
         if (error) console.error('Error signing in with Google', error);
+      },
+
+      signOut: async () => {
+        await supabase.auth.signOut();
+        set({ user: null, slots: EMPTY_SLOTS, userConfig: DEFAULT_CONFIG });
       },
 
       updateUserConfig: async (newConfig) => {

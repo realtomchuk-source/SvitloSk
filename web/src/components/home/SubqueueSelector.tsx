@@ -1,176 +1,199 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useStore } from '@/store/useStore';
+import styles from './SubqueueSelector.module.css';
 
-interface SubqueueSelectorProps {
-  selectedGroup: string;
-  onSelect: (group: string) => void;
+// ── Constants ──────────────────────────────────────────────────────────────────
+const GROUPS = ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2', '5.1', '5.2', '6.1', '6.2'];
+const CLONE = GROUPS.length;                         // 12
+const ITEMS = [...GROUPS, ...GROUPS, ...GROUPS];     // 36 total
+const CARD_W = 72;
+const GAP = 10;
+const STEP = CARD_W + GAP;                           // 82px per snap step
+
+// ── DrumCard (React.memo — prevents re-renders on scroll) ─────────────────────
+interface DrumCardProps {
+    group: string;
+    isSelected: boolean;
+    onClick: () => void;
 }
 
-const GROUPS = [
-  '1.1', '1.2', '2.1', '2.2', '3.1', '3.2', 
-  '4.1', '4.2', '5.1', '5.2', '6.1', '6.2'
-];
-
-export const SubqueueSelector: React.FC<SubqueueSelectorProps> = ({ 
-  selectedGroup, 
-  onSelect
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [items] = useState([...GROUPS, ...GROUPS, ...GROUPS]);
-  const [isDragging, setIsDragging] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(GROUPS.length + GROUPS.indexOf(selectedGroup));
-
-  const startX = useRef(0);
-  const currentScrollLeft = useRef(0);
-
-  const cardWidth = 64; 
-  const cardGap = 12;
-  const itemWidth = cardWidth + cardGap; 
-
-  useEffect(() => {
-    if (containerRef.current && !isDragging) {
-      const centerIndex = GROUPS.length + GROUPS.indexOf(selectedGroup);
-      setActiveIndex(centerIndex);
-      // Center the active card precisely
-      const targetScroll = centerIndex * itemWidth;
-      containerRef.current.scrollTo({ left: targetScroll, behavior: 'smooth' });
-    }
-  }, [selectedGroup]);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    setIsDragging(true);
-    startX.current = e.clientX;
-    if (containerRef.current) {
-      currentScrollLeft.current = containerRef.current.scrollLeft;
-    }
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging || !containerRef.current) return;
-    const dx = e.clientX - startX.current;
-    containerRef.current.scrollLeft = currentScrollLeft.current - dx;
-    
-    // Active index is simply scrollLeft / itemWidth
-    const closestIndex = Math.round(containerRef.current.scrollLeft / itemWidth);
-    if (closestIndex !== activeIndex && closestIndex >= 0 && closestIndex < items.length) {
-      setActiveIndex(closestIndex);
-    }
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    setIsDragging(false);
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    
-    if (!containerRef.current) return;
-    
-    const closestIndex = Math.round(containerRef.current.scrollLeft / itemWidth);
-    
-    let targetIndex = closestIndex;
-    if (targetIndex < GROUPS.length) targetIndex += GROUPS.length;
-    else if (targetIndex >= GROUPS.length * 2) targetIndex -= GROUPS.length;
-
-    const targetGroup = items[targetIndex];
-    onSelect(targetGroup);
-    
-    const targetScroll = targetIndex * itemWidth;
-    containerRef.current.scrollTo({ left: targetScroll, behavior: 'smooth' });
-  };
-
-  return (
-    <div style={{ padding: '0 20px', marginTop: '30px', marginBottom: '100px', width: '100%', boxSizing: 'border-box' }}>
-      
-      {/* Outer Container with Orange Border */}
-      <div 
-        style={{
-          border: '1px solid #FF7A00',
-          borderRadius: '8px',
-          padding: '16px 0',
-          background: '#FFFFFF',
-          position: 'relative',
-          width: '100%',
-          overflow: 'hidden',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
-        }}
-      >
-        {/* Edge Fade Gradients */}
-        <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(to right, #FFFFFF 20%, transparent)', zIndex: 5, pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(to left, #FFFFFF 20%, transparent)', zIndex: 5, pointerEvents: 'none' }} />
-
-        {/* Scrollable Track */}
-        <div 
-          ref={containerRef}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          className="no-scrollbar"
-          style={{ 
-            display: 'flex', 
-            gap: `${cardGap}px`, 
-            overflowX: 'auto', 
-            overflowY: 'hidden',
-            padding: `0 calc(50% - ${cardWidth/2}px)`, 
-            scrollSnapType: isDragging ? 'none' : 'x mandatory',
-            scrollBehavior: isDragging ? 'auto' : 'smooth',
-            touchAction: 'pan-x',
-            cursor: isDragging ? 'grabbing' : 'grab',
-            height: '76px', 
-            alignItems: 'center'
-          }}
-        >
-          {items.map((group, index) => {
-            const isActive = index === activeIndex;
-            
-            return (
-              <div
-                key={`${group}-${index}`}
-                onClick={() => { if (!isDragging) onSelect(group); }}
-                style={{
-                  flex: `0 0 ${cardWidth}px`,
-                  height: `${cardWidth}px`, // Perfectly square
-                  borderRadius: '8px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: isActive ? '#FFFFFF' : '#f4f4f5',
-                  border: isActive ? '2.5px solid #FF7A00' : '1px solid rgba(0,0,0,0.05)',
-                  boxShadow: isActive ? '0 0 20px rgba(255, 122, 0, 0.4)' : 'none',
-                  transform: isActive ? 'scale(1.1)' : 'scale(1)',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  zIndex: isActive ? 2 : 1
-                }}
-              >
-                <span style={{ 
-                  fontSize: isActive ? '22px' : '20px', 
-                  fontWeight: isActive ? 800 : 700, 
-                  color: isActive ? '#111' : '#6B7280',
-                  lineHeight: 1
-                }}>
-                  {group}
-                </span>
-                
-                {/* Preserve space for the label even if inactive to maintain geometry */}
-                {isActive && (
-                  <span style={{ 
-                    fontSize: '8px', 
-                    fontWeight: 600, 
-                    color: '#888', 
-                    marginTop: '2px', 
-                    letterSpacing: '0.2px',
-                    opacity: 1,
-                    transition: 'opacity 0.2s'
-                  }}>
+const DrumCard = React.memo<DrumCardProps>(({ group, isSelected, onClick }) => (
+    <div
+        className={`${styles.card}${isSelected ? ` ${styles.cardActive}` : ''}`}
+        onClick={onClick}
+    >
+        <span className={styles.groupNum}>{group}</span>
+        <AnimatePresence mode="wait">
+            {isSelected && (
+                <motion.span
+                    key="drum-label"
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.12 }}
+                    className={styles.label}
+                >
                     підчерга
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+                </motion.span>
+            )}
+        </AnimatePresence>
     </div>
-  );
+));
+DrumCard.displayName = 'DrumCard';
+
+// ── SubqueueSelector ───────────────────────────────────────────────────────────
+export const SubqueueSelector: React.FC = () => {
+    const { selectedGroup = '1.1', setSelectedGroup } = useStore();
+
+    const viewportRef    = useRef<HTMLDivElement>(null);
+    const isScrollingRef = useRef(false);     // blocks useEffect during user scroll
+    const isInitialMount = useRef(true);      // skips animation on first render
+    const debounceRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // ── Desktop: convert vertical mouse wheel → horizontal scroll ────────────────
+    const handleWheel = useCallback((e: WheelEvent) => {
+        e.preventDefault();
+        const viewport = viewportRef.current;
+        if (!viewport) return;
+        // deltaY from vertical wheel → horizontal scroll
+        viewport.scrollLeft += e.deltaY !== 0 ? e.deltaY : e.deltaX;
+    }, []);
+
+    useEffect(() => {
+        const viewport = viewportRef.current;
+        if (!viewport) return;
+        // passive: false is required to allow preventDefault()
+        viewport.addEventListener('wheel', handleWheel, { passive: false });
+        return () => viewport.removeEventListener('wheel', handleWheel);
+    }, [handleWheel]);
+
+    // ── Core: called after scroll stops ─────────────────────────────────────────
+    const handleSnapEnd = useCallback(() => {
+        const viewport = viewportRef.current;
+        if (!viewport) return;
+
+        const rawIdx     = Math.round(viewport.scrollLeft / STEP);
+        const normalized = ((rawIdx % CLONE) + CLONE) % CLONE;
+        const newGroup   = GROUPS[normalized];
+
+        // Release scroll lock BEFORE setSelectedGroup so useEffect won't fight us
+        isScrollingRef.current = false;
+
+        // Update global state
+        setSelectedGroup(newGroup);
+
+        // Haptic
+        if (window.navigator.vibrate) window.navigator.vibrate(10);
+
+        // Circular instant jump: silently teleport to middle copy
+        const needsJump = rawIdx < CLONE || rawIdx >= CLONE * 2;
+        if (needsJump) {
+            viewport.scrollLeft = (CLONE + normalized) * STEP;
+        }
+    }, [setSelectedGroup]);
+
+    // ── Scroll listener (debounce covers all browsers incl. old Safari) ─────────
+    useEffect(() => {
+        const viewport = viewportRef.current;
+        if (!viewport) return;
+
+        const onScroll = () => {
+            isScrollingRef.current = true;
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+            debounceRef.current = setTimeout(handleSnapEnd, 150);
+        };
+
+        // scrollend gives instant response on modern browsers
+        const onScrollEnd = () => {
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+            handleSnapEnd();
+        };
+
+        const supportsScrollEnd = 'onscrollend' in window;
+
+        viewport.addEventListener('scroll', onScroll, { passive: true });
+        if (supportsScrollEnd) {
+            viewport.addEventListener('scrollend', onScrollEnd);
+        }
+
+        return () => {
+            viewport.removeEventListener('scroll', onScroll);
+            if (supportsScrollEnd) viewport.removeEventListener('scrollend', onScrollEnd);
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+        };
+    }, [handleSnapEnd]);
+
+    // ── Initial position + external sync (e.g. changed from Cabinet) ────────────
+    useEffect(() => {
+        const viewport = viewportRef.current;
+        if (!viewport) return;
+
+        const groupIdx = GROUPS.indexOf(selectedGroup);
+        if (groupIdx === -1) return;
+
+        const targetLeft = (CLONE + groupIdx) * STEP;
+
+        if (isInitialMount.current) {
+            // Instant — no animation on first render
+            viewport.scrollLeft = targetLeft;
+            isInitialMount.current = false;
+            return;
+        }
+
+        // Guard: skip if user is currently dragging
+        if (isScrollingRef.current) return;
+
+        // Guard: skip if already at correct position (avoids double-scroll after handleSnapEnd)
+        if (Math.abs(viewport.scrollLeft - targetLeft) < 2) return;
+
+        viewport.scrollTo({ left: targetLeft, behavior: 'smooth' });
+    }, [selectedGroup]);
+
+    // ── Scroll to a specific group (onClick handler) ─────────────────────────────
+    const scrollToGroup = useCallback((group: string) => {
+        const viewport = viewportRef.current;
+        if (!viewport) return;
+
+        const groupIdx = GROUPS.indexOf(group);
+        if (groupIdx === -1) return;
+
+        // Find the closest occurrence across all three copies
+        const currentIdx = Math.round(viewport.scrollLeft / STEP);
+        const candidates = [groupIdx, CLONE + groupIdx, 2 * CLONE + groupIdx];
+        const closestIdx = candidates.reduce((best, c) =>
+            Math.abs(c - currentIdx) < Math.abs(best - currentIdx) ? c : best
+        );
+
+        viewport.scrollTo({ left: closestIdx * STEP, behavior: 'smooth' });
+    }, []);
+
+    // ── Render ──────────────────────────────────────────────────────────────────
+    return (
+        <div className={styles.wrapper}>
+            <div className={styles.container}>
+
+                {/* Decorative center frame — static, outside map() */}
+                <div className={styles.centerFrame} />
+
+                {/* Orange pill indicator — static, outside map() */}
+                <div className={styles.activePill} />
+
+                {/* Scroll drum */}
+                <div ref={viewportRef} className={styles.viewport} style={{ cursor: 'grab' }} onMouseDown={(e) => { e.currentTarget.style.cursor = 'grabbing'; }} onMouseUp={(e) => { e.currentTarget.style.cursor = 'grab'; }} onMouseLeave={(e) => { e.currentTarget.style.cursor = 'grab'; }}>
+                    <div className={styles.track}>
+                        {ITEMS.map((group, index) => (
+                            <DrumCard
+                                key={index}
+                                group={group}
+                                isSelected={group === selectedGroup}
+                                onClick={() => scrollToGroup(group)}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    );
 };

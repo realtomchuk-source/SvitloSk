@@ -8,17 +8,19 @@ import { SubGroupSheet } from './components/SubGroupSheet';
 import { NotificationEditorSheet } from './components/NotificationEditorSheet';
 import { AuthPromptSheet } from './components/AuthPromptSheet';
 import { AboutSheet } from './components/AboutSheet';
+import { SignOutSheet } from './components/SignOutSheet';
 import type { Slot } from '@/schemas/user';
 import { clsx } from 'clsx';
 import styles from './Cabinet.module.css';
 
 export const Cabinet: React.FC = () => {
-    const { user, userConfig, updateUserConfig, slots, addSlot, updateSlot, deleteSlot, signInWithGoogle } = useStore();
+    const { user, userConfig, updateUserConfig, slots, addSlot, updateSlot, deleteSlot, signInWithGoogle, signOut } = useStore();
 
     const [isSubGroupSheetOpen, setSubGroupSheetOpen] = useState(false);
     const [isEditorSheetOpen, setEditorSheetOpen] = useState(false);
     const [isAuthSheetOpen, setAuthSheetOpen] = useState(false);
     const [isAboutSheetOpen, setAboutSheetOpen] = useState(false);
+    const [isSignOutSheetOpen, setSignOutSheetOpen] = useState(false);
     const [editingSlot, setEditingSlot] = useState<Slot | null>(null);
 
     const isAnon = !user || user.is_anonymous;
@@ -86,7 +88,11 @@ export const Cabinet: React.FC = () => {
 
     return (
         <div className={clsx(styles.cabinetRoot, 'page-cabinet')}>
-            <ProfileCard user={profile} onClick={() => setAuthSheetOpen(true)} />
+            <ProfileCard
+                user={profile}
+                onClick={() => setAuthSheetOpen(true)}
+                onSignOut={() => setSignOutSheetOpen(true)}
+            />
             
             <NotificationSlots 
                 slots={slots} 
@@ -122,6 +128,13 @@ export const Cabinet: React.FC = () => {
                 slot={editingSlot}
                 onSave={handleSaveSlot}
                 onDelete={(id) => deleteSlot(id)}
+            />
+
+            <SignOutSheet
+                isOpen={isSignOutSheetOpen}
+                onClose={() => setSignOutSheetOpen(false)}
+                onConfirm={signOut}
+                userName={profile.name}
             />
 
             <AuthPromptSheet

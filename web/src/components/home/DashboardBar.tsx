@@ -3,13 +3,18 @@ import React from 'react';
 interface DashboardBarProps {
   isOn: boolean;
   realTime: Date;
+  isVirtual?: boolean;
+  isPast?: boolean;
 }
 
-export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime }) => {
+export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual, isPast }) => {
   const dayStr = realTime.toLocaleDateString('uk-UA', { weekday: 'short' }).toUpperCase();
   const dateNum = realTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: '2-digit' });
   const timeStr = realTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
   const secStr = realTime.getSeconds().toString().padStart(2, '0');
+
+  // Styles for History (Past) Mode
+  const clockColor = isPast ? '#A1A1AA' : '#000';
 
   return (
     <div style={{
@@ -21,7 +26,8 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime }) => {
       padding: '16px 24px',
       margin: '12px 20px',
       boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
-      border: '1px solid rgba(0,0,0,0.02)'
+      border: '1px solid rgba(0,0,0,0.02)',
+      transition: 'all 0.3s ease'
     }}>
       {/* Date Segment */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
@@ -31,8 +37,33 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime }) => {
 
       {/* Clock Segment */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1px', fontFamily: 'Inter, sans-serif' }}>
-        <span style={{ fontSize: '20px', fontWeight: 800, color: '#000', letterSpacing: '-0.5px', lineHeight: 1 }}>{timeStr}</span>
-        <span style={{ fontSize: '11px', fontWeight: 600, color: '#A0A0A0', lineHeight: 1, marginTop: '2px' }}>{secStr}</span>
+        <span style={{ 
+          fontSize: '20px', 
+          fontWeight: 800, 
+          color: clockColor, 
+          letterSpacing: '-0.5px', 
+          lineHeight: 1,
+          transition: 'color 0.3s ease'
+        }}>
+          {timeStr}
+        </span>
+        
+        {/* Hide seconds in virtual mode to emphasize 'snapshot' nature */}
+        {!isVirtual && (
+          <span style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#A0A0A0',
+            lineHeight: 1,
+            marginTop: '2px',
+            fontVariantNumeric: 'tabular-nums',  /* A: однакова ширина кожної цифри */
+            display: 'inline-block',             /* B: фіксований блок */
+            width: '16px',                       /* B: постійна ширина — не змінюється */
+            textAlign: 'left',
+          }}>
+            {secStr}
+          </span>
+        )}
       </div>
     </div>
   );

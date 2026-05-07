@@ -11,29 +11,31 @@ interface AuthPromptSheetProps {
 export const AuthPromptSheet: React.FC<AuthPromptSheetProps> = ({ isOpen, onClose, onLogin }) => {
     return (
         <BottomSheet isOpen={isOpen} onClose={onClose} title="Потрібна реєстрація">
-            <div style={{ textAlign: 'center', padding: '32px 16px 120px' }}>
+            <div style={{ textAlign: 'center', padding: '8px 16px 100px' }}>
                 
-                {/* Branded Identity - Bulb */}
-                <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'center' }}>
+                {/* Branded Identity - Glass Hero Icon */}
+                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
                     <div style={{ 
                         width: 80, 
                         height: 80, 
-                        background: '#f4f4f5', 
-                        borderRadius: '12px', 
+                        background: 'linear-gradient(135deg, rgba(238, 114, 33, 0.12) 0%, rgba(238, 114, 33, 0.06) 100%)', 
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: '50%', 
                         display: 'flex', 
                         alignItems: 'center', 
-                        justifyContent: 'center' 
+                        justifyContent: 'center',
+                        border: '1.5px solid rgba(238, 114, 33, 0.15)'
                     }}>
-                        <BrandIcon variant="logo" size={48} color="#EE7221" />
+                        <BrandIcon variant="contour" size={60} color="#EE7221" />
                     </div>
                 </div>
 
                 <div style={{ 
                     fontSize: '17px', 
                     color: '#1a1a1c', 
-                    marginBottom: '40px', 
-                    lineHeight: '1.6', 
-                    padding: '0 12px',
+                    marginBottom: '24px', 
+                    lineHeight: '1.5', 
+                    padding: '0 20px',
                     fontWeight: '600'
                 }}>
                     Щоб користуватися цією функцією та синхронізувати дані, будь ласка, увійдіть у свій профіль.

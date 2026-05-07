@@ -13,7 +13,7 @@ import '@/styles/legacy/selector.css';
 import '@/styles/legacy/sssk-modern.css';
 
 export const Home: React.FC = () => {
-  const { selectedGroup, setSelectedGroup, scheduleData } = useStore();
+  const { selectedGroup, scheduleData } = useStore();
   const fallbackSchedule = "1".repeat(24);
   const currentQueuesStr = scheduleData?.queues[selectedGroup] || fallbackSchedule;
   
@@ -46,6 +46,7 @@ export const Home: React.FC = () => {
     return {
       referenceDate,
       isVirtual: scrubSlot !== null,
+      isPast: scrubSlot !== null && referenceDate < realTime,
       isOn: info.isCurrentlyOn,
       timeH: info.h,
       timeM: info.m,
@@ -74,6 +75,8 @@ export const Home: React.FC = () => {
         <DashboardBar 
           isOn={displayContext.isOn} 
           realTime={displayContext.referenceDate} 
+          isVirtual={displayContext.isVirtual}
+          isPast={displayContext.isPast}
         />
         
         <InteractiveTimeline 
@@ -81,10 +84,7 @@ export const Home: React.FC = () => {
           onScrub={setScrubSlot}
         />
 
-        <SubqueueSelector 
-          selectedGroup={selectedGroup}
-          onSelect={setSelectedGroup}
-        />
+        <SubqueueSelector />
       </section>
     </div>
   );
