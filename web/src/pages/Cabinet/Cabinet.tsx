@@ -4,7 +4,7 @@ import { ProfileCard } from './components/ProfileCard';
 import { NotificationSlots } from './components/NotificationSlots';
 import { GeneralSettings } from './components/GeneralSettings';
 import { CabinetRow } from './components/CabinetPrimitives';
-import { Hash, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { AboutSection } from './components/AboutSection';
 import { SubGroupSheet } from './components/SubGroupSheet';
 import { NotificationEditorSheet } from './components/NotificationEditorSheet';
@@ -98,9 +98,9 @@ export const Cabinet: React.FC = () => {
             
             <div className={styles.standaloneRowWrap}>
                 <CabinetRow
-                    icon={<Hash size={18} strokeWidth={2.5} />}
-                    label="Стартова підчерга"
+                    label={<span className={styles.slotTitle}>Показувати першою підчергу</span>}
                     onClick={() => setSubGroupSheetOpen(true)}
+                    className={styles.controlPanelRow}
                     rightElement={
                         <>
                             <span className={styles.settingValueOrange}>{userConfig.startGroup}</span>

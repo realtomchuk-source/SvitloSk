@@ -1,28 +1,20 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { clsx } from 'clsx';
 
 interface InteractiveTimelineProps {
   queuesStr: string;
-  onScrub?: (slotIndex: number | null) => void;
+  activeSlot: number;
+  currentRealSlot: number;
+  onScrub?: (percent: number | null) => void;
 }
 
-export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queuesStr, onScrub }) => {
+export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queuesStr, activeSlot, currentRealSlot, onScrub }) => {
   const SLOTS_COUNT = 48;
   const trackRef = useRef<HTMLDivElement>(null);
   
   const [isDragging, setIsDragging] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   
-  const getCurrentSlot = () => {
-    const d = new Date();
-    return Math.floor((d.getHours() * 60 + d.getMinutes()) / 30);
-  };
-
-  useEffect(() => {
-    if (!isDragging && selectedSlot === null) {
-      setSelectedSlot(getCurrentSlot());
-    }
-  }, [isDragging, selectedSlot]);
+  // (Initial slot logic moved to parent Home.tsx)
 
   const handlePointerDown = (e: React.PointerEvent) => {
     setIsDragging(true);
@@ -41,7 +33,6 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
     
     // Auto-return after 5 seconds of idle time
     setTimeout(() => {
-      setSelectedSlot(null);
       if (onScrub) onScrub(null);
     }, 5000);
   };
@@ -53,14 +44,12 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
     let percent = relativeX / rect.width;
     percent = Math.max(0, Math.min(1, percent));
     
-    const snappedSlot = Math.round(percent * SLOTS_COUNT);
-    const finalSlot = Math.max(0, Math.min(SLOTS_COUNT - 1, snappedSlot));
-    setSelectedSlot(finalSlot);
-    if (onScrub) onScrub(finalSlot);
+    // Parent will receive percent and update activeSlot prop
+    if (onScrub) onScrub(percent);
   };
 
-  // If not scrubbing, visually show the current real time slot
-  const displaySlot = selectedSlot !== null ? selectedSlot : getCurrentSlot();
+  // Use activeSlot from parent props
+  const displaySlot = activeSlot;
   const slotPercent = (displaySlot / (SLOTS_COUNT - 1)) * 100;
   const isSlotAvailable = queuesStr[Math.floor(displaySlot / 2)] === '1';
   
@@ -161,8 +150,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
         >
           {Array.from({ length: 48 }).map((_, i) => {
             const isAvailable = queuesStr[Math.floor(i / 2)] === '1';
-            const realSlot = getCurrentSlot();
-            const isPast = i < realSlot;
+            const isPast = i < currentRealSlot;
             
             // Muted colors for history (fixed to real time)
             const availableColor = isPast ? '#FFB380' : '#FF7A00'; 

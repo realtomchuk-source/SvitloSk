@@ -40,7 +40,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #71717a;
-    padding: 0 12px; /* Align with internal card content (12px from card edge) */
+    padding: 0 16px; /* Align with the 'Iron Vertical' (16px root + 16px inner) */
     margin-top: 4px;
     margin-bottom: 0px;
 }
@@ -57,7 +57,7 @@
 }
 
 .standaloneRowWrap {
-    margin-top: 4px;
+    margin-top: 0px;
     margin-bottom: 0px;
     transition: all 0.2s ease;
     cursor: pointer;
@@ -77,9 +77,9 @@
    ============================================ */
 .profileHeader {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 10px;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
 }
 
 .avatarWrap {
@@ -112,8 +112,8 @@
 .profileText {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 64px; /* Match new 64px standard */
+    justify-content: flex-end;
+    height: 64px;
 }
 
 .statusIconWrap {
@@ -140,10 +140,11 @@
 }
 
 .profileName {
-    font-size: 17px; /* Slightly refined size */
+    font-size: 17px;
     font-weight: 700;
     color: #1a1a1c;
     line-height: 1.2;
+    padding-bottom: 3px;
 }
 
 
@@ -204,7 +205,7 @@
 .slotTitle {
     font-size: 16px;
     font-weight: 700;
-    color: #1a1a1c;
+    color: #71717a;
 }
 
 .slotTimeText {
@@ -358,11 +359,11 @@
 /* ============================================
    SYNC ICONS (ProfileCard right column)
    ============================================ */
-.syncIcons {
+.profileActionsGrid {
     margin-left: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(2, 32px);
+    grid-template-rows: auto;
     gap: 6px;
     flex-shrink: 0;
 }
@@ -379,6 +380,12 @@
     padding: 0;
     transition: background 0.2s ease, border-color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
+}
+
+.statusIconOnly {
+    background: transparent !important;
+    border: none !important;
+    transform: translateY(2px);
 }
 
 .syncIconBtn:active {

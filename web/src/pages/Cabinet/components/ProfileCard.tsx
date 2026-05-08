@@ -1,6 +1,7 @@
 import React from 'react';
+import { clsx } from 'clsx';
 import { BrandIcon } from '../../../assets/brand/BrandIcon';
-import { Plus, Minus } from 'lucide-react';
+import { PlusStatusIcon, MinusStatusIcon } from '../../../assets/icons/StatusIcons';
 import styles from '../Cabinet.module.css';
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────────
@@ -66,12 +67,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
 
                     {/* Name block */}
                     <div className={styles.profileText}>
-                        <div className={`${styles.statusIconWrap} ${isAnon ? styles.statusIconAnon : styles.statusIconReg}`}>
-                            {isAnon 
-                                ? <Minus size={16} strokeWidth={3} /> 
-                                : <Plus size={16} strokeWidth={3} />
-                            }
-                        </div>
                         <div className={styles.profileName}>
                             {isAnon && user.id
                                 ? `Користувач #${user.id.slice(-4).toUpperCase()}`
@@ -79,22 +74,25 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
                         </div>
                     </div>
 
-                    {/* Sync icons — always in top-right */}
-                    <div className={styles.syncIcons}>
-                        {/* Google — color if registered, tap to sign out */}
+                    {/* Action Grid — top right */}
+                    <div className={styles.profileActionsGrid}>
+                        {/* Row 1 */}
+                        <div className={styles.syncIconBtn} title="Telegram (незабаром)">
+                            <TelegramIcon />
+                        </div>
                         <button
                             className={styles.syncIconBtn}
                             onClick={!isAnon ? (e) => { e.stopPropagation(); onSignOut?.(); } : undefined}
                             style={{ cursor: !isAnon ? 'pointer' : 'default' }}
                             title={!isAnon ? 'Вийти з акаунту Google' : 'Google'}
-                            aria-label="Google sync status"
                         >
                             <GoogleIcon active={!isAnon} />
                         </button>
-
-                        {/* Telegram — always gray (future) */}
-                        <div className={styles.syncIconBtn} title="Telegram (незабаром)" aria-label="Telegram sync status">
-                            <TelegramIcon />
+                        
+                        {/* Row 2: Status Icon in the far bottom-right corner (under Google) */}
+                        <div /> {/* Empty cell under Telegram */}
+                        <div className={clsx(styles.syncIconBtn, styles.statusIconOnly)}>
+                            {isAnon ? <MinusStatusIcon size={18} /> : <PlusStatusIcon size={18} />}
                         </div>
                     </div>
 

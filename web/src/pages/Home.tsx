@@ -19,8 +19,8 @@ export const Home: React.FC = () => {
   
   const [realTime, setRealTime] = useState(new Date());
   
-  // TIME MACHINE STATE
-  const [scrubSlot, setScrubSlot] = useState<number | null>(null);
+  // TIME MACHINE STATE (Continuous)
+  const [scrubPercent, setScrubPercent] = useState<number | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -34,10 +34,11 @@ export const Home: React.FC = () => {
     // Determine the reference time (Real or Virtual)
     let referenceDate = new Date(realTime);
     
-    if (scrubSlot !== null) {
-      // Set to virtual time (slot 0 = 00:00, slot 1 = 00:30, etc.)
-      const vHour = Math.floor(scrubSlot / 2);
-      const vMin = (scrubSlot % 2) * 30;
+    if (scrubPercent !== null) {
+      // High-precision virtual time (0 - 1439 minutes)
+      const totalMinutes = Math.floor(scrubPercent * 1439);
+      const vHour = Math.floor(totalMinutes / 60);
+      const vMin = totalMinutes % 60;
       referenceDate.setHours(vHour, vMin, 0, 0);
     }
 
@@ -45,20 +46,25 @@ export const Home: React.FC = () => {
     
     return {
       referenceDate,
-      isVirtual: scrubSlot !== null,
-      isPast: scrubSlot !== null && referenceDate < realTime,
+      isVirtual: scrubPercent !== null,
+      isPast: scrubPercent !== null && referenceDate < realTime,
       isOn: info.isCurrentlyOn,
       timeH: info.h,
       timeM: info.m,
       nextChangeHour: info.nextChangeHour
     };
-  }, [realTime, scrubSlot, currentQueuesStr]);
+  }, [realTime, scrubPercent, currentQueuesStr]);
   
   // VIRTUAL POINTER PERCENT
-  // Use SLOTS_COUNT - 1 (47) to perfectly align 100% with the right edge
-  const pointerPercent = scrubSlot !== null 
-    ? (scrubSlot / 47) * 100 
+  const pointerPercent = scrubPercent !== null 
+    ? scrubPercent * 100 
     : ((realTime.getHours() * 60 + realTime.getMinutes()) / 1440) * 100;
+
+  // Discrete slot for labels (0 - 47)
+  const currentRealSlot = Math.floor((realTime.getHours() * 60 + realTime.getMinutes()) / 30);
+  const activeSlot = scrubPercent !== null 
+    ? Math.max(0, Math.min(47, Math.round(scrubPercent * 47))) 
+    : currentRealSlot;
 
   return (
     <div className={clsx("page-home", !displayContext.isOn && "status-off")}>
@@ -81,7 +87,9 @@ export const Home: React.FC = () => {
         
         <InteractiveTimeline 
           queuesStr={currentQueuesStr} 
-          onScrub={setScrubSlot}
+          activeSlot={activeSlot}
+          currentRealSlot={currentRealSlot}
+          onScrub={setScrubPercent}
         />
 
         <SubqueueSelector />

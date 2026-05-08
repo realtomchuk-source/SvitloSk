@@ -1,6 +1,6 @@
 import React from 'react';
 import { BottomSheet } from '../../../components/ui/BottomSheet/BottomSheet';
-import { BrandIcon } from '../../../assets/brand/BrandIcon';
+import { MainLogoIcon } from '../../../assets/brand/MainLogoIcon';
 import styles from './AboutSheet.module.css';
 
 interface AboutSheetProps {
@@ -14,21 +14,24 @@ export const AboutSheet: React.FC<AboutSheetProps> = ({ isOpen, onClose }) => {
             <div className={styles.container}>
                 <div className={styles.logoBoxWrap}>
                     <div className={styles.logoBox}>
-                        <BrandIcon variant="logo" size={48} color="#EE7221" />
+                        <MainLogoIcon size={84} />
                     </div>
                 </div>
                 
                 <h2 className={styles.title}>
-                    SvitloSk
+                    <span style={{ color: '#ee7221' }}>Svitlo</span>
+                    <span style={{ color: '#374151' }}>Sk</span>
                 </h2>
                 <p className={styles.version}>
-                    Версія 2.1.0 (Build 20240503)
+                    Версія 2.1.0
                 </p>
 
                 <div className={styles.descriptionBox}>
                     <p className={styles.descriptionText}>
-                        <strong>SvitloSk</strong> — це зручний інструмент для моніторингу графіків відключень світла у Старокостянтинівській громаді. 
-                        Ми прагнемо робити отримання інформації швидким та комфортним.
+                        Зручний інструмент моніторингу енергопостачання Старокостянтинівської громади.
+                    </p>
+                    <p className={styles.descriptionText} style={{ marginTop: '12px' }}>
+                        Ми робимо отримання інформації комфортним та швидким.
                     </p>
                 </div>
 

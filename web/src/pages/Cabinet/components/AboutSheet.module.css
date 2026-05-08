@@ -10,17 +10,16 @@
 }
 
 .logoBox {
-    width: 80px;
-    height: 80px;
-    background: #f4f4f5;
-    border-radius: 12px;
+    width: 84px;
+    height: 84px;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .title {
-    fontSize: 20px;
+    font-size: 20px;
     font-weight: 700;
     margin-bottom: 8px;
     color: #1a1a1c;
@@ -41,7 +40,7 @@
 }
 
 .descriptionText {
-    font-size: 14px;
+    font-size: 15px;
     color: #3f3f46;
     line-height: 1.6;
     margin: 0;

@@ -7,7 +7,7 @@ import styles from './SubqueueSelector.module.css';
 const GROUPS = ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2', '5.1', '5.2', '6.1', '6.2'];
 const CLONE = GROUPS.length;                         // 12
 const ITEMS = [...GROUPS, ...GROUPS, ...GROUPS];     // 36 total
-const CARD_W = 72;
+const CARD_W = 78;
 const GAP = 10;
 const STEP = CARD_W + GAP;                           // 82px per snap step
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BottomSheet } from '../../../components/ui/BottomSheet/BottomSheet';
-import { BrandIcon } from '../../../assets/brand/BrandIcon';
+import { MainLogoIcon } from '../../../assets/brand/MainLogoIcon';
 
 interface AuthPromptSheetProps {
     isOpen: boolean;
@@ -15,15 +15,13 @@ export const AuthPromptSheet: React.FC<AuthPromptSheetProps> = ({ isOpen, onClos
                 
                 <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}>
                     <div style={{ 
-                        width: 80, 
-                        height: 80, 
-                        background: '#f4f4f5', 
-                        borderRadius: '12px', 
+                        width: 84, 
+                        height: 84, 
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center'
                     }}>
-                        <BrandIcon variant="logo" size={48} color="#EE7221" />
+                        <MainLogoIcon size={84} />
                     </div>
                 </div>
 
