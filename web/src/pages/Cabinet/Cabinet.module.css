@@ -266,7 +266,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px; /* Unified 12px padding */
+    padding: 12px 16px; /* Unified 16px side padding for 'Iron Vertical' */
     cursor: pointer;
     position: relative;
     min-height: 52px;
@@ -386,6 +386,7 @@
     background: transparent !important;
     border: none !important;
     transform: translateY(2px);
+    justify-content: flex-end; /* Align to the right edge of the grid cell */
 }
 
 .syncIconBtn:active {
