@@ -45,15 +45,18 @@ export const NotificationSlots: React.FC<NotificationSlotsProps> = ({ slots, isL
                 </div>
 
                 <div className={styles.slotDetailsLine}>
-                    <span className={styles.slotTimeText}>
-                        <Moon size={14} strokeWidth={2.5} />
-                        {slot.notify247 ? 'Сповіщати 24/7' : `з ${slot.dndStart}-${slot.dndEnd} не турбувати`}
-                    </span>
-                    <span className={styles.slotDnd} style={{ color: '#d4d4d8' }}>•</span>
-                    <span className={styles.slotTimeText}>
-                        <Bell size={14} strokeWidth={2.5} />
-                        за {slot.notifyAdvance} хв.
-                    </span>
+                    <div className={styles.slotDetailsLeft}>
+                        <span className={styles.slotTimeText}>
+                            <Moon size={14} strokeWidth={2.5} />
+                            {slot.notify247 ? 'Сповіщати 24/7' : `з ${slot.dndStart}-${slot.dndEnd} не турбувати`}
+                        </span>
+                    </div>
+                    <div className={styles.slotDetailsRight}>
+                        <span className={styles.slotTimeText}>
+                            за {slot.notifyAdvance} хв.
+                            <Bell size={14} strokeWidth={2.5} />
+                        </span>
+                    </div>
                 </div>
             </div>
         );

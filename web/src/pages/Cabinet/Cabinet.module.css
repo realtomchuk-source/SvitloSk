@@ -40,9 +40,10 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #71717a;
-    padding: 0 16px; /* Align with the 'Iron Vertical' (16px root + 16px inner) */
+    padding: 0 24px 0 16px; /* Right-side gutter (24px) to accommodate indicators at 16px */
     margin-top: 4px;
     margin-bottom: 0px;
+    text-align: right;
 }
 
 /* ============================================
@@ -79,7 +80,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 14px 16px;
+    padding: 14px 24px 14px 16px; /* 24px right padding for grid alignment */
 }
 
 .avatarWrap {
@@ -188,12 +189,23 @@
 
 .activeIndicator {
     position: absolute;
-    left: 0;
+    right: 16px;
     top: 0;
     bottom: 0;
     width: 4px;
     background: var(--cb-brand-orange);
-    border-radius: 4px 0 0 4px;
+    border-radius: 2px;
+}
+
+.standaloneActiveIndicator {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: var(--cb-brand-orange);
+    border-radius: 2px;
 }
 
 .slotTopRow {
@@ -209,12 +221,12 @@
 }
 
 .slotTimeText {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: #71717a;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .slotGroup {
@@ -236,9 +248,16 @@
 
 .slotDetailsLine {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f4f4f5;
+}
+
+.slotDetailsLeft, .slotDetailsRight {
+    display: flex;
+    align-items: center;
 }
 
 .slotBottomRow {
@@ -266,7 +285,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px; /* Unified 16px side padding for 'Iron Vertical' */
+    padding: 12px 24px 12px 16px; /* Consistent 24px right padding for 'Action Zone' sync */
     cursor: pointer;
     position: relative;
     min-height: 52px;

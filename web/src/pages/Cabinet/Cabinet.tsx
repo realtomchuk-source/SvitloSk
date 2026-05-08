@@ -4,7 +4,7 @@ import { ProfileCard } from './components/ProfileCard';
 import { NotificationSlots } from './components/NotificationSlots';
 import { GeneralSettings } from './components/GeneralSettings';
 import { CabinetRow } from './components/CabinetPrimitives';
-import { ChevronRight } from 'lucide-react';
+// Icons handled in primitives or sub-components
 import { AboutSection } from './components/AboutSection';
 import { SubGroupSheet } from './components/SubGroupSheet';
 import { NotificationEditorSheet } from './components/NotificationEditorSheet';
@@ -96,16 +96,16 @@ export const Cabinet: React.FC = () => {
                 onSignOut={() => setSignOutSheetOpen(true)}
             />
             
-            <div className={styles.standaloneRowWrap}>
+            <div className={styles.standaloneRowWrap} style={{ position: 'relative' }}>
+                <div className={styles.standaloneActiveIndicator} />
                 <CabinetRow
                     label={<span className={styles.slotTitle}>Показувати першою підчергу</span>}
                     onClick={() => setSubGroupSheetOpen(true)}
                     className={styles.controlPanelRow}
                     rightElement={
-                        <>
-                            <span className={styles.settingValueOrange}>{userConfig.startGroup}</span>
-                            <ChevronRight size={16} color="#d4d4d8" />
-                        </>
+                        <span className={styles.slotGroup} style={{ color: 'var(--cb-brand-orange)' }}>
+                            {userConfig.startGroup}
+                        </span>
                     }
                 />
             </div>
