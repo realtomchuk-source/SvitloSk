@@ -40,7 +40,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #71717a;
-    padding: 0 24px 0 16px; /* Right-side gutter (24px) to accommodate indicators at 16px */
+    padding: 0 20px 0 16px; /* Optimized 20px right padding for better optical balance */
     margin-top: 4px;
     margin-bottom: 0px;
     text-align: right;
@@ -80,7 +80,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 14px 24px 14px 16px; /* 24px right padding for grid alignment */
+    padding: 14px 20px 14px 16px; /* 20px right padding for grid alignment */
 }
 
 .avatarWrap {
@@ -187,27 +187,6 @@
     overflow: hidden;
 }
 
-.activeIndicator {
-    position: absolute;
-    right: 16px;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--cb-brand-orange);
-    border-radius: 2px;
-}
-
-.standaloneActiveIndicator {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 20px;
-    background: var(--cb-brand-orange);
-    border-radius: 2px;
-}
-
 .slotTopRow {
     display: flex;
     justify-content: space-between;
@@ -285,7 +264,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 24px 12px 16px; /* Consistent 24px right padding for 'Action Zone' sync */
+    padding: 12px 20px 12px 16px; /* Unified 20px side padding for optical balance */
     cursor: pointer;
     position: relative;
     min-height: 52px;

@@ -97,7 +97,6 @@ export const Cabinet: React.FC = () => {
             />
             
             <div className={styles.standaloneRowWrap} style={{ position: 'relative' }}>
-                <div className={styles.standaloneActiveIndicator} />
                 <CabinetRow
                     label={<span className={styles.slotTitle}>Показувати першою підчергу</span>}
                     onClick={() => setSubGroupSheetOpen(true)}
