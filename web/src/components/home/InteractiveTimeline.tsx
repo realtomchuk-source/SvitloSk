@@ -11,9 +11,9 @@ interface InteractiveTimelineProps {
 export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queuesStr, activeSlot, currentRealSlot, onScrub }) => {
   const SLOTS_COUNT = 48;
   const trackRef = useRef<HTMLDivElement>(null);
-  
+
   const [isDragging, setIsDragging] = useState(false);
-  
+
   // (Initial slot logic moved to parent Home.tsx)
 
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -30,7 +30,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
   const handlePointerUp = (e: React.PointerEvent) => {
     setIsDragging(false);
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    
+
     // Auto-return after 5 seconds of idle time
     setTimeout(() => {
       if (onScrub) onScrub(null);
@@ -43,7 +43,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
     const relativeX = clientX - rect.left;
     let percent = relativeX / rect.width;
     percent = Math.max(0, Math.min(1, percent));
-    
+
     // Parent will receive percent and update activeSlot prop
     if (onScrub) onScrub(percent);
   };
@@ -52,7 +52,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
   const displaySlot = activeSlot;
   const slotPercent = (displaySlot / (SLOTS_COUNT - 1)) * 100;
   const isSlotAvailable = queuesStr[Math.floor(displaySlot / 2)] === '1';
-  
+
   const h = Math.floor(displaySlot / 2).toString().padStart(2, '0');
   const m = (displaySlot % 2 === 0) ? '00' : '30';
   const timeStr = `${h}:${m}`;
@@ -62,9 +62,9 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
 
   return (
     <div className="section-container timeline-block-v2" style={{ padding: '0 34px', margin: '20px 0' }}>
-      
+
       {/* Light Theme Status Display */}
-      <div 
+      <div
         style={{
           fontSize: '12px',
           color: isSlotAvailable ? '#FF7A00' : '#8E8E93',
@@ -78,7 +78,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
         {timeStr} — {label}
       </div>
 
-      <div 
+      <div
         className="track-wrap"
         ref={trackRef}
         onPointerDown={handlePointerDown}
@@ -99,7 +99,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
             const leftPercent = (i / SLOTS_COUNT) * 100;
             return (
               <React.Fragment key={i}>
-                <div 
+                <div
                   className={clsx("scale__tick", isMajor && "scale__tick--major")}
                   style={{
                     position: 'absolute',
@@ -108,10 +108,10 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
                     height: isMajor ? '8px' : '4px',
                     background: '#C2C5CA',
                     left: `${leftPercent}%`
-                  }} 
+                  }}
                 />
                 {isMajor && (
-                  <div 
+                  <div
                     className="scale__label"
                     style={{
                       position: 'absolute',
@@ -124,7 +124,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
                       left: `${leftPercent}%`
                     }}
                   >
-                    {(i/2).toString().padStart(2, '0')}
+                    {(i / 2).toString().padStart(2, '0')}
                   </div>
                 )}
               </React.Fragment>
@@ -133,7 +133,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
         </div>
 
         {/* The Track */}
-        <div 
+        <div
           className="track"
           style={{
             position: 'absolute',
@@ -151,31 +151,31 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
           {Array.from({ length: 48 }).map((_, i) => {
             const isAvailable = queuesStr[Math.floor(i / 2)] === '1';
             const isPast = i < currentRealSlot;
-            
+
             // Muted colors for history (fixed to real time)
-            const availableColor = isPast ? '#FFB380' : '#FF7A00'; 
+            const availableColor = isPast ? '#FFB380' : '#FF7A00';
             const unavailableColor = isPast ? 'rgba(232, 232, 237, 0.4)' : 'transparent';
 
             return (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className={clsx("track__segment", isAvailable ? "track__segment--available" : "track__segment--unavailable")}
-                style={{ 
-                  flex: 1, 
+                style={{
+                  flex: 1,
                   background: isAvailable ? availableColor : unavailableColor,
-                  height: '100%' 
-                }} 
+                  height: '100%'
+                }}
               />
             );
           })}
         </div>
 
         {/* The Metallic Thumb */}
-        <div 
+        <div
           className={clsx("thumb", isDragging && "thumb--dragging")}
           style={{
             position: 'absolute',
-            top: '39px', 
+            top: '39px',
             left: `${slotPercent}%`,
             width: '18px',
             height: '28px',
@@ -183,40 +183,40 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
             border: '1.5px solid #A0AEC0',
             borderRadius: '8px',
             transform: 'translate(-50%, -50%)',
-            boxShadow: isDragging 
-              ? '0 4px 12px rgba(255, 122, 0, 0.4), 0 0 8px rgba(255,255,255,0.4)' 
+            boxShadow: isDragging
+              ? '0 4px 12px rgba(255, 122, 0, 0.4), 0 0 8px rgba(255,255,255,0.4)'
               : 'inset 0 1px 2px rgba(255,255,255,1), 0 2px 8px rgba(0,0,0,0.2), 0 0 3px rgba(255,255,255,0.6)',
             pointerEvents: 'none',
             zIndex: 10,
             transition: isDragging ? 'none' : 'left 0.1s ease-out'
           }}
         >
-           {/* Inner glowing orange line */}
-           <div style={{
-               position: 'absolute',
-               top: '50%',
-               left: '50%',
-               width: '6px',
-               height: '14px',
-               background: '#FF7A00',
-               borderRadius: '3px',
-               transform: 'translate(-50%, -50%)',
-               boxShadow: '0 0 4px #FF7A00',
-               zIndex: 2
-             }}
-           />
-           {/* Crosshair Drop line (Time Machine indicator) */}
-           <div style={{
-             position: 'absolute',
-             top: '50%',
-             left: '50%',
-             width: '1px',
-             height: '46px', 
-             background: '#C2C5CA',
-             transform: 'translate(-50%, -50%)',
-             opacity: 1, 
-             zIndex: 1
-           }} />
+          {/* Inner glowing orange line */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '6px',
+            height: '14px',
+            background: '#FF7A00',
+            borderRadius: '3px',
+            transform: 'translate(-50%, -50%)',
+            boxShadow: '0 0 4px #FF7A00',
+            zIndex: 2
+          }}
+          />
+          {/* Crosshair Drop line (Time Machine indicator) */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '1px',
+            height: '46px',
+            background: '#C2C5CA',
+            transform: 'translate(-50%, -50%)',
+            opacity: 1,
+            zIndex: 1
+          }} />
         </div>
       </div>
     </div>

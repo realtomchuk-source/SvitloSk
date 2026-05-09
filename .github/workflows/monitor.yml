@@ -69,6 +69,15 @@ jobs:
             echo "SQLite DB not found - normal if no heavy scan occurred yet."
           fi
 
+      # ===== Синхронізація з Supabase (Push-машина) =====
+      - name: Sync schedules to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          cd parser
+          python sync_supabase.py
+
       # ===== Commit results =====
       - name: Commit and Push
         run: |

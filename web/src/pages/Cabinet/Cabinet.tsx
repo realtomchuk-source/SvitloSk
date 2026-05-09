@@ -14,6 +14,8 @@ import { SignOutSheet } from './components/SignOutSheet';
 import type { Slot } from '@/schemas/user';
 import { clsx } from 'clsx';
 import styles from './Cabinet.module.css';
+import { subscribeToPushNotifications } from '@/pushService';
+import { supabase } from '@/services/supabaseClient';
 
 export const Cabinet: React.FC = () => {
     const { user, userConfig, updateUserConfig, slots, addSlot, updateSlot, deleteSlot, signInWithGoogle, signOut } = useStore();
@@ -35,12 +37,50 @@ export const Cabinet: React.FC = () => {
         isAnon
     };
 
-    const handleToggleTomorrow = () => {
+    // --- Логіка запиту дозволу та підписки на пуші ---
+    const ensurePushSubscription = async () => {
+        if (isAnon) return false;
+        try {
+            const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+            if (!vapidKey) throw new Error("VAPID ключ не знайдено в налаштуваннях");
+
+            // Отримуємо підписку з браузера
+            const tokenJson = await subscribeToPushNotifications(vapidKey);
+            
+            // Відправляємо її в нашу "сліпу" базу Supabase
+            const { error } = await supabase
+                .from('user_push_tokens')
+                .upsert({
+                    user_id: user!.id,
+                    push_token: JSON.parse(tokenJson),
+                    device_id: navigator.userAgent, // Базовий ідентифікатор пристрою
+                    updated_at: new Date().toISOString()
+                });
+
+            if (error) throw error;
+            return true;
+        } catch (error: any) {
+            console.error("Помилка підписки на пуші:", error);
+            alert("Не вдалося увімкнути сповіщення: " + error.message);
+            return false;
+        }
+    };
+
+    const handleToggleTomorrow = async () => {
         if (isAnon) {
             setAuthSheetOpen(true);
             return;
         }
-        updateUserConfig({ tomorrowPush: !userConfig.tomorrowPush });
+        
+        const newValue = !userConfig.tomorrowPush;
+        
+        // Якщо користувач вмикає тумблер — запитуємо дозвіл
+        if (newValue) {
+            const subscribed = await ensurePushSubscription();
+            if (!subscribed) return; // Якщо сталася помилка або відмова, тумблер не вмикається
+        }
+
+        updateUserConfig({ tomorrowPush: newValue });
     };
 
     const handleShare = async () => {
@@ -80,7 +120,13 @@ export const Cabinet: React.FC = () => {
         setAboutSheetOpen(true);
     };
 
-    const handleSaveSlot = (slot: Slot) => {
+    const handleSaveSlot = async (slot: Slot) => {
+        // При збереженні слота також перевіряємо/запитуємо дозвіл
+        if (!isAnon) {
+            const subscribed = await ensurePushSubscription();
+            if (!subscribed) return; // Блокуємо збереження, якщо немає дозволу
+        }
+
         if (slots.find(s => s.id === slot.id)) {
             updateSlot(slot);
         } else {
