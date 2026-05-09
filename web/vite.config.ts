@@ -15,6 +15,7 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'assets/*'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        importScripts: ['push-listener.js'],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/data/'),

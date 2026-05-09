@@ -19,8 +19,9 @@ export async function subscribeToPushNotifications(vapidPublicKey: string) {
     throw new Error('Push-сповіщення не підтримуються цим браузером (можливо потрібен HTTPS або це iOS без PWA).');
   }
 
-  // 1. Реєструємо нашого фонового слухача (sw.js)
-  const registration = await navigator.serviceWorker.register('/sw.js');
+  // 1. Реєструємо фонового слухача з урахуванням базового шляху GitHub Pages
+  const swUrl = import.meta.env.BASE_URL + 'sw.js';
+  const registration = await navigator.serviceWorker.register(swUrl);
 
   // 2. Запитуємо дозвіл у користувача
   const permission = await Notification.requestPermission();
