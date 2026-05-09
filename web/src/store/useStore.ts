@@ -111,7 +111,7 @@ export const useStore = create<AppState>()(
           } else if (event === 'INITIAL_SESSION' && !hasCode) {
             set({ user: null, isAuthLoading: false });
           } else if (event === 'SIGNED_OUT') {
-            set({ user: null, isAuthLoading: false });
+            set({ user: null, slots: EMPTY_SLOTS, userConfig: DEFAULT_CONFIG, isAuthLoading: false });
           }
         });
 
@@ -135,6 +135,10 @@ export const useStore = create<AppState>()(
       },
 
       signOut: async () => {
+        // Очищаємо локальну базу даних (IndexedDB) при виході
+        await db.setSetting('userConfig', DEFAULT_CONFIG);
+        for (const s of EMPTY_SLOTS) await db.saveSlot(s);
+        
         await supabase.auth.signOut();
         set({ user: null, slots: EMPTY_SLOTS, userConfig: DEFAULT_CONFIG });
       },
@@ -246,10 +250,16 @@ export const useStore = create<AppState>()(
             });
         }
 
+        // Якщо користувач не авторизований, він не може мати увімкнені пуші
+        const finalConfig = localConfig ? { ...localConfig } : { ...DEFAULT_CONFIG };
+        if (!user) {
+            finalConfig.tomorrowPush = false;
+        }
+
         set({ 
           slots: currentSlots,
-          userConfig: localConfig || DEFAULT_CONFIG,
-          selectedGroup: localConfig?.startGroup || get().selectedGroup 
+          userConfig: finalConfig,
+          selectedGroup: finalConfig.startGroup || get().selectedGroup 
         });
       }
     }),
@@ -259,4 +269,3 @@ export const useStore = create<AppState>()(
     }
   )
 );
-

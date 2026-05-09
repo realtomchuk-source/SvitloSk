@@ -123,8 +123,7 @@ export const Cabinet: React.FC = () => {
     const handleSaveSlot = async (slot: Slot) => {
         // При збереженні слота також перевіряємо/запитуємо дозвіл
         if (!isAnon) {
-            const subscribed = await ensurePushSubscription();
-            if (!subscribed) return; // Блокуємо збереження, якщо немає дозволу
+            await ensurePushSubscription(); // Пробуємо підписати на пуші, але не блокуємо збереження картки при відмові
         }
 
         if (slots.find(s => s.id === slot.id)) {
