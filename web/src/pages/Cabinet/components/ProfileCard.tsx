@@ -1,7 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
 import { BrandIcon } from '../../../assets/brand/BrandIcon';
-import { PlusStatusIcon, MinusStatusIcon } from '../../../assets/icons/StatusIcons';
 import styles from '../Cabinet.module.css';
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────────
@@ -28,6 +27,18 @@ const TelegramIcon: React.FC = () => (
         <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.938z" fill="#d4d4d8" />
     </svg>
 );
+
+const StatusLightbulbIcon: React.FC<{ active: boolean }> = ({ active }) => {
+    // Registered: Orange bulb (#ee7221)
+    // Guest: Gray bulb (#d4d4d8)
+    const bulbColor = active ? "#ee7221" : "#d4d4d8";
+    return (
+        <svg width="16" height="22" viewBox="0 0 90.61 125" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.58,106.06c0,10.46,8.47,18.94,18.94,18.94h7.57c10.46,0,18.94-8.47,18.94-18.94v-3.79H22.58v3.79Z" fill={bulbColor} />
+            <path d="M45.31.03C6.31-1.32-15.03,49.85,12.34,76.74c3.9,4.12,7.38,8.9,9.09,14.18h47.76c1.73-5.28,5.18-10.06,9.09-14.18C105.65,49.85,84.3-1.33,45.31.03Z" fill={bulbColor} />
+        </svg>
+    );
+};
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
@@ -91,8 +102,12 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
                         
                         {/* Row 2: Status Icon in the far bottom-right corner (under Google) */}
                         <div /> {/* Empty cell under Telegram */}
-                        <div className={clsx(styles.syncIconBtn, styles.statusIconOnly)}>
-                            {isAnon ? <MinusStatusIcon size={18} /> : <PlusStatusIcon size={18} />}
+                        <div 
+                            className={clsx(styles.syncIconBtn, styles.statusIconAnonBtn)}
+                            onClick={!isAnon ? (e) => { e.stopPropagation(); onSignOut?.(); } : undefined}
+                            style={{ cursor: !isAnon ? 'pointer' : 'default' }}
+                        >
+                            <StatusLightbulbIcon active={!isAnon} />
                         </div>
                     </div>
 

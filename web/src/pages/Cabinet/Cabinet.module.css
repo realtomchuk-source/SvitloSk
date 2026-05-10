@@ -31,7 +31,13 @@
 .section {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0;
+}
+
+.cardSection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .sectionTitle {
@@ -138,6 +144,11 @@
     background: rgba(238, 114, 33, 0.08);
     border: 1px solid rgba(238, 114, 33, 0.2);
     color: #EE7221;
+}
+
+.statusIconActive {
+    background: var(--cb-brand-orange);
+    border: 1px solid var(--cb-brand-orange);
 }
 
 .profileName {
@@ -264,10 +275,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px 12px 16px; /* Unified 20px side padding for optical balance */
+    padding: 10px 20px 10px 16px; /* Tightened 10px vertical padding */
     cursor: pointer;
     position: relative;
-    min-height: 52px;
+    min-height: 48px; /* Optimized height for menus */
     box-sizing: border-box;
     width: 100%;
     transition: all 0.2s ease;
@@ -380,11 +391,13 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-.statusIconOnly {
-    background: transparent !important;
-    border: none !important;
-    transform: translateY(2px);
-    justify-content: flex-end; /* Align to the right edge of the grid cell */
+.statusIconActive {
+    background: var(--cb-brand-orange) !important;
+    border-color: var(--cb-brand-orange) !important;
+}
+
+.statusIconAnonBtn {
+    /* Standard syncIconBtn style is enough, but we can refine if needed */
 }
 
 .syncIconBtn:active {

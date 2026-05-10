@@ -63,7 +63,7 @@ export const NotificationSlots: React.FC<NotificationSlotsProps> = ({ slots, isL
     };
 
     return (
-        <div className={styles.section}>
+        <div className={styles.cardSection}>
             <div className={styles.sectionTitle}>Налаштування сповіщень</div>
             
             {displaySlots.map((slot, index) => (
