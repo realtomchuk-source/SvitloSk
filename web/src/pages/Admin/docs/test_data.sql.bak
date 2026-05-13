@@ -1,0 +1,202 @@
+-- Тестові дані для адмін-панелі SvitloSk
+-- Виконайте цей скрипт у Supabase SQL Editor після створення таблиць
+
+-- 1. Створення таблиць (якщо ще не створені)
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT,
+  role TEXT DEFAULT 'user',
+  status TEXT DEFAULT 'active',
+  last_login TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS parser_logs (
+  id BIGSERIAL PRIMARY KEY,
+  timestamp TIMESTAMP DEFAULT NOW(),
+  level TEXT,
+  message TEXT,
+  source TEXT,
+  device_id UUID
+);
+
+CREATE TABLE IF NOT EXISTS daily_stats (
+  date DATE PRIMARY KEY,
+  processed_records INT DEFAULT 0,
+  errors INT DEFAULT 0,
+  avg_latency_ms FLOAT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS hourly_load (
+  date DATE,
+  hour INT,
+  requests INT DEFAULT 0,
+  avg_response_ms FLOAT DEFAULT 0,
+  PRIMARY KEY (date, hour)
+);
+
+-- 2. Очищення існуючих тестових даних (опціонально)
+-- TRUNCATE TABLE profiles, parser_logs, daily_stats, hourly_load CASCADE;
+
+-- 3. Заповнення таблиці profiles (користувачі)
+INSERT INTO profiles (email, role, status, last_login, created_at) VALUES
+  ('admin@svitlosk.com', 'admin', 'active', NOW() - INTERVAL '5 minutes', NOW() - INTERVAL '6 months'),
+  ('user1@gmail.com', 'user', 'active', NOW() - INTERVAL '1 hour', NOW() - INTERVAL '3 months'),
+  ('user2@ukr.net', 'user', 'active', NOW() - INTERVAL '2 hours', NOW() - INTERVAL '2 months'),
+  ('user3@gmail.com', 'user', 'blocked', NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 month'),
+  ('moderator@svitlosk.com', 'moderator', 'active', NOW() - INTERVAL '30 minutes', NOW() - INTERVAL '4 months'),
+  ('user4@i.ua', 'user', 'active', NOW() - INTERVAL '3 hours', NOW() - INTERVAL '2 weeks'),
+  ('user5@gmail.com', 'user', 'active', NOW() - INTERVAL '5 hours', NOW() - INTERVAL '1 week'),
+  ('user6@meta.ua', 'user', 'blocked', NOW() - INTERVAL '2 days', NOW() - INTERVAL '5 days'),
+  ('user7@gmail.com', 'user', 'active', NOW() - INTERVAL '10 minutes', NOW() - INTERVAL '3 days'),
+  ('user8@ukr.net', 'user', 'active', NOW() - INTERVAL '1 hour', NOW() - INTERVAL '1 day'),
+  ('user9@gmail.com', 'user', 'active', NOW() - INTERVAL '4 hours', NOW() - INTERVAL '12 hours'),
+  ('user10@i.ua', 'user', 'active', NOW() - INTERVAL '6 hours', NOW() - INTERVAL '6 hours'),
+  ('test@svitlosk.com', 'user', 'active', NOW() - INTERVAL '15 minutes', NOW() - INTERVAL '2 hours'),
+  ('demo@svitlosk.com', 'user', 'blocked', NOW() - INTERVAL '3 days', NOW() - INTERVAL '1 hour'),
+  ('support@svitlosk.com', 'moderator', 'active', NOW() - INTERVAL '20 minutes', NOW() - INTERVAL '5 months');
+
+-- 4. Заповнення таблиці daily_stats (денна статистика)
+INSERT INTO daily_stats (date, processed_records, errors, avg_latency_ms) VALUES
+  (CURRENT_DATE - INTERVAL '6 days', 1523, 12, 45.3),
+  (CURRENT_DATE - INTERVAL '5 days', 1687, 8, 42.1),
+  (CURRENT_DATE - INTERVAL '4 days', 1456, 15, 48.7),
+  (CURRENT_DATE - INTERVAL '3 days', 1789, 5, 38.9),
+  (CURRENT_DATE - INTERVAL '2 days', 1634, 9, 41.2),
+  (CURRENT_DATE - INTERVAL '1 day', 1712, 7, 39.8),
+  (CURRENT_DATE, 1598, 11, 43.5);
+
+-- 5. Заповнення таблиці hourly_load (погодинне навантаження)
+INSERT INTO hourly_load (date, hour, requests, avg_response_ms) VALUES
+  (CURRENT_DATE, 0, 45, 38.2),
+  (CURRENT_DATE, 1, 32, 35.7),
+  (CURRENT_DATE, 2, 28, 34.1),
+  (CURRENT_DATE, 3, 25, 33.5),
+  (CURRENT_DATE, 4, 31, 36.8),
+  (CURRENT_DATE, 5, 42, 39.2),
+  (CURRENT_DATE, 6, 67, 42.5),
+  (CURRENT_DATE, 7, 89, 45.3),
+  (CURRENT_DATE, 8, 123, 48.7),
+  (CURRENT_DATE, 9, 156, 52.1),
+  (CURRENT_DATE, 10, 178, 54.8),
+  (CURRENT_DATE, 11, 189, 56.2),
+  (CURRENT_DATE, 12, 201, 58.9),
+  (CURRENT_DATE, 13, 195, 57.3),
+  (CURRENT_DATE, 14, 187, 55.6),
+  (CURRENT_DATE, 15, 176, 53.2),
+  (CURRENT_DATE, 16, 165, 51.8);
+
+-- 6. Заповнення таблиці parser_logs (логи парсера)
+INSERT INTO parser_logs (timestamp, level, message, source, device_id) VALUES
+  (NOW() - INTERVAL '5 minutes', 'INFO', 'Парсер запущено успішно', 'parser-main', NULL),
+  (NOW() - INTERVAL '4 minutes', 'INFO', 'Підключення до hoe.com.ua встановлено', 'site-parser', NULL),
+  (NOW() - INTERVAL '3 minutes', 'SUCCESS', 'Графік на 12.05 успішно розпізнано', 'ocr-service', NULL),
+  (NOW() - INTERVAL '2 minutes', 'INFO', 'Оновлено JSON у web/public/data', 'deploy-service', NULL),
+  (NOW() - INTERVAL '1 minute', 'WARNING', 'Висока затримка при скрапінгу новин (2.3s)', 'news-scraper', NULL),
+  
+  (NOW() - INTERVAL '15 minutes', 'INFO', 'Початок сканування розкладу', 'parser-main', NULL),
+  (NOW() - INTERVAL '14 minutes', 'SUCCESS', 'Знайдено 12 груп у розкладі', 'schedule-parser', NULL),
+  (NOW() - INTERVAL '13 minutes', 'INFO', 'Обробка групи 1.1', 'queue-processor', NULL),
+  (NOW() - INTERVAL '12 minutes', 'INFO', 'Обробка групи 1.2', 'queue-processor', NULL),
+  (NOW() - INTERVAL '11 minutes', 'WARNING', 'Група 2.1: неповні дані за 23:00', 'data-validator', NULL),
+  
+  (NOW() - INTERVAL '30 minutes', 'ERROR', 'Не вдалося підключитися до hoe.com.ua (timeout)', 'site-parser', NULL),
+  (NOW() - INTERVAL '29 minutes', 'INFO', 'Повторна спроба підключення...', 'site-parser', NULL),
+  (NOW() - INTERVAL '28 minutes', 'SUCCESS', 'Підключення відновлено', 'site-parser', NULL),
+  (NOW() - INTERVAL '27 minutes', 'INFO', 'Завантаження зображення розкладу', 'image-downloader', NULL),
+  (NOW() - INTERVAL '26 minutes', 'SUCCESS', 'Зображення збережено (1.2 MB)', 'image-downloader', NULL),
+  
+  (NOW() - INTERVAL '1 hour', 'INFO', 'Запуск щогодинної перевірки', 'cron-scheduler', NULL),
+  (NOW() - INTERVAL '59 minutes', 'INFO', 'Перевірка наявності оновлень', 'update-checker', NULL),
+  (NOW() - INTERVAL '58 minutes', 'INFO', 'Оновлень не знайдено', 'update-checker', NULL),
+  (NOW() - INTERVAL '57 minutes', 'SUCCESS', 'Кеш очищено успішно', 'cache-manager', NULL),
+  (NOW() - INTERVAL '56 minutes', 'INFO', 'Статистика збережена у БД', 'stats-collector', NULL),
+  
+  (NOW() - INTERVAL '2 hours', 'ERROR', 'OCR не розпізнав текст у секції 3.2', 'ocr-service', NULL),
+  (NOW() - INTERVAL '119 minutes', 'WARNING', 'Низька якість зображення (DPI < 150)', 'image-validator', NULL),
+  (NOW() - INTERVAL '118 minutes', 'INFO', 'Застосовано фільтр покращення якості', 'image-processor', NULL),
+  (NOW() - INTERVAL '117 minutes', 'SUCCESS', 'Повторне розпізнавання успішне', 'ocr-service', NULL),
+  (NOW() - INTERVAL '116 minutes', 'INFO', 'Дані валідовано та збережено', 'data-validator', NULL),
+  
+  (NOW() - INTERVAL '3 hours', 'INFO', 'Початок денного резервного копіювання', 'backup-service', NULL),
+  (NOW() - INTERVAL '179 minutes', 'INFO', 'Створення snapshot БД', 'backup-service', NULL),
+  (NOW() - INTERVAL '178 minutes', 'SUCCESS', 'Snapshot створено (45.3 MB)', 'backup-service', NULL),
+  (NOW() - INTERVAL '177 minutes', 'INFO', 'Завантаження у хмарне сховище', 'cloud-uploader', NULL),
+  (NOW() - INTERVAL '176 minutes', 'SUCCESS', 'Резервна копія збережена', 'cloud-uploader', NULL),
+  
+  (NOW() - INTERVAL '4 hours', 'WARNING', 'Використання пам\'яті: 85%', 'system-monitor', NULL),
+  (NOW() - INTERVAL '239 minutes', 'INFO', 'Очищення тимчасових файлів', 'cleanup-service', NULL),
+  (NOW() - INTERVAL '238 minutes', 'SUCCESS', 'Звільнено 234 MB', 'cleanup-service', NULL),
+  (NOW() - INTERVAL '237 minutes', 'INFO', 'Використання пам\'яті: 67%', 'system-monitor', NULL),
+  (NOW() - INTERVAL '236 minutes', 'INFO', 'Система працює стабільно', 'health-checker', NULL),
+  
+  (NOW() - INTERVAL '5 hours', 'ERROR', 'Помилка запису у БД: connection timeout', 'database-writer', NULL),
+  (NOW() - INTERVAL '299 minutes', 'WARNING', 'Повторна спроба запису (1/3)', 'database-writer', NULL),
+  (NOW() - INTERVAL '298 minutes', 'SUCCESS', 'Запис успішний', 'database-writer', NULL),
+  (NOW() - INTERVAL '297 minutes', 'INFO', 'Транзакція завершена', 'database-writer', NULL),
+  (NOW() - INTERVAL '296 minutes', 'INFO', 'Індекси оновлено', 'database-optimizer', NULL),
+  
+  (NOW() - INTERVAL '6 hours', 'INFO', 'Запуск нічного обслуговування', 'maintenance-service', NULL),
+  (NOW() - INTERVAL '359 minutes', 'INFO', 'Оптимізація таблиць БД', 'database-optimizer', NULL),
+  (NOW() - INTERVAL '358 minutes', 'SUCCESS', 'Оптимізація завершена', 'database-optimizer', NULL),
+  (NOW() - INTERVAL '357 minutes', 'INFO', 'Перевірка цілісності даних', 'integrity-checker', NULL),
+  (NOW() - INTERVAL '356 minutes', 'SUCCESS', 'Дані цілісні', 'integrity-checker', NULL),
+  
+  (NOW() - INTERVAL '12 hours', 'INFO', 'Початок денного циклу парсингу', 'parser-main', NULL),
+  (NOW() - INTERVAL '11 hours 59 minutes', 'SUCCESS', 'Всі джерела опрацьовано', 'parser-main', NULL),
+  (NOW() - INTERVAL '11 hours 58 minutes', 'INFO', 'Генерація звітів', 'report-generator', NULL),
+  (NOW() - INTERVAL '11 hours 57 minutes', 'SUCCESS', 'Звіти згенеровано та відправлено', 'report-generator', NULL),
+  (NOW() - INTERVAL '11 hours 56 minutes', 'INFO', 'Денний цикл завершено успішно', 'parser-main', NULL);
+
+-- 7. Створення індексів для оптимізації запитів
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
+CREATE INDEX IF NOT EXISTS idx_profiles_status ON profiles(status);
+CREATE INDEX IF NOT EXISTS idx_parser_logs_timestamp ON parser_logs(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_parser_logs_level ON parser_logs(level);
+CREATE INDEX IF NOT EXISTS idx_daily_stats_date ON daily_stats(date DESC);
+CREATE INDEX IF NOT EXISTS idx_hourly_load_date_hour ON hourly_load(date DESC, hour DESC);
+
+-- 8. Налаштування Row Level Security (RLS)
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE parser_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_stats ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hourly_load ENABLE ROW LEVEL SECURITY;
+
+-- Політика для адміністраторів (повний доступ)
+CREATE POLICY "Admins have full access to profiles" ON profiles
+  FOR ALL USING (
+    auth.jwt() ->> 'role' = 'admin'
+  );
+
+CREATE POLICY "Admins have full access to parser_logs" ON parser_logs
+  FOR ALL USING (
+    auth.jwt() ->> 'role' = 'admin'
+  );
+
+CREATE POLICY "Admins have full access to daily_stats" ON daily_stats
+  FOR ALL USING (
+    auth.jwt() ->> 'role' = 'admin'
+  );
+
+CREATE POLICY "Admins have full access to hourly_load" ON hourly_load
+  FOR ALL USING (
+    auth.jwt() ->> 'role' = 'admin'
+  );
+
+-- Політика для звичайних користувачів (тільки читання своїх даних)
+CREATE POLICY "Users can view their own profile" ON profiles
+  FOR SELECT USING (
+    auth.uid() = id
+  );
+
+-- 9. Перевірка результатів
+SELECT 'Profiles count:' as info, COUNT(*) as count FROM profiles
+UNION ALL
+SELECT 'Parser logs count:', COUNT(*) FROM parser_logs
+UNION ALL
+SELECT 'Daily stats count:', COUNT(*) FROM daily_stats
+UNION ALL
+SELECT 'Hourly load count:', COUNT(*) FROM hourly_load;
+
+-- Готово! Тестові дані успішно додано.

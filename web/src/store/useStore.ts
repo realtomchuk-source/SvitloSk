@@ -90,7 +90,7 @@ export const useStore = create<AppState>()(
             // Sync profiles
             const { data } = await supabase
               .from('user_profiles')
-              .select('start_group, tomorrow_push')
+              .select('start_group, tomorrow_push, role')
               .eq('id', session.user.id)
               .single();
               
@@ -100,7 +100,7 @@ export const useStore = create<AppState>()(
                 startGroup: data.start_group || '1.1',
                 tomorrowPush: data.tomorrow_push || false
               };
-              set({ userConfig: remoteConfig, isAuthLoading: false });
+              set({ userConfig: remoteConfig, isAuthLoading: false, user: { ...session.user, user_metadata: { role: data.role } } });
               await db.setSetting('userConfig', remoteConfig);
             }
 
@@ -128,7 +128,7 @@ export const useStore = create<AppState>()(
           provider: 'google',
           options: {
             // Use EXACT string from Supabase Dashboard
-            redirectTo: 'https://realtomchuk-source.github.io/SvitloSk/'
+            redirectTo: window.location.origin + window.location.pathname
           }
         });
         if (error) console.error('Error signing in with Google', error);

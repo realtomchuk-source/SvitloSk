@@ -6,12 +6,15 @@ import './styles/legacy/style.css'
 import './styles/pages.css'
 import { initDB } from '@/services/db'
 import { migrateFromLocalStorage } from '@/services/migrationService'
+import { QueryProvider } from '@/providers/QueryProvider'
 
 initDB();
 migrateFromLocalStorage();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <QueryProvider>
+      <App />
+    </QueryProvider>
   </React.StrictMode>,
 )
