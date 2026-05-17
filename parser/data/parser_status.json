@@ -1,13 +1,13 @@
 {
-  "last_sync": "2026-05-17T21:11:40.004649+03:00",
+  "last_sync": "2026-05-17T22:39:43.582972+03:00",
   "today": {
     "date": "17.05",
     "state": "no_outages_fallback",
-    "updated": "17.05.2026 21:11"
+    "updated": "17.05.2026 22:39"
   },
   "tomorrow": {
     "date": "18.05",
     "state": "pending",
-    "updated": "17.05.2026 21:11"
+    "updated": "17.05.2026 22:39"
   }
 }
