@@ -29,7 +29,7 @@ export interface RegistryData {
 export const loadAddressRegistry = async (): Promise<RegistryData> => {
   // Uses Vite dynamic import or simple fetch
   const base = import.meta.env.BASE_URL;
-  const response = await fetch(`${base}src/pages/AddressSearch/data/starokost_addresses.json?t=${Date.now()}`);
+  const response = await fetch(`${base}data/starokost_addresses.json?t=${Date.now()}`);
   if (!response.ok) {
     throw new Error("Не вдалося завантажити базу адрес");
   }
