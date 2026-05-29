@@ -1,10 +1,10 @@
 {
-  "date": "30.05",
-  "updated_at": "2026-05-29T21:39:39.590479+03:00",
+  "date": "31.05",
+  "updated_at": "2026-05-30T00:03:24.395393+03:00",
   "status": "pending",
   "meta": {
-    "generated_at": "29.05.2026 21:39",
+    "generated_at": "30.05.2026 00:03",
     "state": "pending",
-    "target_date": "30.05"
+    "target_date": "31.05"
   }
 }
