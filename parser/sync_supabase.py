@@ -77,5 +77,24 @@ def process_schedule():
         requests.post(f"{SUPABASE_URL}/rest/v1/rpc/build_push_queue", headers=headers)
         print(f"✅ Успіх! Графік на {iso_date} завантажено в БД. Згенеровано пушів для черг.")
 
+    # 5. Відправляємо дані в Центр Верифікації (parser_results)
+    verification_entry = {
+        "target_date": target_date_str,
+        "raw_data": latest["queues"],
+        "status": "pending",
+        "source_media_url": latest.get("source_url") or latest.get("img_url")
+    }
+    
+    try:
+        # Перевіряємо, чи немає вже запису на цю дату, щоб не плодити дублікати в черзі
+        check_res = requests.get(f"{SUPABASE_URL}/rest/v1/parser_results?target_date=eq.{target_date_str}&status=eq.pending", headers=headers)
+        if check_res.status_code == 200 and not check_res.json():
+            requests.post(f"{SUPABASE_URL}/rest/v1/parser_results", headers=headers, json=verification_entry)
+            print(f"📡 Дані на {target_date_str} відправлено в Центр Верифікації.")
+        else:
+            print(f"📡 Запис на {target_date_str} вже існує в черзі верифікації.")
+    except Exception as e:
+        print(f"⚠️ Помилка відправки в Центр Верифікації: {e}")
+
 if __name__ == "__main__":
     process_schedule()

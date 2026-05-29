@@ -1,0 +1,147 @@
+/* ==========================================================================
+   DrumPicker.module.css — 3D Vertical Wheel Picker
+   ========================================================================== */
+
+.drumContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.drumLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #71717a;
+}
+
+.drumWheel {
+  position: relative;
+  height: 160px; /* Exact height for 3 rows + top/bottom margins: spacer(60px) + item(40px) + spacer(60px) */
+  background: #f8f9fa; /* Sleek light background to give visual separation */
+  border: 1.5px solid #d4d4d8; /* Distinct, visible borders for left/right edges */
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+  user-select: none;
+}
+
+/* Subtle overlay shading for top and bottom of the cylinder picker */
+.drumWheel::before,
+.drumWheel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 45px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.drumWheel::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(248, 249, 250, 0.95), rgba(248, 249, 250, 0));
+}
+
+.drumWheel::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(248, 249, 250, 0.95), rgba(248, 249, 250, 0));
+}
+
+/* Middle active selection focus zone */
+.drumFocusLane {
+  position: absolute;
+  top: 60px;
+  left: 8px;
+  right: 8px;
+  height: 40px;
+  border: 1.5px solid #EE7221; /* Strong orange border to pop visually */
+  background: #ffffff; /* Solid white background so centered item stands out */
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(238, 114, 33, 0.1);
+}
+
+/* The scrollable cylinder area */
+.drumList {
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Hide standard Firefox scrollbar */
+  -ms-overflow-style: none; /* Hide IE scrollbar */
+  position: relative;
+  z-index: 3;
+}
+
+.drumList::-webkit-scrollbar {
+  display: none; /* Hide Chrome/Safari scrollbar */
+}
+
+/* Top & bottom spacers (exactly height of 1.5 items = 60px) to allow center-snapping */
+.drumSpacer {
+  height: 60px;
+  content: '';
+  pointer-events: none;
+}
+
+/* Cylinder elements */
+.drumItem {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #71717a;
+  cursor: pointer;
+  scroll-snap-align: center;
+  transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              opacity 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              color 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+              font-weight 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 0 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-tap-highlight-color: transparent;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.drumItemActive {
+  color: #EE7221;
+  font-weight: 700;
+  font-size: 16px;
+  text-shadow: 0 0 1px rgba(238, 114, 33, 0.2);
+}
+
+.scrolling .drumItem {
+  /* Dynamic styles during active scroll */
+  transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.drumItemConfirmChevron {
+  position: absolute;
+  right: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #EE7221;
+  animation: bounceRight 1.5s infinite;
+  display: inline-block;
+  line-height: 1;
+}
+
+@keyframes bounceRight {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+

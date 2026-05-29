@@ -1,17 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useStore } from '@/store/useStore';
 import { fetchSchedule } from '@/services/scheduleService';
 import { Home } from '@/pages/Home';
 import { Cabinet } from '@/pages/Cabinet/Cabinet';
-import { Admin } from '@/pages/Admin';
-import { Archive, Apps } from '@/pages/Stubs';
+const Admin = lazy(() => import('@/pages/Admin').then(m => ({ default: m.Admin })));
+import { Archive } from '@/pages/Stubs';
+const AddressSearch = lazy(() => import('@/pages/AddressSearch/AddressSearch').then(m => ({ default: m.AddressSearch })));
 import { BottomNav } from '@/components/navigation/BottomNav';
+
+import { Login } from '@/pages/Admin/Login';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 function AppContent() {
   const { setScheduleData, setLoading, setError, loadUserData, initAuth, isAuthLoading } = useStore();
   const location = useLocation();
-  const isAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     initAuth();
@@ -32,33 +35,12 @@ function AppContent() {
     loadData();
   }, [setScheduleData, setLoading, setError, loadUserData]);
 
-  if (isAdmin) {
-    return <Admin />;
-  }
-
   if (isAuthLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh',
-        background: '#ffffff' 
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ 
-            width: '40px', 
-            height: '40px', 
-            border: '3px solid #e4e4e7', 
-            borderTop: '3px solid #1a1a1c', 
-            borderRadius: '50%', 
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 16px'
-          }} />
-          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-          <div style={{ color: '#71717a', fontSize: '14px', fontWeight: '500', fontFamily: 'Inter, sans-serif' }}>
-            Синхронізація...
-          </div>
+      <div className="flex h-screen items-center justify-center bg-white dark:bg-[#050505]">
+        <div className="text-center">
+          <div className="w-10 h-10 border-3 border-zinc-200 border-t-zinc-900 dark:border-zinc-800 dark:border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <div className="text-zinc-500 text-sm font-medium">Синхронізація...</div>
         </div>
       </div>
     );
@@ -70,14 +52,49 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/archive" element={<Archive />} />
-          <Route path="/apps" element={<Apps />} />
+          <Route 
+            path="/address-search" 
+            element={
+              <Suspense fallback={
+                <div className="flex h-screen items-center justify-center bg-white dark:bg-[#050505]">
+                  <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-zinc-200 border-t-zinc-900 dark:border-zinc-800 dark:border-t-white rounded-full animate-spin mx-auto mb-3" />
+                    <div className="text-zinc-500 text-sm">Завантаження...</div>
+                  </div>
+                </div>
+              }>
+                <AddressSearch />
+              </Suspense>
+            } 
+          />
           <Route path="/cabinet" element={<Cabinet />} />
-          {/* Fallback for old links or mistakes */}
+          
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<Login />} />
+          <Route 
+            path="/admin/*" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <Suspense fallback={
+                  <div className="flex h-screen items-center justify-center bg-gray-50">
+                    <div className="text-center">
+                      <div className="w-8 h-8 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3" />
+                      <div className="text-gray-400 text-sm">Завантаження панелі...</div>
+                    </div>
+                  </div>
+                }>
+                  <Admin />
+                </Suspense>
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 
-      <BottomNav />
+      {!location.pathname.startsWith('/admin') && <BottomNav />}
     </div>
   );
 }

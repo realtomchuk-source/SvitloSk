@@ -49,9 +49,9 @@ export const BottomNav: React.FC = () => {
       />
 
       <NavItem 
-        to="/apps" 
-        label="Apps" 
-        active={location.pathname === '/apps'} 
+        to="/address-search" 
+        label="Підчерга" 
+        active={location.pathname === '/address-search'} 
         icon={<LayoutGrid />} 
       />
 

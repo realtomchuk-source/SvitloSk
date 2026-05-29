@@ -40,3 +40,95 @@ export const fetchParserState = async () => {
     const history = await response.json();
     return history[history.length - 1];
 };
+
+export const fetchSystemStats = async () => {
+    // 1. Total users
+    const { count: totalUsers } = await supabase.from('user_profiles').select('*', { count: 'exact', head: true });
+    
+    // 2. Group density (Subscriber count per group)
+    const { data: profiles } = await supabase.from('user_profiles').select('start_group');
+    const density: Record<string, number> = {};
+    profiles?.forEach(p => {
+        const g = p.start_group || 'none';
+        density[g] = (density[g] || 0) + 1;
+    });
+
+    // 3. Admin actions (last 24h)
+    const { count: recentActions } = await supabase
+        .from('admin_actions')
+        .select('*', { count: 'exact', head: true })
+        .gt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+    return {
+        totalUsers: totalUsers || 0,
+        groupDensity: density,
+        recentActions: recentActions || 0,
+        health: 'stable'
+    };
+};
+
+import { supabase } from './supabaseClient';
+
+export const fetchPendingResults = async () => {
+    const { data, error } = await supabase
+        .from('parser_results')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+};
+
+export const approveResult = async (id: number) => {
+    const { error } = await supabase
+        .from('parser_results')
+        .update({ status: 'approved' })
+        .eq('id', id);
+    
+    if (error) throw error;
+    return true;
+};
+
+export const logAdminAction = async (action_type: string, target_id: string | null = null, details: any = {}) => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase.from('admin_actions').insert([{
+      admin_id: user.id,
+      action_type,
+      target_id,
+      details
+    }]);
+  } catch (err) {
+    console.error('Failed to log admin action:', err);
+  }
+};
+
+export const fetchAddressRequests = async () => {
+  const { data, error } = await supabase
+    .from('missing_address_requests')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  return data;
+};
+
+export const updateAddressRequestStatus = async (
+  id: number,
+  status: 'resolved' | 'rejected',
+  assignedSubgroup: string | null = null
+) => {
+  const { error } = await supabase
+    .from('missing_address_requests')
+    .update({ 
+      status, 
+      assigned_subgroup: assignedSubgroup 
+    })
+    .eq('id', id);
+  
+  if (error) throw error;
+  return true;
+};

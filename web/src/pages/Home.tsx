@@ -6,6 +6,7 @@ import { HeroCard } from '@/components/home/HeroCard';
 import { DashboardBar } from '@/components/home/DashboardBar';
 import { SubqueueSelector } from '@/components/home/SubqueueSelector';
 import { InteractiveTimeline } from '@/components/home/InteractiveTimeline';
+import { MarqueeBanner } from '@/components/home/MarqueeBanner';
 
 import '@/styles/legacy/home.css';
 import '@/styles/legacy/tech-ui.css';
@@ -84,6 +85,8 @@ export const Home: React.FC = () => {
           isVirtual={displayContext.isVirtual}
           isPast={displayContext.isPast}
         />
+
+        <MarqueeBanner />
         
         <InteractiveTimeline 
           queuesStr={currentQueuesStr} 

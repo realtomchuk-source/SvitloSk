@@ -85,33 +85,39 @@ export const useStore = create<AppState>()(
           localStorage.setItem('sssk_last_auth_event', `${event} at ${new Date().toLocaleTimeString()}`);
           
           if (session?.user) {
-            set({ user: session.user, isAuthLoading: false });
-            
-            // Sync profiles
+            // Sync profiles first for ANY session event
             const { data } = await supabase
               .from('user_profiles')
               .select('start_group, tomorrow_push, role')
               .eq('id', session.user.id)
               .single();
               
-            if (data) {
-              const remoteConfig = {
+            const userWithRole = data 
+              ? { ...session.user, user_metadata: { ...session.user.user_metadata, role: data.role } }
+              : session.user;
+
+            const remoteConfig = data ? {
                 ...get().userConfig,
                 startGroup: data.start_group || '1.1',
                 tomorrowPush: data.tomorrow_push || false
-              };
-              set({ userConfig: remoteConfig, isAuthLoading: false, user: { ...session.user, user_metadata: { role: data.role } } });
-              await db.setSetting('userConfig', remoteConfig);
-            }
+            } : get().userConfig;
+
+            set({ 
+              user: userWithRole, 
+              userConfig: remoteConfig,
+              isAuthLoading: false 
+            });
+
+            if (data) await db.setSetting('userConfig', remoteConfig);
 
             // Redirect to cabinet if coming from OAuth
             if (window.location.search.includes('code=')) {
               window.location.hash = '#/cabinet';
             }
-          } else if (event === 'INITIAL_SESSION' && !hasCode) {
-            set({ user: null, isAuthLoading: false });
           } else if (event === 'SIGNED_OUT') {
             set({ user: null, slots: EMPTY_SLOTS, userConfig: DEFAULT_CONFIG, isAuthLoading: false });
+          } else if (event === 'INITIAL_SESSION' && !session) {
+            set({ user: null, isAuthLoading: false });
           }
         });
 

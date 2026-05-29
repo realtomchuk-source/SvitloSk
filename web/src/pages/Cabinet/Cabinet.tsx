@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useStore } from '@/store/useStore';
 import { ProfileCard } from './components/ProfileCard';
 import { NotificationSlots } from './components/NotificationSlots';
@@ -19,6 +20,7 @@ import { supabase } from '@/services/supabaseClient';
 
 export const Cabinet: React.FC = () => {
     const { user, userConfig, updateUserConfig, slots, addSlot, updateSlot, deleteSlot, signInWithGoogle, signOut } = useStore();
+    const location = useLocation();
 
     const [isSubGroupSheetOpen, setSubGroupSheetOpen] = useState(false);
     const [isEditorSheetOpen, setEditorSheetOpen] = useState(false);
@@ -28,6 +30,41 @@ export const Cabinet: React.FC = () => {
     const [editingSlot, setEditingSlot] = useState<Slot | null>(null);
 
     const isAnon = !user || user.is_anonymous;
+
+    // --- Розумний міст з пошуку адрес ---
+    useEffect(() => {
+        // Parse params from hash routing query part
+        const hash = window.location.hash;
+        const queryIndex = hash.indexOf('?');
+        if (queryIndex !== -1 && !isAnon) {
+            const params = new URLSearchParams(hash.substring(queryIndex));
+            const setupPush = params.get('setupPush');
+            const subGroup = params.get('subGroup');
+
+            if (setupPush === 'true' && subGroup) {
+                // Find existing slot with this subgroup or edit the first inactive slot
+                const existingSlot = slots.find(s => s.subGroup === subGroup && s.isActive);
+                if (existingSlot) {
+                    setEditingSlot(existingSlot);
+                    setEditorSheetOpen(true);
+                } else {
+                    const inactiveSlot = slots.find(s => !s.isActive) || slots[0];
+                    if (inactiveSlot) {
+                        const newSlot: Slot = {
+                            ...inactiveSlot,
+                            name: inactiveSlot.name || 'Оселя',
+                            subGroup: subGroup,
+                            isActive: true
+                        };
+                        setEditingSlot(newSlot);
+                        setEditorSheetOpen(true);
+                    }
+                }
+                // Clean up hash query parameters so it does not trigger again
+                window.location.hash = hash.split('?')[0];
+            }
+        }
+    }, [location, isAnon, slots]);
     
     const profile = {
         name: isAnon ? 'Гість SvitloSk' : (user?.user_metadata?.full_name || 'Google Auth Профіль'),
