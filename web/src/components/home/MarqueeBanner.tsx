@@ -77,7 +77,7 @@ export function MarqueeBanner() {
       {announcements.map((a, i) => (
         <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
           {i > 0 && <span style={{ color: 'rgba(238,114,33,0.35)', padding: '0 14px', fontSize: '8px' }}>●</span>}
-          <span style={{ color: '#3a3a3c', fontSize: '14px', paddingRight: '6px' }}>{a.text}</span>
+          <span style={{ color: '#3a3a3c', fontSize: '15px', fontWeight: 500, paddingRight: '6px' }}>{a.text}</span>
         </span>
       ))}
       <span style={{ padding: '0 40px' }} />
