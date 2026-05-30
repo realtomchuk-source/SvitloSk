@@ -37,6 +37,75 @@ def ensure_full_queues(queues):
             result[q_name] = "1" * 24
     return result
 
+def archive_day(today_data):
+    """Saves the today schedule into the static archive folder in YYYY-MM-DD.json format."""
+    try:
+        # Convert date "30.05" to "2026-05-30"
+        date_str = today_data.get("date") # e.g. "30.05"
+        if not date_str or "." not in date_str:
+            return
+            
+        day_part, month_part = date_str.split('.')
+        day = int(day_part)
+        month = int(month_part)
+        
+        # Use timezone-aware now in Europe/Kyiv to calculate current year and month
+        now_kyiv = get_now()
+        current_year = now_kyiv.year
+        current_month = now_kyiv.month
+        
+        # Year transition safety logic:
+        # If the schedule is for December (12) but we are already in January (1), it belongs to the previous year.
+        if month == 12 and current_month == 1:
+            schedule_year = current_year - 1
+        # If the schedule is for January (1) but we are in December (12), it belongs to the next year.
+        elif month == 1 and current_month == 12:
+            schedule_year = current_year + 1
+        else:
+            schedule_year = current_year
+            
+        iso_date = f"{schedule_year}-{month:02d}-{day:02d}"
+        
+        # Build archived queues (48 chars) and stats
+        archived_queues = {}
+        stats = {}
+        queues = today_data.get("queues", {})
+        
+        for q_name, bitstring in queues.items():
+            # Convert 24-char to 48-char
+            archived_queues[q_name] = "".join(c * 2 for c in bitstring)
+            # Calculate stats
+            hours_on = bitstring.count('1')
+            hours_off = bitstring.count('0')
+            stats[q_name] = {
+                "hoursOn": hours_on,
+                "hoursOff": hours_off
+            }
+            
+        archived_day_data = {
+            "date": iso_date,
+            "queues": archived_queues,
+            "meta": {
+                "savedAt": now_kyiv.isoformat(),
+                "source": "parser",
+                "stats": stats
+            }
+        }
+        
+        # Create web/public/data/archive directory if it doesn't exist
+        archive_dir = os.path.join(os.path.dirname(TODAY_JSON_FILE), "archive")
+        os.makedirs(archive_dir, exist_ok=True)
+        
+        # Save archived day
+        archive_file_path = os.path.join(archive_dir, f"{iso_date}.json")
+        with open(archive_file_path, 'w', encoding='utf-8') as f:
+            json.dump(archived_day_data, f, ensure_ascii=False, indent=2)
+            
+        logger.info(f"✅ Objective schedule archived to {archive_file_path}")
+        
+    except Exception as e:
+        logger.error(f"Failed to archive today's schedule: {e}")
+
 def generate_files():
     db = load_json(UNIFIED_DB, default=[])
     
@@ -71,7 +140,7 @@ def generate_files():
             "date": today_str,
             "updated_at": now.isoformat(),
             "mode": "schedule",
-            "message": "Графік обмежень не оприлюднено. Попередньо: відключень не прогнозується.",
+            "message": "Графік обмежень не оприлюнено. Попередньо: відключень не прогнозується.",
             "queues": get_fallback_queues(),
             "meta": {
                 "generated_at": now.strftime("%d.%m.%Y %H:%M"),
@@ -82,6 +151,7 @@ def generate_files():
     
     save_json(TODAY_JSON_FILE, today_data)
     logger.info(f"G1 (Today) saved to {TODAY_JSON_FILE}")
+    archive_day(today_data)
 
     # 2. G2: TOMORROW
     best_tomorrow = None

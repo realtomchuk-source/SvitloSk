@@ -5,7 +5,7 @@ import { fetchSchedule } from '@/services/scheduleService';
 import { Home } from '@/pages/Home';
 import { Cabinet } from '@/pages/Cabinet/Cabinet';
 const Admin = lazy(() => import('@/pages/Admin').then(m => ({ default: m.Admin })));
-import { Archive } from '@/pages/Stubs';
+const Archive = lazy(() => import('@/pages/Archive/Archive').then(m => ({ default: m.Archive })));
 const AddressSearch = lazy(() => import('@/pages/AddressSearch/AddressSearch').then(m => ({ default: m.AddressSearch })));
 import { BottomNav } from '@/components/navigation/BottomNav';
 
@@ -51,7 +51,21 @@ function AppContent() {
       <main className="content-area">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/archive" element={<Archive />} />
+          <Route 
+            path="/archive" 
+            element={
+              <Suspense fallback={
+                <div className="flex h-screen items-center justify-center bg-white dark:bg-[#050505]">
+                  <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-zinc-200 border-t-zinc-900 dark:border-zinc-800 dark:border-t-white rounded-full animate-spin mx-auto mb-3" />
+                    <div className="text-zinc-500 text-sm">Завантаження архіву...</div>
+                  </div>
+                </div>
+              }>
+                <Archive />
+              </Suspense>
+            } 
+          />
           <Route 
             path="/address-search" 
             element={

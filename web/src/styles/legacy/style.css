@@ -2581,6 +2581,27 @@ body {
 
 /* --- Archive Module Styles --- */
 
+.archive-calendar-card {
+    border-radius: 16px;
+    background: var(--hero-bg, rgba(255, 255, 255, 0.92));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px;
+    margin: 0 0 12px 0;
+    box-sizing: border-box;
+    display: block;
+    height: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+    .archive-calendar-card {
+        background: rgba(28, 28, 30, 0.8) !important;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+}
+
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);

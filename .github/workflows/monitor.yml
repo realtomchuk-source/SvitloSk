@@ -83,6 +83,6 @@ jobs:
         run: |
           git config --global user.name "SSSK-Bot"
           git config --global user.email "bot@svitlo-starkon.com"
-          git add parser/data/*.json web/public/data/*.json || true
+          git add parser/data/*.json web/public/data/*.json web/public/data/archive/*.json || true
           git commit -m "Auto-update schedules [skip ci]" || echo "No changes to commit"
           git push
