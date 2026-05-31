@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS public.missing_address_requests (
     village TEXT,
     street TEXT NOT NULL,
     house TEXT NOT NULL,
+    subgroup TEXT, -- підчерга, вказана громадянином при подачі (опціонально)
+    assigned_subgroup TEXT, -- підчерга, призначена адміном при верифікації
     status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'added', 'rejected'
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     user_id UUID REFERENCES auth.users(id) -- NULL, якщо гість відправляє анонімно

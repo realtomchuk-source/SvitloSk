@@ -31,6 +31,7 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
   const { user } = useStore();
   const [street, setStreet] = useState('');
   const [house, setHouse] = useState('');
+  const [selectedSubgroup, setSelectedSubgroup] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -78,6 +79,7 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
     if (isOpen) {
       setStreet(staticData.street || '');
       setHouse(staticData.house || '');
+      setSelectedSubgroup('');
       setErrorMsg(null);
       
       const isCityVal = staticData.isCity;
@@ -173,6 +175,7 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
         village: localIsCity ? null : (localVillage || null),
         street: street.trim(),
         house: house.trim(),
+        subgroup: selectedSubgroup || null,
         status: 'pending',
         user_id: user?.id || null
       };
@@ -253,6 +256,24 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
             className={styles.textInput}
             disabled={isSubmitting}
           />
+        </div>
+
+        {/* Optional Sub-queue selection pills */}
+        <div className={styles.formGroup}>
+          <label className={styles.formGroupLabel}>Підчерга (якщо відомо, необов'язково)</label>
+          <div className={styles.subgroupGrid}>
+            {['1.1', '1.2', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2'].map(g => (
+              <button
+                key={g}
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => setSelectedSubgroup(selectedSubgroup === g ? '' : g)}
+                className={`${styles.subgroupChip} ${selectedSubgroup === g ? styles.subgroupChipActive : ''}`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
         </div>
 
         {errorMsg && (
