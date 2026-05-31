@@ -530,16 +530,6 @@ export const AddressSearch: React.FC = () => {
 
   return (
     <div className={styles.root}>
-      {/* Header */}
-      {!isSelectionComplete && (
-        <div className={styles.headerSection}>
-          <h1 className={styles.pageTitle}>Визначення підчерги</h1>
-          <p className={styles.pageSubtitle}>
-            Вкажіть адресу, щоб дізнатися графік
-          </p>
-        </div>
-      )}
-
       {isSelectionComplete ? (
         <>
           {/* BLOCK 1: Уніфікована картка (Підчерга зліва + Адреса справа) */}
