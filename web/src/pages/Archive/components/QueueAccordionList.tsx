@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { clsx } from 'clsx';
 import { MiniTimeline } from './MiniTimeline';
@@ -31,6 +30,38 @@ export const QueueAccordionList: React.FC<QueueAccordionListProps> = ({ dayData 
     setOpenQueue(prev => (prev === queueNum ? null : queueNum));
   };
 
+  // Smart Auto-folding of active queue due to inactivity / idle state
+  useEffect(() => {
+    if (openQueue === null) return;
+
+    let timeoutId: any;
+
+    const startTimer = () => {
+      timeoutId = setTimeout(() => {
+        setOpenQueue(null);
+      }, 8000); // Auto-fold after 8 seconds of idle time
+    };
+
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      startTimer();
+    };
+
+    startTimer();
+
+    // Listen to user interactions inside the window to reset idle timer
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('touchstart', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('touchstart', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+    };
+  }, [openQueue]);
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-6 duration-500" style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingLeft: 0, paddingRight: 0, paddingBottom: '80px' }}>
       {QUEUES.map((qNum) => {
@@ -61,42 +92,36 @@ export const QueueAccordionList: React.FC<QueueAccordionListProps> = ({ dayData 
               boxSizing: 'border-box' 
             }}
           >
-            {/* Header Accordion bar */}
-            <div 
-              onClick={() => handleToggle(qNum)}
-              className="accordion-header flex items-center justify-between select-none cursor-pointer"
-              style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '16px', paddingRight: '16px' }}
-            >
-              <div className="flex items-center gap-2">
-                <span className={clsx("text-[14px] font-black", isOpen ? "text-orange-500" : "text-zinc-800 dark:text-white")}>
-                  ЧЕРГА {qNum}
-                </span>
-                {isUserPrimary && (
-                  <span 
-                    style={{ 
-                      width: '6px', 
-                      height: '6px', 
-                      borderRadius: '50%', 
-                      backgroundColor: '#f97316', 
-                      display: 'inline-block', 
-                      boxShadow: '0 0 6px #f97316', 
-                      marginLeft: '2px'
-                    }} 
-                    title="Ваша черга" 
-                  />
-                )}
+            {/* Header Accordion bar (Visible only when collapsed) */}
+            {!isOpen && (
+              <div 
+                onClick={() => handleToggle(qNum)}
+                className="accordion-header flex items-center justify-between select-none cursor-pointer"
+                style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '16px', paddingRight: '16px' }}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[14px] font-black text-zinc-800 dark:text-white">
+                    ЧЕРГА {qNum}
+                  </span>
+                  {isUserPrimary && (
+                    <span 
+                      style={{ 
+                        width: '6px', 
+                        height: '6px', 
+                        borderRadius: '50%', 
+                        backgroundColor: '#f97316', 
+                        display: 'inline-block', 
+                        boxShadow: '0 0 6px #f97316', 
+                        marginLeft: '2px'
+                      }} 
+                      title="Ваша черга" 
+                    />
+                  )}
+                </div>
               </div>
-              
-              <ChevronDown 
-                size={14} 
-                className={clsx(
-                  "accordion-arrow text-zinc-400 transition-transform duration-300",
-                  isOpen && "transform rotate-180 text-orange-500"
-                )}
-              />
-            </div>
+            )}
 
-            {/* Inner Content of Accordion */}
+            {/* Inner Content of Accordion (Expanded) */}
             <div 
               className="accordion-content transition-all duration-300 ease-in-out"
               style={{ 
@@ -105,7 +130,12 @@ export const QueueAccordionList: React.FC<QueueAccordionListProps> = ({ dayData 
                 pointerEvents: isOpen ? 'auto' : 'none'
               }}
             >
-              <div className="bg-zinc-50/50 dark:bg-black/10 border-t border-zinc-200 dark:border-white/5" style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '8px', paddingBottom: '12px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div 
+                onClick={() => setOpenQueue(null)}
+                className="bg-zinc-50/50 dark:bg-black/10 cursor-pointer" 
+                style={{ paddingLeft: '16px', paddingRight: '16px', paddingTop: '14px', paddingBottom: '14px', display: 'flex', flexDirection: 'column', gap: '12px' }}
+                title="Клацніть, щоб згорнути"
+              >
                 {/* Subqueue .1 */}
                 <MiniTimeline 
                   queueId={sq1} 
@@ -113,8 +143,12 @@ export const QueueAccordionList: React.FC<QueueAccordionListProps> = ({ dayData 
                   stats={stats1}
                 />
                 
-                <div className="h-px bg-zinc-200 dark:bg-white/5" style={{ marginTop: '8px', marginBottom: '8px' }} />
-
+                {/* Soft horizontal divider between subqueues */}
+                <div 
+                  className="border-t border-zinc-200 dark:border-white/5" 
+                  style={{ height: '0px', width: '100%' }} 
+                />
+                
                 {/* Subqueue .2 */}
                 <MiniTimeline 
                   queueId={sq2} 

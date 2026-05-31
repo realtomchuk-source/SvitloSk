@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { clsx } from 'clsx';
-import type { OutageInterval, QueueStats } from '../types/archive';
+import type { QueueStats } from '../types/archive';
 
 interface MiniTimelineProps {
   queueId: string; // e.g. "3.1"
@@ -13,10 +13,6 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
   bitstring,
   stats
 }) => {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const normalizedBitstring = useMemo(() => {
     if (bitstring.length === 48) return bitstring;
     if (bitstring.length === 24) {
@@ -39,68 +35,6 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
     };
   }, [stats, normalizedBitstring]);
 
-  const outageIntervals = useMemo((): OutageInterval[] => {
-    const intervals: OutageInterval[] = [];
-    let isInsideOutage = false;
-    let startSlot = 0;
-
-    const toTimeStr = (slot: number) => {
-      const h = Math.floor(slot / 2);
-      const m = (slot % 2) * 30;
-      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-    };
-
-    for (let i = 0; i < 48; i++) {
-      const bit = normalizedBitstring[i];
-      if (bit === '0' && !isInsideOutage) {
-        isInsideOutage = true;
-        startSlot = i;
-      } else if (bit === '1' && isInsideOutage) {
-        isInsideOutage = false;
-        intervals.push({
-          start: toTimeStr(startSlot),
-          end: toTimeStr(i),
-          type: 'outage'
-        });
-      }
-    }
-
-    if (isInsideOutage) {
-      intervals.push({
-        start: toTimeStr(startSlot),
-        end: '24:00',
-        type: 'outage'
-      });
-    }
-
-    return intervals;
-  }, [normalizedBitstring]);
-
-  const handleMouseMove = (e: React.MouseEvent, index: number) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      setTooltipPos({
-        x: e.clientX,
-        y: rect.top - 8
-      });
-      setHoveredIdx(index);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredIdx(null);
-  };
-
-  const getCapsuleTimeLabel = (idx: number) => {
-    const startHour = Math.floor(idx / 2);
-    const startMin = (idx % 2) * 30;
-    const endTotalMinutes = (idx + 1) * 30;
-    const endHour = Math.floor(endTotalMinutes / 60);
-    const endMin = endTotalMinutes % 60;
-    
-    return `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')} - ${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-  };
-
   const transitions = useMemo(() => {
     const trans: Array<{ slot: number; type: 'on' | 'off' }> = [];
     for (let i = 1; i < 48; i++) {
@@ -114,99 +48,210 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
     return trans;
   }, [normalizedBitstring]);
 
+  // Helper to format slot index to HH:MM string
+  const formatSlotToTime = (slot: number) => {
+    const totalMinutes = slot * 30;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  };
+
+  // Determine boundary states for 00:00 and 24:00
+  const isStartLit = normalizedBitstring[0] === '1';
+  const isEndLit = normalizedBitstring[47] === '1';
+
   return (
-    <div className="mini-slider-row" style={{ padding: '4px 16px 2px' }}>
-      {/* Subqueue title & stats side-by-side */}
-      <div className="flex justify-between items-center" style={{ marginBottom: '4px' }}>
-        <span className="text-[11px] font-black text-orange-500 tracking-wider">ПІДЧЕРГА {queueId}</span>
-        <div className="flex gap-2 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
-          <span>💡 {calculatedStats.hoursOn} год</span>
-          <span className="opacity-25">|</span>
-          <span className={clsx(calculatedStats.hoursOff > 0 && "text-red-500 dark:text-red-400")}>
-            🔌 {calculatedStats.hoursOff} год
-          </span>
-        </div>
-      </div>
-
-      {/* Sleek Segmented Line Track (Height 8px, rounded, overflow hidden) */}
-      <div 
-        ref={containerRef}
-        className="flex gap-[0.5px] items-center bg-zinc-200 dark:bg-zinc-800 rounded-full relative overflow-hidden" 
-        style={{ height: '8px', padding: 0 }}
-      >
-        {Array.from({ length: 48 }).map((_, i) => {
-          const isLit = normalizedBitstring[i] === '1';
-          return (
-            <div
-              key={i}
-              onMouseMove={(e) => handleMouseMove(e, i)}
-              onMouseLeave={handleMouseLeave}
-              className={clsx(
-                "flex-1 h-full cursor-pointer transition-colors duration-150",
-                isLit 
-                  ? "bg-orange-500" 
-                  : "bg-zinc-400 dark:bg-zinc-600"
-              )}
-            />
-          );
-        })}
-
-        {/* Render transition boundaries / neon splitters */}
-        {transitions.map(tr => {
-          const leftPercent = (tr.slot / 48) * 100;
-          return (
-            <div
-              key={tr.slot}
-              className={clsx(
-                "absolute pointer-events-none top-0 bottom-0 w-[1px] z-10",
-                tr.type === 'on' ? "bg-orange-400 shadow-[0_0_3px_#f97316]" : "bg-zinc-500"
-              )}
-              style={{ left: `${leftPercent}%` }}
-            />
-          );
-        })}
-      </div>
-
-      {/* Time Axis markings (super compact) */}
-      <div className="flex justify-between text-[8px] font-mono font-bold text-zinc-400 dark:text-zinc-500" style={{ paddingLeft: '2px', paddingRight: '2px', marginTop: '2px' }}>
-        <span>00:00</span>
-        <span>06:00</span>
-        <span>12:00</span>
-        <span>18:00</span>
-        <span>24:00</span>
-      </div>
-
-      {/* Outage Intervals text list (single line, no card background) */}
-      <div className="flex items-start gap-1 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400" style={{ marginTop: '4px' }}>
-        <span className="text-[8px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider whitespace-nowrap mt-[1px]">
-          🔌 ВІДБИВКИ:
-        </span>
-        {outageIntervals.length === 0 ? (
-          <span className="italic text-zinc-400 text-[10px]">Знеструмлень немає ☀️</span>
-        ) : (
-          <span className="font-mono text-[10px]">
-            {outageIntervals.map(interval => `${interval.start}-${interval.end}`).join(', ')}
-          </span>
-        )}
-      </div>
-
-      {/* Scrubber Tooltip */}
-      {hoveredIdx !== null && (
-        <div 
-          className="mini-scrubber-tooltip animate-in fade-in zoom-in-95 duration-100"
-          style={{
-            position: 'fixed',
-            left: `${tooltipPos.x}px`,
-            top: `${tooltipPos.y}px`,
-            transform: 'translate(-50%, -100%)'
+    <div className="mini-slider-row" style={{ padding: '0px', display: 'flex', flexDirection: 'column' }}>
+      
+      {/* 1. Subqueue title & stats side-by-side (Comfortable buffer spacing) */}
+      <div className="flex justify-between items-center" style={{ marginBottom: '12px' }}>
+        <span 
+          className="text-zinc-800 dark:text-zinc-200"
+          style={{ 
+            fontSize: '11px', 
+            fontWeight: 900, 
+            letterSpacing: '0.05em', 
+            textTransform: 'uppercase' 
           }}
         >
-          <span className="text-[10px] text-zinc-400 block font-mono">{getCapsuleTimeLabel(hoveredIdx)}</span>
-          <span className="text-[12px] font-black block mt-0.5" style={{ color: normalizedBitstring[hoveredIdx] === '1' ? '#f97316' : '#9ca3af' }}>
-            {normalizedBitstring[hoveredIdx] === '1' ? 'Світло є 💡' : 'Відключення 🔌'}
-          </span>
+          ПІДЧЕРГА {queueId}
+        </span>
+        <div 
+          className="flex items-center" 
+          style={{ 
+            gap: '10px', 
+            fontSize: '11px', 
+            fontWeight: 900, 
+            letterSpacing: '0.05em', 
+            textTransform: 'uppercase' 
+          }}
+        >
+          <div className="flex items-center" style={{ gap: '4px', color: '#EE7221' }}>
+            <span 
+              style={{ 
+                width: '5px', 
+                height: '5px', 
+                borderRadius: '50%', 
+                backgroundColor: '#EE7221', 
+                display: 'inline-block', 
+                boxShadow: '0 0 4px #EE7221' 
+              }} 
+            />
+            <span>{calculatedStats.hoursOn} ГОД</span>
+          </div>
+          <span className="text-zinc-300 dark:text-zinc-700 opacity-30 font-normal">|</span>
+          <div className="flex items-center" style={{ gap: '4px', color: '#8e8e93' }}>
+            <span 
+              style={{ 
+                width: '5px', 
+                height: '5px', 
+                borderRadius: '50%', 
+                backgroundColor: '#8e8e93', 
+                display: 'inline-block' 
+              }} 
+            />
+            <span>{calculatedStats.hoursOff} ГОД</span>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* 2. Dynamic Timeline Area with dynamic labels & external indicators */}
+      <div style={{ position: 'relative', width: '100%', padding: '16px 0 16px' }}>
+        
+        {/* ABOVE TRACK: ON labels & ticks (height 16px) */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '16px', pointerEvents: 'none' }}>
+          {/* Start label at 00:00 (if light) */}
+          {isStartLit && (
+            <span style={{ position: 'absolute', left: 0, top: 0, color: '#EE7221', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
+              00:00
+            </span>
+          )}
+          
+          {/* Transitions to ON (Tick & Label) */}
+          {transitions.map(tr => {
+            if (tr.type !== 'on') return null;
+            const leftPercent = (tr.slot / 48) * 100;
+            return (
+              <React.Fragment key={`on-group-${tr.slot}`}>
+                {/* Visual Tick line going up from track top edge */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    left: `${leftPercent}%`, 
+                    bottom: 0, 
+                    transform: 'translateX(-50%)', 
+                    width: '1.2px', 
+                    height: '6px', 
+                    backgroundColor: '#EE7221',
+                    opacity: 0.8
+                  }} 
+                />
+                {/* Time Label sitting right above the tick line */}
+                <span 
+                  style={{ 
+                    position: 'absolute', 
+                    left: `${leftPercent}%`, 
+                    top: 0,
+                    transform: 'translateX(-50%)', 
+                    color: '#EE7221', 
+                    fontSize: '10px', 
+                    fontWeight: 900, 
+                    letterSpacing: '0.05em',
+                    lineHeight: 1
+                  }}
+                >
+                  {formatSlotToTime(tr.slot)}
+                </span>
+              </React.Fragment>
+            );
+          })}
+
+          {/* End label at 24:00 (if light) */}
+          {isEndLit && (
+            <span style={{ position: 'absolute', right: 0, top: 0, color: '#EE7221', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
+              24:00
+            </span>
+          )}
+        </div>
+
+        {/* THE MONOLITHIC TRACK (100% Homogeneous, no internal markings) */}
+        <div 
+          className="flex items-center bg-zinc-200 dark:bg-zinc-800 rounded-full relative overflow-hidden" 
+          style={{ height: '8px', padding: 0 }}
+        >
+          {Array.from({ length: 48 }).map((_, i) => {
+            const isLit = normalizedBitstring[i] === '1';
+            return (
+              <div
+                key={i}
+                className={clsx(
+                  "flex-1 h-full transition-colors duration-150",
+                  isLit 
+                    ? "bg-orange-500" 
+                    : "bg-zinc-400 dark:bg-zinc-600"
+                )}
+              />
+            );
+          })}
+        </div>
+
+        {/* BELOW TRACK: OFF labels & ticks (height 16px) */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '16px', pointerEvents: 'none' }}>
+          {/* Start label at 00:00 (if outage) */}
+          {!isStartLit && (
+            <span style={{ position: 'absolute', left: 0, bottom: 0, color: '#8e8e93', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
+              00:00
+            </span>
+          )}
+          
+          {/* Transitions to OFF (Tick & Label) */}
+          {transitions.map(tr => {
+            if (tr.type !== 'off') return null;
+            const leftPercent = (tr.slot / 48) * 100;
+            return (
+              <React.Fragment key={`off-group-${tr.slot}`}>
+                {/* Visual Tick line going down from track bottom edge */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    left: `${leftPercent}%`, 
+                    top: 0, 
+                    transform: 'translateX(-50%)', 
+                    width: '1.2px', 
+                    height: '6px', 
+                    backgroundColor: '#8e8e93',
+                    opacity: 0.6
+                  }} 
+                />
+                {/* Time Label sitting right below the tick line */}
+                <span 
+                  style={{ 
+                    position: 'absolute', 
+                    left: `${leftPercent}%`, 
+                    bottom: 0,
+                    transform: 'translateX(-50%)', 
+                    color: '#8e8e93', 
+                    fontSize: '10px', 
+                    fontWeight: 900, 
+                    letterSpacing: '0.05em',
+                    lineHeight: 1
+                  }}
+                >
+                  {formatSlotToTime(tr.slot)}
+                </span>
+              </React.Fragment>
+            );
+          })}
+
+          {/* End label at 24:00 (if outage) */}
+          {!isEndLit && (
+            <span style={{ position: 'absolute', right: 0, bottom: 0, color: '#8e8e93', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
+              24:00
+            </span>
+          )}
+        </div>
+
+      </div>
     </div>
   );
 };
