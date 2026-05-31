@@ -531,11 +531,14 @@ export const AddressSearch: React.FC = () => {
   return (
     <div className={styles.root}>
       {/* Header */}
-      <div className={styles.headerSection}>
-        <p className={styles.pageSubtitle} style={{ margin: '8px 0 0 0' }}>
-          Оберіть адресу щоб дізнатися номер вашої підчерги
-        </p>
-      </div>
+      {!isSelectionComplete && (
+        <div className={styles.headerSection}>
+          <h1 className={styles.pageTitle}>Визначення підчерги</h1>
+          <p className={styles.pageSubtitle}>
+            Вкажіть адресу, щоб дізнатися графік
+          </p>
+        </div>
+      )}
 
       {isSelectionComplete ? (
         <>
