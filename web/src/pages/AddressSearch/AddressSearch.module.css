@@ -374,7 +374,7 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  margin-top: 12px;
+  margin-top: 2px; /* Decreased from 12px to 2px for tighter layout */
   box-sizing: border-box;
 }
 
@@ -872,7 +872,7 @@
 .unifiedHeaderCardGray {
   background: #ffffff;
   border-radius: 16px;
-  padding: 16px 18px;
+  padding: 12px 18px; /* Decreased vertical padding from 16px to 12px for tighter layout */
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1054,6 +1054,66 @@
   color: #ffffff;
   border-color: #ee7221;
   box-shadow: 0 2px 6px rgba(238, 114, 33, 0.2);
+}
+
+/* Inline Card Actions Styles */
+.cardTopRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.cardDivider {
+  height: 1px;
+  background: #e4e4e7;
+  opacity: 0.6;
+  width: 100%;
+  margin: 2px 0;
+}
+
+.cardActionsRowContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.cardActionChip {
+  flex: 1;
+  background: #f4f4f5; /* clean neutral grey background */
+  border: 1px solid rgba(113, 113, 122, 0.22); /* light grey border */
+  color: #52525b; /* neutral dark text */
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 10px; /* matched rounding for design consistency */
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+}
+
+.cardActionChip:hover {
+  background: #e4e4e7;
+  color: #18181b;
+  border-color: rgba(113, 113, 122, 0.35);
+}
+
+.cardActionChip:active {
+  transform: scale(0.97);
+  background: #d4d4d8;
 }
 
 

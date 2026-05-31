@@ -19,8 +19,7 @@ import styles from './AddressSearch.module.css';
 
 export const AddressSearch: React.FC = () => {
   const navigate = useNavigate();
-  const { scheduleData, user, updateUserConfig } = useStore();
-  const isAnon = !user || user.is_anonymous;
+  const { scheduleData, updateUserConfig } = useStore();
 
   // Query to fetch the address registry dynamically
   const { data: registry, isLoading, isError } = useQuery({
@@ -114,7 +113,7 @@ export const AddressSearch: React.FC = () => {
 
   // Handle push setup redirect
   const handleSetupPush = async () => {
-    if (!foundSubGroupVal || foundSubGroupVal === 'needs_clarification' || isAnon) return;
+    if (!foundSubGroupVal || foundSubGroupVal === 'needs_clarification') return;
     
     // Redirect to Cabinet and open notifications editor without changing starter group
     navigate(`/cabinet?setupPush=true&subGroup=${foundSubGroupVal}`);
@@ -537,73 +536,98 @@ export const AddressSearch: React.FC = () => {
                   ? styles.unifiedHeaderCardOrange
                   : styles.unifiedHeaderCardGray
               }
-              style={{ animation: 'fadeIn 0.4s ease' }}
+              style={{ 
+                animation: 'fadeIn 0.4s ease',
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                gap: '6px'
+              }}
             >
-              {/* Ліва частина: Номер підчерги або іконка уточнення */}
-              <div className={styles.headerLeftPart}>
-                {foundSubGroupVal === 'needs_clarification' ? (
-                  <div className={styles.plaqueOuterFrameGray}>
-                    <div className={styles.plaqueInnerCardGray}>
-                      <HelpCircle size={28} className="text-zinc-400" />
-                      <span className={styles.plaqueSubLabelGray} style={{ fontSize: '8px', marginTop: '1px' }}>
-                        уточнення
-                      </span>
+              <div className={styles.cardTopRow}>
+                {/* Ліва частина: Номер підчерги або іконка уточнення */}
+                <div className={styles.headerLeftPart}>
+                  {foundSubGroupVal === 'needs_clarification' ? (
+                    <div className={styles.plaqueOuterFrameGray}>
+                      <div className={styles.plaqueInnerCardGray}>
+                        <HelpCircle size={28} className="text-zinc-400" />
+                        <span className={styles.plaqueSubLabelGray} style={{ fontSize: '8px', marginTop: '1px' }}>
+                          уточнення
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div
-                    className={
-                      liveStatus?.isOn ? styles.plaqueOuterFrameOrange : styles.plaqueOuterFrameGray
-                    }
-                  >
+                  ) : (
                     <div
                       className={
-                        liveStatus?.isOn ? styles.plaqueInnerCardOrange : styles.plaqueInnerCardGray
+                        liveStatus?.isOn ? styles.plaqueOuterFrameOrange : styles.plaqueOuterFrameGray
                       }
                     >
-                      <span
-                        className={`${styles.plaqueValue} ${
-                          liveStatus?.isOn ? styles.plaqueValueOrange : styles.plaqueValueGray
-                        }`}
+                      <div
+                        className={
+                          liveStatus?.isOn ? styles.plaqueInnerCardOrange : styles.plaqueInnerCardGray
+                        }
                       >
-                        {foundSubGroupVal}
-                      </span>
-                      <span
-                        className={`${styles.plaqueSubLabel} ${
-                          liveStatus?.isOn ? styles.plaqueSubLabelOrange : styles.plaqueSubLabelGray
-                        }`}
-                      >
-                        підчерга
-                      </span>
+                        <span
+                          className={`${styles.plaqueValue} ${
+                            liveStatus?.isOn ? styles.plaqueValueOrange : styles.plaqueValueGray
+                          }`}
+                        >
+                          {foundSubGroupVal}
+                        </span>
+                        <span
+                          className={`${styles.plaqueSubLabel} ${
+                            liveStatus?.isOn ? styles.plaqueSubLabelOrange : styles.plaqueSubLabelGray
+                          }`}
+                        >
+                          підчерга
+                        </span>
+                      </div>
+                      <div className={liveStatus?.isOn ? styles.plaquePillOrange : styles.plaquePillGray} />
                     </div>
-                    <div className={liveStatus?.isOn ? styles.plaquePillOrange : styles.plaquePillGray} />
-                  </div>
-                )}
+                  )}
+                </div>
+
+                {/* Права частина: Дані обраної адреси */}
+                <div className={styles.headerRightPart}>
+                  {!isCity ? (
+                    <>
+                      <span className={styles.summaryLabel}>Обрана адреса</span>
+                      <span className={styles.summaryDistrict}>
+                        {cleanOkrug(selectedOkrug)} старостинський округ
+                      </span>
+                      <span className={styles.summaryVillage}>с. {selectedVillage}</span>
+                      <span className={styles.summaryStreet}>
+                        {selectedStreet}, буд. {selectedHouse}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className={styles.summaryLabel}>Обрана адреса</span>
+                      <span className={styles.summaryVillage}>м. Старокостянтинів</span>
+                      <span className={styles.summaryStreet}>
+                        {selectedStreet}, буд. {selectedHouse}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
 
-              {/* Права частина: Дані обраної адреси */}
-              <div className={styles.headerRightPart}>
-                {!isCity ? (
-                  <>
-                    <span className={styles.summaryLabel}>Обрана адреса</span>
-                    <span className={styles.summaryDistrict}>
-                      {cleanOkrug(selectedOkrug)} старостинський округ
-                    </span>
-                    <span className={styles.summaryVillage}>с. {selectedVillage}</span>
-                    <span className={styles.summaryStreet}>
-                      {selectedStreet}, буд. {selectedHouse}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className={styles.summaryLabel}>Обрана адреса</span>
-                    <span className={styles.summaryVillage}>м. Старокостянтинів</span>
-                    <span className={styles.summaryStreet}>
-                      {selectedStreet}, буд. {selectedHouse}
-                    </span>
-                  </>
-                )}
-              </div>
+              {/* Clickable Actions as side-by-side capsule chips inside the card */}
+              {foundSubGroupVal !== 'needs_clarification' && (
+                <div className={styles.cardActionsRowContainer}>
+                  <button
+                    onClick={handleSetStarterSubGroup}
+                    className={styles.cardActionChip}
+                  >
+                    Зробити стартовою
+                  </button>
+                  <button
+                    onClick={handleSetupPush}
+                    className={styles.cardActionChip}
+                  >
+                    Налаштувати пуш
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -619,40 +643,7 @@ export const AddressSearch: React.FC = () => {
           {/* BLOCK 3: Преміальний iOS-Style капсульний стек кнопок дій */}
           {selectedHouse && foundSubGroupVal && (
             <div className={styles.buttonStack} style={{ animation: 'fadeIn 0.4s ease' }}>
-              {/* Дія 1: Показувати першою в додатку (Помаранчева капсула) */}
-              <button
-                onClick={handleSetStarterSubGroup}
-                className={`${styles.capsuleBtn} ${styles.capsuleOrange}`}
-              >
-                Показувати цю підчергу першою в додатку
-              </button>
-
-              {/* Дія 2: Налаштувати пуш (Помаранчева капсула) або баннер входу для гостей */}
-              {!isAnon ? (
-                <button
-                  onClick={handleSetupPush}
-                  className={`${styles.capsuleBtn} ${styles.capsuleOrange}`}
-                >
-                  Налаштувати пуш-сповіщення для підчерги
-                </button>
-              ) : (
-                <div className={styles.infoBanner}>
-                  <span>
-                    Хочете отримувати миттєві сповіщення про відключення?
-                  </span>
-                  <span>
-                    <span
-                      onClick={() => navigate('/cabinet')}
-                      className={styles.infoBannerLink}
-                    >
-                      Увійдіть через Google
-                    </span>{' '}
-                    в особистому кабінеті, щоб налаштувати пуш-сповіщення.
-                  </span>
-                </div>
-              )}
-
-              {/* Дія 3: Скидання пошуку в корінь (Нейтральна сіра капсула) */}
+              {/* Дія: Скидання пошуку в корінь (Нейтральна сіра капсула) */}
               <button
                 onClick={handleResetSearch}
                 className={`${styles.capsuleBtn} ${styles.capsuleNeutral}`}
