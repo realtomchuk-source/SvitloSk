@@ -973,4 +973,55 @@
   line-height: 1.55;
 }
 
+/* Onboarding Card styling */
+.onboardingCard {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  margin-top: 16px;
+  box-sizing: border-box;
+}
+
+.onboardingLogoBox {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.onboardingTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.brandSvitlo {
+  color: #ee7221;
+}
+
+.brandSk {
+  color: #374151;
+}
+
+.onboardingText {
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.55;
+  margin: 0 0 4px 0;
+  max-width: 320px;
+}
+
+
 

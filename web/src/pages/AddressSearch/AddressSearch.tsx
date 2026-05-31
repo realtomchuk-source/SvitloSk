@@ -15,6 +15,7 @@ import { AutoCompleteInput } from './components/AutoCompleteInput';
 import { MissingAddressForm } from './components/MissingAddressForm';
 import { DrumPicker } from './components/DrumPicker';
 import { HelpCircle } from 'lucide-react';
+import { MainLogoIcon } from '@/assets/brand/MainLogoIcon';
 import styles from './AddressSearch.module.css';
 
 export const AddressSearch: React.FC = () => {
@@ -677,6 +678,29 @@ export const AddressSearch: React.FC = () => {
         <>
           {/* BLOCK 1: Address selection input form at the top */}
           {searchFormCard}
+
+          {/* BLOCK 2: Welcoming Onboarding Card (visible only on Step 1) */}
+          {currentStep === 1 && (
+            <div className={styles.onboardingCard} style={{ animation: 'fadeIn 0.4s ease' }}>
+              <div className={styles.onboardingLogoBox}>
+                <MainLogoIcon size={56} />
+              </div>
+              <h3 className={styles.onboardingTitle}>
+                <span className={styles.brandSvitlo}>Svitlo</span>
+                <span className={styles.brandSk}>Sk</span>
+              </h3>
+              <p className={styles.onboardingText}>
+                Не знайшли свою адресу? Її немає у відкритих джерелах. Надішліть нам запит — і ви допоможете зробити графіки відключень доступними для всіх мешканців нашої громади! 🧡
+              </p>
+              <button
+                onClick={() => setIsMissingFormOpen(true)}
+                className={`${styles.capsuleBtn} ${styles.capsuleOrange}`}
+                style={{ marginTop: '4px', minHeight: '40px', fontSize: '13px' }}
+              >
+                Повідомити про відсутню адресу
+              </button>
+            </div>
+          )}
         </>
       )}
 
