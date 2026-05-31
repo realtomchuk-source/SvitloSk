@@ -27,7 +27,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   // Filter suggestions when typing
   useEffect(() => {
     if (!value.trim()) {
-      setFilteredSuggestions(suggestions.slice(0, 10)); // Show first 10 when empty
+      setFilteredSuggestions(suggestions); // Show all when empty
       return;
     }
 
@@ -37,7 +37,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       return itemNorm.includes(query);
     });
 
-    setFilteredSuggestions(filtered.slice(0, 10)); // Limit to top 10 items for speed
+    setFilteredSuggestions(filtered);
   }, [value, suggestions]);
 
   // Click outside listener
@@ -90,6 +90,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
             setActiveIndex(-1);
           }}
           onFocus={() => setShowSuggestions(true)}
+          onClick={() => setShowSuggestions(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}

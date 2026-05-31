@@ -61,6 +61,16 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
     return Array.from(villagesSet).sort();
   }, [registry]);
 
+  // Filtered list of villages for the current selected okrug.
+  // If no okrug is selected, show all villages.
+  const localVillagesList = useMemo(() => {
+    if (!registry) return [];
+    if (!localOkrug) return allVillagesList;
+    const okrugData = registry[localOkrug];
+    if (!okrugData) return allVillagesList;
+    return Object.keys(okrugData).sort();
+  }, [registry, localOkrug, allVillagesList]);
+
   // Helper to find the okrug for a selected village
   const findOkrugForVillage = (villageName: string): string => {
     if (!registry) return '';
@@ -90,6 +100,9 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
         setLocalVillage('');
       } else {
         const v = staticData.village || '';
+        const o = staticData.okrug || '';
+        
+        setLocalOkrug(o);
         setLocalVillage(v);
         
         if (v && registry) {
@@ -102,9 +115,14 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
               break;
             }
           }
-          setLocalOkrug(resolvedOkrug);
+          if (resolvedOkrug) {
+            setLocalOkrug(resolvedOkrug);
+          }
+        } else if (o && registry) {
+          // If okrug is provided but village is empty, respect the selected okrug
+          setLocalVillage('');
         } else if (registry) {
-          // If village not provided, prefill with first one in sorted list
+          // If neither village nor okrug provided, prefill with first one in sorted list of all villages
           const okrugs = Object.keys(registry).filter(key => key !== 'Місто');
           const vSet = new Set<string>();
           for (const okrug of okrugs) {
@@ -216,7 +234,7 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
               onClick={() => handleToggleIsCity(false)}
               className={`${styles.toggleButton} ${!localIsCity ? styles.toggleButtonActive : ''}`}
             >
-              Села громади
+              Населені пункти громади
             </button>
           </div>
         </div>
@@ -229,7 +247,7 @@ export const MissingAddressForm: React.FC<MissingAddressFormProps> = ({
               placeholder="Введіть назву села або оберіть зі списку"
               value={localVillage}
               onChange={handleVillageSelect}
-              suggestions={allVillagesList}
+              suggestions={localVillagesList}
               disabled={isSubmitting}
             />
           </div>

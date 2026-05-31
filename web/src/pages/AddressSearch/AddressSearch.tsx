@@ -13,7 +13,6 @@ import {
 } from './services/addressService';
 import { AutoCompleteInput } from './components/AutoCompleteInput';
 import { MissingAddressForm } from './components/MissingAddressForm';
-import { DrumPicker } from './components/DrumPicker';
 import { HelpCircle } from 'lucide-react';
 import { MainLogoIcon } from '@/assets/brand/MainLogoIcon';
 import styles from './AddressSearch.module.css';
@@ -78,28 +77,6 @@ export const AddressSearch: React.FC = () => {
     return housesList.filter(hNum => hNum.toLowerCase().includes(query));
   }, [housesList, houseSearchQuery]);
 
-  // Pre-select when toggled or loaded to ensure no blank picker state
-  useEffect(() => {
-    if (!isCity && registry) {
-      const oList = getOkrugs(registry);
-      if (oList.length > 0) {
-        if (!selectedOkrug) {
-          const firstOkrug = oList[0];
-          setSelectedOkrug(firstOkrug);
-          const vList = getVillages(registry, firstOkrug);
-          if (vList.length > 0) {
-            setSelectedVillage(vList[0]);
-          }
-        } else {
-          // If okrug is selected but village is not, or is invalid
-          const vList = getVillages(registry, selectedOkrug);
-          if (vList.length > 0 && (!selectedVillage || !vList.includes(selectedVillage))) {
-            setSelectedVillage(vList[0]);
-          }
-        }
-      }
-    }
-  }, [isCity, registry, selectedOkrug, selectedVillage]);
 
   // Found Subgroup logic
   const foundSubGroupVal = useMemo(() => {
@@ -157,22 +134,8 @@ export const AddressSearch: React.FC = () => {
     setSelectedHouse('');
     setHouseSearchQuery('');
     setCurrentStep(1);
-    if (!cityMode && registry) {
-      const oList = getOkrugs(registry);
-      if (oList.length > 0) {
-        const firstOkrug = oList[0];
-        setSelectedOkrug(firstOkrug);
-        const vList = getVillages(registry, firstOkrug);
-        if (vList.length > 0) {
-          setSelectedVillage(vList[0]);
-        } else {
-          setSelectedVillage('');
-        }
-      }
-    } else {
-      setSelectedOkrug('');
-      setSelectedVillage('');
-    }
+    setSelectedOkrug('');
+    setSelectedVillage('');
   };
 
   const handleOkrugChange = (okrug: string) => {
@@ -181,14 +144,17 @@ export const AddressSearch: React.FC = () => {
     setSelectedHouse('');
     setHouseSearchQuery('');
     if (registry) {
-      const vList = getVillages(registry, okrug);
-      if (vList.length > 0) {
-        setSelectedVillage(vList[0]);
-      } else {
+      const oList = getOkrugs(registry);
+      const normalizedOkrug = okrug.toLowerCase().trim();
+      const matchedOkrug = oList.find(o => 
+        o.toLowerCase().trim() === normalizedOkrug ||
+        cleanOkrug(o).toLowerCase().trim() === normalizedOkrug
+      );
+      if (matchedOkrug) {
+        setSelectedOkrug(matchedOkrug);
         setSelectedVillage('');
+        setCurrentStep(2);
       }
-    } else {
-      setSelectedVillage('');
     }
   };
 
@@ -197,6 +163,15 @@ export const AddressSearch: React.FC = () => {
     setSelectedStreet('');
     setSelectedHouse('');
     setHouseSearchQuery('');
+    if (registry && selectedOkrug) {
+      const vList = getVillages(registry, selectedOkrug);
+      const normalizedVillage = village.toLowerCase().trim();
+      const matchedVillage = vList.find(v => v.toLowerCase().trim() === normalizedVillage);
+      if (matchedVillage) {
+        setSelectedVillage(matchedVillage);
+        setCurrentStep(3);
+      }
+    }
   };
 
   const handleStreetChange = (val: string) => {
@@ -219,20 +194,8 @@ export const AddressSearch: React.FC = () => {
     setSelectedHouse('');
     setHouseSearchQuery('');
     setCurrentStep(1);
-    if (!isCity && registry) {
-      const oList = getOkrugs(registry);
-      if (oList.length > 0) {
-        const firstOkrug = oList[0];
-        setSelectedOkrug(firstOkrug);
-        const vList = getVillages(registry, firstOkrug);
-        if (vList.length > 0) {
-          setSelectedVillage(vList[0]);
-        }
-      }
-    } else {
-      setSelectedOkrug('');
-      setSelectedVillage('');
-    }
+    setSelectedOkrug('');
+    setSelectedVillage('');
   };
 
   if (isLoading) {
@@ -260,23 +223,50 @@ export const AddressSearch: React.FC = () => {
 
   const searchFormCard = (
     <div className={styles.card}>
-      {/* Territory Toggle (Місто / Округи) — Visible only during active search */}
+      {/* Territory Selection (Vertically stacked full-width capsule buttons) — Visible only during active search */}
       {!isSelectionComplete && (
         <div className={styles.inputGroup}>
           <span className={styles.inputLabel}>Оберіть адресу</span>
-          <div className={styles.toggleGroup}>
-            <button
-              onClick={() => handleSettlementTypeChange(true)}
-              className={`${styles.toggleButton} ${isCity ? styles.toggleButtonActive : ''}`}
-            >
-              Старокостянтинів
-            </button>
-            <button
-              onClick={() => handleSettlementTypeChange(false)}
-              className={`${styles.toggleButton} ${!isCity ? styles.toggleButtonActive : ''}`}
-            >
-              Села громади
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}>
+            {isCity ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleSettlementTypeChange(false)}
+                  className={`${styles.capsuleBtn} ${styles.capsuleGray}`}
+                  style={{ minHeight: '44px', padding: '8px 16px', fontSize: '13px' }}
+                >
+                  Населені пункти громади
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSettlementTypeChange(true)}
+                  className={`${styles.capsuleBtn} ${styles.capsuleOrange}`}
+                  style={{ minHeight: '44px', padding: '8px 16px', fontSize: '13px' }}
+                >
+                  Старокостянтинів
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleSettlementTypeChange(true)}
+                  className={`${styles.capsuleBtn} ${styles.capsuleGray}`}
+                  style={{ minHeight: '44px', padding: '8px 16px', fontSize: '13px' }}
+                >
+                  Старокостянтинів
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSettlementTypeChange(false)}
+                  className={`${styles.capsuleBtn} ${styles.capsuleOrange}`}
+                  style={{ minHeight: '44px', padding: '8px 16px', fontSize: '13px' }}
+                >
+                  Населені пункти громади
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -290,6 +280,7 @@ export const AddressSearch: React.FC = () => {
           <button
             onClick={() => {
               setCurrentStep(1);
+              setSelectedOkrug('');
               setSelectedVillage('');
               setSelectedStreet('');
               setSelectedHouse('');
@@ -304,6 +295,7 @@ export const AddressSearch: React.FC = () => {
             <button
               onClick={() => {
                 setCurrentStep(2);
+                setSelectedVillage('');
                 setSelectedStreet('');
                 setSelectedHouse('');
               }}
@@ -319,6 +311,7 @@ export const AddressSearch: React.FC = () => {
             <button
               onClick={() => {
                 setCurrentStep(3);
+                setSelectedStreet('');
                 setSelectedHouse('');
               }}
               className={styles.unifiedCardRowButton}
@@ -333,6 +326,7 @@ export const AddressSearch: React.FC = () => {
               <button
                 onClick={() => {
                   setCurrentStep(3);
+                  setSelectedStreet('');
                   setSelectedHouse('');
                 }}
                 className={styles.unifiedCardCombinedPart}
@@ -342,6 +336,7 @@ export const AddressSearch: React.FC = () => {
               <button
                 onClick={() => {
                   setCurrentStep(4);
+                  setSelectedHouse('');
                 }}
                 className={styles.unifiedCardCombinedPart}
                 style={{ marginLeft: '-2px' }}
@@ -372,6 +367,7 @@ export const AddressSearch: React.FC = () => {
           <button
             onClick={() => {
               setCurrentStep(1);
+              setSelectedStreet('');
               setSelectedHouse('');
             }}
             className={styles.unifiedCardRowButton}
@@ -383,28 +379,28 @@ export const AddressSearch: React.FC = () => {
 
       {/* ACTIVE SELECTORS FOR CURRENT STEP */}
 
-      {/* Rural Step 1: Okrug Drum Picker */}
+      {/* Rural Step 1: Okrug Autocomplete */}
       {!isCity && currentStep === 1 && (
-        <div className={`${styles.drumPickerSection} ${styles.fadeEntry}`}>
-          <span className={styles.inputLabel}>Оберіть старостинський округ</span>
-          <DrumPicker
-            items={okrugsList}
-            selectedItem={selectedOkrug}
+        <div className={styles.fadeEntry}>
+          <AutoCompleteInput
+            label="Оберіть старостинський округ"
+            placeholder="Наприклад, Баглаївський"
+            value={selectedOkrug}
             onChange={handleOkrugChange}
-            onConfirm={() => setCurrentStep(2)}
+            suggestions={okrugsList}
           />
         </div>
       )}
 
-      {/* Rural Step 2: Village Drum Picker */}
+      {/* Rural Step 2: Village Autocomplete */}
       {!isCity && currentStep === 2 && (
-        <div className={`${styles.drumPickerSection} ${styles.fadeEntry}`}>
-          <span className={styles.inputLabel}>Оберіть село</span>
-          <DrumPicker
-            items={villagesList}
-            selectedItem={selectedVillage}
+        <div className={styles.fadeEntry}>
+          <AutoCompleteInput
+            label="Оберіть село"
+            placeholder="Наприклад, Ємці"
+            value={selectedVillage}
             onChange={handleVillageChange}
-            onConfirm={() => setCurrentStep(3)}
+            suggestions={villagesList}
           />
         </div>
       )}
@@ -656,20 +652,35 @@ export const AddressSearch: React.FC = () => {
                 </div>
               )}
 
-              {/* Дія 3: Зворотній зв'язок (Сіра капсула) */}
-              <button
-                onClick={() => setIsMissingFormOpen(true)}
-                className={`${styles.capsuleBtn} ${styles.capsuleGray}`}
-              >
-                Повідомити про відсутню в базі адресу
-              </button>
-
-              {/* Дія 4: Скидання пошуку в корінь (Нейтральна сіра капсула) */}
+              {/* Дія 3: Скидання пошуку в корінь (Нейтральна сіра капсула) */}
               <button
                 onClick={handleResetSearch}
                 className={`${styles.capsuleBtn} ${styles.capsuleNeutral}`}
               >
                 Почати новий пошук з самого початку
+              </button>
+            </div>
+          )}
+
+          {/* BLOCK 4: Onboarding Welcome Card (duplicated below the buttons stack) */}
+          {selectedHouse && foundSubGroupVal && (
+            <div className={styles.onboardingCard} style={{ marginTop: '16px', animation: 'fadeIn 0.4s ease' }}>
+              <div className={styles.onboardingLogoBox}>
+                <MainLogoIcon size={56} />
+              </div>
+              <h3 className={styles.onboardingTitle}>
+                <span className={styles.brandSvitlo}>Svitlo</span>
+                <span className={styles.brandSk}>Sk</span>
+              </h3>
+              <p className={styles.onboardingText}>
+                Не знайшли свою адресу? Її немає у відкритих джерелах. Надішліть нам запит — і ви допоможете зробити графіки відключень доступними для всіх мешканців нашої громади! 🧡
+              </p>
+              <button
+                onClick={() => setIsMissingFormOpen(true)}
+                className={`${styles.capsuleBtn} ${styles.capsuleOrange}`}
+                style={{ marginTop: '4px', minHeight: '40px', fontSize: '13px' }}
+              >
+                Повідомити про відсутню адресу
               </button>
             </div>
           )}
@@ -711,7 +722,7 @@ export const AddressSearch: React.FC = () => {
             onClick={() => setIsMissingFormOpen(true)}
             className={`${styles.capsuleBtn} ${styles.capsuleGray}`}
           >
-            Повідомити про відсутню в базі адресу
+            Повідомити про відсутню адресу
           </button>
           <button
             onClick={handleResetSearch}
