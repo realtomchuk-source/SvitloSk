@@ -655,7 +655,7 @@ export const AddressSearch: React.FC = () => {
 
           {/* BLOCK 4: Onboarding Welcome Card (duplicated below the buttons stack) */}
           {selectedHouse && foundSubGroupVal && (
-            <div className={styles.onboardingCard} style={{ marginTop: '16px', animation: 'fadeIn 0.4s ease' }}>
+            <div className={styles.onboardingCard} style={{ animation: 'fadeIn 0.4s ease' }}>
               <div className={styles.onboardingLogoBox}>
                 <MainLogoIcon size={56} />
               </div>

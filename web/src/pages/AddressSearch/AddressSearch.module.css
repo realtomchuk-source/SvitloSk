@@ -5,7 +5,7 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   padding: 16px 16px 120px 16px;
   max-width: 450px;
   margin: 0 auto;
@@ -374,7 +374,6 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  margin-top: 2px; /* Decreased from 12px to 2px for tighter layout */
   box-sizing: border-box;
 }
 
@@ -872,7 +871,7 @@
 .unifiedHeaderCardGray {
   background: #ffffff;
   border-radius: 16px;
-  padding: 12px 18px; /* Decreased vertical padding from 16px to 12px for tighter layout */
+  padding: 14px 16px; /* balanced padding for visual symmetry */
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -985,7 +984,6 @@
   align-items: center;
   text-align: center;
   gap: 12px;
-  margin-top: 16px;
   box-sizing: border-box;
 }
 
