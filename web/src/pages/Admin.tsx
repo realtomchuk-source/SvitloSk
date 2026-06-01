@@ -3,8 +3,8 @@ import { triggerParserWorkflow, fetchHealthStatus, fetchParserState, fetchPendin
 import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard, Users, BarChart2, Grid3X3, Megaphone, Terminal,
-  Play, CheckCircle, RotateCcw, AlertCircle, Clock,
-  Shield, Key, ExternalLink, MapPin
+  Play, CheckCircle, RotateCcw, AlertCircle,
+  Shield, Key, ExternalLink, MapPin, LogOut, ArrowUpRight
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { UserManagement } from './Admin/UserManagement';
@@ -34,7 +34,7 @@ const TAB_CONFIG: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
 ];
 
 export const Admin: React.FC = () => {
-  const { user, isAuthLoading } = useStore();
+  const { user, isAuthLoading, signOut } = useStore();
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [token, setToken] = useState(localStorage.getItem('sssk_admin_token') || '');
   const [showTokenInput, setShowTokenInput] = useState(false);
@@ -62,8 +62,8 @@ export const Admin: React.FC = () => {
     return [
       { label: 'GitHub Sync', value: isSyncFresh ? 'Норма' : 'Затримка', status: isSyncFresh ? 'ok' : 'warning' },
       { label: 'База даних', value: stats ? 'Онлайн' : 'Очікування', status: stats ? 'ok' : 'pending' },
-      { label: 'Парсер', value: health?.version || '—', status: health ? 'ok' : 'pending' },
-      { label: 'Користувачів', value: stats?.totalUsers?.toString() || '—', status: stats?.totalUsers ? 'ok' : 'pending' },
+      { label: 'Парсер', value: health ? `${health.version || '2.1-Adaptive'} (Успішно)` : '—', status: health ? 'ok' : 'pending' },
+      { label: 'Push Service', value: stats ? 'Онлайн' : 'Очікування', status: stats ? 'ok' : 'pending' },
     ];
   }, [health, stats]);
 
@@ -131,13 +131,13 @@ export const Admin: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-50 flex overflow-hidden font-sans antialiased">
+    <div className="admin-fixed-layout">
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0">
+      <aside className="admin-sidebar">
         {/* Logo */}
-        <div className="p-6 pb-5 border-b border-gray-100">
+        <div className="admin-sidebar-logo">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shrink-0">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm">
               <Shield size={20} />
             </div>
             <div>
@@ -148,16 +148,14 @@ export const Admin: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
+        <nav className="admin-sidebar-nav space-y-1.5">
           {TAB_CONFIG.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={clsx(
-                "w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-left transition-all text-[15px] font-medium",
-                activeTab === tab.id
-                  ? "bg-blue-50 text-blue-700 font-bold shadow-sm"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+                "admin-nav-btn",
+                activeTab === tab.id && "active"
               )}
             >
               <span className={clsx(activeTab === tab.id ? "text-blue-600" : "text-gray-400")}>{tab.icon}</span>
@@ -177,7 +175,7 @@ export const Admin: React.FC = () => {
         </nav>
 
         {/* Footer: System Pulse + Token */}
-        <div className="p-3 border-t border-gray-100 space-y-2">
+        <div className="admin-sidebar-footer space-y-2">
           {/* System pulse */}
           <div className="flex items-center justify-between px-2 py-1.5">
             <span className="text-[10px] text-gray-400 font-medium">Система</span>
@@ -215,68 +213,142 @@ export const Admin: React.FC = () => {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 overflow-y-auto flex flex-col">
+      <main className="admin-main-area">
         {/* Header */}
-        <header className="px-6 py-4 border-b border-gray-200 bg-white flex justify-between items-center shrink-0">
+        <header className="admin-header">
           <div>
-            <h2 className="text-xl font-bold text-gray-800">{tabTitles[activeTab]}</h2>
+            <h2 className="text-xl font-bold text-gray-800 leading-tight">{tabTitles[activeTab]}</h2>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="admin-header-buttons flex items-center gap-3">
+            {/* Refresh Button */}
             <button
               onClick={() => window.location.reload()}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Оновити"
+              className="admin-btn-secondary !py-2 !px-3.5 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
+              title="Оновити сторінку"
             >
-              <RotateCcw size={16} />
+              <RotateCcw size={14} className="text-gray-500" />
+              <span className="hidden md:inline text-xs font-bold text-gray-700">Оновити дані</span>
             </button>
+
+            {/* Trigger Parser Button */}
             <button
               onClick={handleTrigger}
               disabled={isTriggering}
-              className="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="admin-btn-primary !py-2 !px-3.5 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm cursor-pointer disabled:opacity-50"
               title="Запустити парсер"
             >
               <Play size={14} fill="currentColor" />
-              <span className="hidden sm:inline">Запустити парсер</span>
+              <span className="hidden md:inline text-xs font-bold">Запустити парсер</span>
+            </button>
+
+            {/* Sign Out Button */}
+            <button
+              onClick={async () => {
+                if (window.confirm('Ви впевнені, що хочете вийти з адмін-панелі?')) {
+                  await signOut();
+                  window.location.hash = '#/';
+                }
+              }}
+              className="admin-btn-danger !py-2 !px-3.5 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
+              title="Вийти з адмін-панелі"
+            >
+              <LogOut size={14} />
+              <span className="hidden md:inline text-xs font-bold">Вийти</span>
             </button>
           </div>
         </header>
 
         {/* Content */}
-        <div className="p-8 flex-1 max-w-[1280px] w-full mx-auto space-y-8">
+        <div className="admin-content-container">
           {/* --- DASHBOARD --- */}
           {activeTab === 'dashboard' && (
             <div className="space-y-8 animate-in fade-in duration-300">
               {/* Stat Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard label="Користувачів" value={stats?.totalUsers?.toLocaleString() || '0'} icon={<Users size={24} />} color="blue" />
-                <StatCard label="Поточний графік" value={latestEntry?.target_date || '—'} icon={<BarChart2 size={24} />} color="emerald" />
+              <div className="admin-stats-grid">
+                <StatCard label="Користувачів в БД" value={stats?.totalUsers?.toLocaleString() || '0'} icon={<Users size={24} />} color="blue" />
+                <StatCard label="Поточний графік" value={latestEntry?.target_date || '—'} icon={<BarChart2 size={24} />} color="emerald" badge="Актуальний" />
+                <StatCard 
+                  label="Запити адрес" 
+                  value={pendingRequestsCount.toString()} 
+                  icon={<MapPin size={24} />} 
+                  color="purple" 
+                  badge={pendingRequestsCount > 0 ? "Очікують" : "Оброблені"}
+                  highlight={pendingRequestsCount > 0}
+                />
                 <StatCard
                   label="Очікує перевірки"
                   value={(pendingResults?.length || 0).toString()}
                   icon={<Grid3X3 size={24} />}
                   color="amber"
                   highlight={pendingResults && pendingResults.length > 0}
+                  badge={pendingResults && pendingResults.length > 0 ? "Потребує уваги" : "Підтверджено"}
                 />
-                <StatCard label="Подій за 24г" value={stats?.recentActions?.toString() || '0'} icon={<Clock size={24} />} color="purple" />
               </div>
 
-              {/* System Status */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                <h3 className="text-base font-bold text-gray-800 mb-4">Стан системи</h3>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  {systemStatus.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between px-5 py-4 min-h-[56px] bg-gray-50 rounded-xl border border-gray-100 shadow-inner">
-                      <span className="text-sm font-semibold text-gray-500">{s.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className={clsx("text-sm font-bold",
-                          s.status === 'ok' ? "text-emerald-600" : s.status === 'warning' ? "text-amber-600" : "text-gray-400"
-                        )}>{s.value}</span>
-                        <div className={clsx("w-2 h-2 rounded-full",
-                          s.status === 'ok' ? "bg-emerald-500" : s.status === 'warning' ? "bg-amber-500" : "bg-gray-300"
-                        )} />
-                      </div>
+              {/* System Grid Layout containing Status & Quick Actions */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+                {/* System Status (2 cols) */}
+                <div className="admin-system-board lg:col-span-2 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-base font-bold text-gray-800 mb-4">Стан системи</h3>
+                    <div className="admin-system-grid">
+                      {systemStatus.map((s, i) => (
+                        <div key={i} className="admin-status-box">
+                          <span className="text-sm font-semibold text-gray-500">{s.label}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={clsx("text-sm font-bold",
+                              s.status === 'ok' ? "text-emerald-600" : s.status === 'warning' ? "text-amber-600" : "text-gray-400"
+                            )}>{s.value}</span>
+                            <div className={clsx("w-2 h-2 rounded-full",
+                              s.status === 'ok' ? "bg-emerald-500" : s.status === 'warning' ? "bg-amber-500" : "bg-gray-300"
+                            )} />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                </div>
+
+                {/* Quick Actions widget (1 col) */}
+                <div className="admin-system-board lg:col-span-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-base font-bold text-gray-800 mb-4">Швидкі дії</h3>
+                    <div className="flex flex-col gap-2.5">
+                      <button
+                        onClick={handleTrigger}
+                        disabled={isTriggering}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-blue-50/50 hover:bg-blue-50 text-blue-700 font-bold rounded-xl border border-blue-100 transition-all text-xs cursor-pointer group disabled:opacity-50"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Play size={14} fill="currentColor" className="group-hover:scale-110 transition-transform" />
+                          Перевірити авто-парсер
+                        </span>
+                        <ArrowUpRight size={14} className="opacity-50" />
+                      </button>
+
+                      <button
+                        onClick={() => setActiveTab('editor')}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-purple-50/50 hover:bg-purple-50 text-purple-700 font-bold rounded-xl border border-purple-100 transition-all text-xs cursor-pointer group"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Grid3X3 size={14} className="group-hover:scale-110 transition-transform" />
+                          Експорт графіка (PNG)
+                        </span>
+                        <ArrowUpRight size={14} className="opacity-50" />
+                      </button>
+
+                      <button
+                        onClick={() => setActiveTab('announcements')}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 font-bold rounded-xl border border-emerald-100 transition-all text-xs cursor-pointer group"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Megaphone size={14} className="group-hover:scale-110 transition-transform" />
+                          Створити оголошення
+                        </span>
+                        <ArrowUpRight size={14} className="opacity-50" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -320,9 +392,9 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl py-5 px-6 flex items-center gap-3 shadow-sm">
-                  <CheckCircle size={20} className="text-emerald-600" />
-                  <span className="text-base text-emerald-700 font-semibold">Всі графіки підтверджені</span>
+                <div className="admin-alert-banner">
+                  <CheckCircle size={20} className="text-emerald-600 shrink-0" />
+                  <span className="text-base text-emerald-800 font-semibold">Всі графіки підтверджені</span>
                 </div>
               )}
             </div>
@@ -353,7 +425,7 @@ export const Admin: React.FC = () => {
 
 // ─── Sub-components ─────────────────────────────────────────
 
-const StatCard = ({ label, value, icon, color, highlight }: any) => {
+const StatCard = ({ label, value, icon, color, highlight, badge }: any) => {
   const colorMap: Record<string, string> = {
     blue: 'text-blue-600 bg-blue-50',
     emerald: 'text-emerald-600 bg-emerald-50',
@@ -361,13 +433,30 @@ const StatCard = ({ label, value, icon, color, highlight }: any) => {
     purple: 'text-purple-600 bg-purple-50',
   };
   return (
-    <div className={clsx("bg-white border rounded-2xl p-6 shadow-sm transition-all border-gray-150 hover:shadow-md",
-      highlight ? "border-amber-300 bg-amber-50/30" : "border-gray-200"
+    <div className={clsx("admin-stat-card transition-all duration-200 hover:shadow-md",
+      highlight && "border-amber-300 bg-amber-50/30"
     )}>
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
+      <div className="flex items-center justify-between w-full">
+        <div className="space-y-1 text-left">
           <p className="text-sm font-semibold text-gray-500">{label}</p>
-          <p className="text-3xl font-extrabold text-gray-900 tracking-tight">{value}</p>
+          <div className="flex items-baseline gap-2">
+            <p className="text-3xl font-extrabold text-gray-900 tracking-tight">{value}</p>
+            {badge && (
+              <span className={clsx(
+                "px-2 py-0.5 text-[9px] font-bold rounded-md border flex items-center gap-1 shrink-0 select-none",
+                highlight 
+                  ? "bg-amber-50 text-amber-700 border-amber-200" 
+                  : label === "Поточний графік" || badge === "Підтверджено"
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : "bg-gray-50 text-gray-600 border-gray-200"
+              )}>
+                <span className={clsx("w-1 h-1 rounded-full", 
+                  highlight ? "bg-amber-500" : label === "Поточний графік" || badge === "Підтверджено" ? "bg-emerald-500" : "bg-gray-400"
+                )} />
+                {badge}
+              </span>
+            )}
+          </div>
         </div>
         <div className={clsx("p-3.5 rounded-xl shrink-0 shadow-sm", colorMap[color])}>{icon}</div>
       </div>

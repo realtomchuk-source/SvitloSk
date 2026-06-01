@@ -8,8 +8,8 @@ import path from 'path';
 export default defineConfig({
   base: '/SvitloSk/',
   plugins: [
-    react(),
     tailwindcss(),
+    react(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'assets/*'],

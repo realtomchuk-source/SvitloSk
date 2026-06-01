@@ -123,15 +123,15 @@ export function LogsViewer() {
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-300">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-300 w-full text-left">
       {/* Tab Switcher */}
       <div className="flex items-center justify-between">
-        <div className="flex bg-gray-100 rounded-lg p-0.5">
+        <div className="admin-tab-group">
           <button
             onClick={() => setLogTab('parser')}
             className={clsx(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all",
-              logTab === 'parser' ? "bg-white text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              "admin-tab-btn",
+              logTab === 'parser' && "active"
             )}
           >
             <Terminal size={14} /> Логи парсера
@@ -139,8 +139,8 @@ export function LogsViewer() {
           <button
             onClick={() => setLogTab('audit')}
             className={clsx(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all",
-              logTab === 'audit' ? "bg-white text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              "admin-tab-btn",
+              logTab === 'audit' && "active"
             )}
           >
             <Fingerprint size={14} /> Аудит дій
@@ -151,11 +151,12 @@ export function LogsViewer() {
             onClick={() => refetch()}
             disabled={isFetching}
             className={clsx(
-              "p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors",
+              "admin-btn-secondary !p-2",
               isFetching && "animate-spin"
             )}
+            title="Оновити логи"
           >
-            <RefreshCw size={16} />
+            <RefreshCw size={15} />
           </button>
         )}
       </div>
@@ -164,27 +165,27 @@ export function LogsViewer() {
       {logTab === 'parser' && (
         <>
           {/* Search + Filters */}
-          <div className="flex flex-col sm:flex-row gap-2">
-            <div className="flex-1 relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="relative w-full sm:max-w-xs">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Пошук у логах..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm text-gray-700 outline-none focus:border-blue-400 transition-colors"
+                className="admin-input !pl-9.5"
               />
             </div>
-            <div className="flex gap-1.5 flex-wrap">
+            <div className="flex gap-2 flex-wrap shrink-0">
               {(['ALL', 'INFO', 'SUCCESS', 'WARNING', 'ERROR'] as LogLevel[]).map((level) => (
                 <button
                   key={level}
                   onClick={() => setLevelFilter(level)}
                   className={clsx(
-                    "px-2.5 py-2 rounded-lg text-[10px] font-semibold transition-all",
+                    "px-5 py-2.5 rounded-xl text-xs md:text-sm font-extrabold transition-all border cursor-pointer min-w-[95px] text-center shadow-sm duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98]",
                     levelFilter === level
-                      ? "bg-blue-600 text-white"
-                      : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"
+                      ? "bg-blue-600 border-blue-600 text-white"
+                      : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   )}
                 >
                   {level === 'ALL' ? 'Всі' : level}
@@ -194,27 +195,27 @@ export function LogsViewer() {
           </div>
 
           {logsLoading ? (
-            <div className="py-12 text-center text-gray-400 text-sm">Завантаження логів...</div>
+            <div className="py-12 text-center text-gray-400 text-sm font-semibold">Завантаження логів...</div>
           ) : (
             <>
               {/* Log entries */}
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm font-mono text-sm max-h-[500px] overflow-y-auto">
+              <div className="admin-table-container font-mono text-sm max-h-[500px] overflow-y-auto !p-0">
                 {filteredLogs.length === 0 ? (
-                  <div className="text-center text-gray-400 py-10 text-sm">
+                  <div className="text-center text-gray-400 py-12 text-sm font-semibold">
                     {searchQuery ? 'Логів не знайдено' : 'Немає логів'}
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-100">
+                  <div className="divide-y divide-gray-100 bg-white">
                     {filteredLogs.map((log) => (
-                      <div key={log.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
-                        <span className="text-gray-400 text-xs whitespace-nowrap pt-0.5">
+                      <div key={log.id} className="flex items-start gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors">
+                        <span className="text-gray-400 text-xs whitespace-nowrap pt-0.5 font-bold">
                           {new Date(log.timestamp).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </span>
-                        <span className={clsx("px-1.5 py-0.5 rounded text-[10px] font-bold whitespace-nowrap", getLevelBadge(log.level))}>
+                        <span className={clsx("px-2 py-0.5 rounded text-[10px] font-extrabold whitespace-nowrap border", getLevelBadge(log.level))}>
                           {log.level}
                         </span>
-                        <span className="text-gray-400 text-xs whitespace-nowrap">[{log.source || 'system'}]</span>
-                        <span className="text-gray-700 flex-1 text-xs">{log.message}</span>
+                        <span className="text-gray-400 text-xs font-semibold whitespace-nowrap">[{log.source || 'system'}]</span>
+                        <span className="text-gray-700 flex-1 text-xs font-medium text-left">{log.message}</span>
                       </div>
                     ))}
                   </div>
@@ -222,8 +223,8 @@ export function LogsViewer() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-4 gap-3">
-                <StatBox label="Всього" value={logs?.length || 0} color="gray" />
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <StatBox label="Всього логів" value={logs?.length || 0} color="gray" />
                 <StatBox label="Помилок" value={logs?.filter(l => l.level === 'ERROR').length || 0} color="red" />
                 <StatBox label="Попереджень" value={logs?.filter(l => l.level === 'WARNING').length || 0} color="amber" />
                 <StatBox label="Успішних" value={logs?.filter(l => l.level === 'SUCCESS').length || 0} color="emerald" />
@@ -237,41 +238,43 @@ export function LogsViewer() {
       {logTab === 'audit' && (
         <>
           {auditLoading ? (
-            <div className="py-12 text-center text-gray-400 text-sm">Завантаження аудиту...</div>
+            <div className="py-12 text-center text-gray-400 text-sm font-semibold">Завантаження аудиту...</div>
           ) : (
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <div className="admin-table-container">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="admin-table">
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500">Час</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500">Операція</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500">Ціль</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 text-right">Деталі</th>
+                    <tr>
+                      <th className="admin-table-th">Час</th>
+                      <th className="admin-table-th">Операція</th>
+                      <th className="admin-table-th">Ціль</th>
+                      <th className="admin-table-th text-right pr-8">Деталі</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-150 text-xs font-medium text-gray-700 bg-white">
                     {auditLogs?.length === 0 ? (
-                      <tr><td colSpan={4} className="p-8 text-center text-gray-400 text-sm">Журнал порожній</td></tr>
+                      <tr><td colSpan={4} className="p-12 text-center text-gray-400 text-sm font-semibold">Журнал порожній</td></tr>
                     ) : (
                       auditLogs?.map((log) => (
-                        <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-3">
-                            <p className="text-sm text-gray-700">{new Date(log.created_at).toLocaleDateString('uk-UA')}</p>
-                            <p className="text-xs text-gray-400">{new Date(log.created_at).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}</p>
+                        <tr key={log.id} className="admin-table-row">
+                          <td className="admin-table-td">
+                            <div className="flex flex-col text-left">
+                              <span className="font-bold text-gray-750">{new Date(log.created_at).toLocaleDateString('uk-UA')}</span>
+                              <span className="text-[10px] text-gray-400 font-mono mt-0.5">{new Date(log.created_at).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className={clsx("px-2 py-0.5 rounded text-[10px] font-bold", getActionBadge(log.action_type))}>
+                          <td className="admin-table-td">
+                            <span className={clsx("px-2.5 py-0.5 rounded-md text-[10px] font-extrabold border uppercase tracking-wider", getActionBadge(log.action_type))}>
                               {getActionLabel(log.action_type)}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="text-xs font-mono text-gray-500 truncate max-w-[150px] block">{log.target_id || '—'}</span>
+                          <td className="admin-table-td">
+                            <span className="text-xs font-mono text-gray-400 font-semibold truncate max-w-[150px] block text-left">{log.target_id || '—'}</span>
                           </td>
-                          <td className="px-4 py-3 text-right">
+                          <td className="admin-table-td text-right pr-8 font-semibold">
                             {log.details && Object.entries(log.details).map(([key, val]) => (
-                              <div key={key} className="text-xs text-gray-400">
-                                <span className="text-gray-500">{key}:</span> {String(val)}
+                              <div key={key} className="text-xs text-gray-400 mt-0.5">
+                                <span className="text-gray-500 font-bold">{key}:</span> {String(val)}
                               </div>
                             ))}
                           </td>
@@ -293,13 +296,19 @@ function StatBox({ label, value, color }: { label: string; value: number; color:
   const colorMap: Record<string, string> = {
     gray: 'text-gray-800',
     red: 'text-red-600',
-    amber: 'text-amber-600',
-    emerald: 'text-emerald-600',
+    amber: 'text-amber-650',
+    emerald: 'text-emerald-700',
+  };
+  const bgMap: Record<string, string> = {
+    gray: 'border-gray-200',
+    red: 'border-red-200 bg-red-50/10',
+    amber: 'border-amber-200 bg-amber-50/10',
+    emerald: 'border-emerald-250 bg-emerald-50/10',
   };
   return (
-    <div className="bg-white border border-gray-200 p-3 rounded-lg shadow-sm">
-      <p className="text-[10px] text-gray-500 font-medium mb-0.5">{label}</p>
-      <p className={clsx("text-xl font-bold", colorMap[color])}>{value}</p>
+    <div className={clsx("admin-stat-card !p-4", bgMap[color])}>
+      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1 text-left">{label}</p>
+      <p className={clsx("text-2xl font-extrabold tracking-tight text-left", colorMap[color])}>{value}</p>
     </div>
   );
 }

@@ -12,7 +12,7 @@
 #home-section {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     width: 100%;
     max-width: 450px;
     margin: 0 auto;

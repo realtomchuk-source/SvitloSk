@@ -206,36 +206,36 @@ export function Announcements() {
   );
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-300">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-300 w-full text-left">
       {/* Tab Switcher */}
-      <div className="flex items-center justify-between">
-        <div className="flex bg-gray-100 rounded-lg p-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="admin-tab-group">
           <button
             onClick={() => { setActiveTab('today'); setForm(null); setEditingId(null); }}
             className={clsx(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all",
-              activeTab === 'today' ? "bg-white text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              "admin-tab-btn",
+              activeTab === 'today' && "active"
             )}
           >
             <Megaphone size={14} /> Сьогодні ({shortDate(today)})
-            {todayCount > 0 && <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full">{todayCount}</span>}
+            {todayCount > 0 && <span className="ml-1.5 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full">{todayCount}</span>}
           </button>
           <button
             onClick={() => { setActiveTab('tomorrow'); setForm(null); setEditingId(null); }}
             className={clsx(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all",
-              activeTab === 'tomorrow' ? "bg-white text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              "admin-tab-btn",
+              activeTab === 'tomorrow' && "active"
             )}
           >
             <Clock size={14} /> Завтра ({shortDate(tomorrow)})
-            {tomorrowCount > 0 && <span className="ml-1 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full">{tomorrowCount}</span>}
+            {tomorrowCount > 0 && <span className="ml-1.5 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full">{tomorrowCount}</span>}
           </button>
         </div>
         <button
           onClick={() => setShowPreview(p => !p)}
           className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors",
-            showPreview ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-500 hover:text-gray-700"
+            "admin-btn-secondary",
+            showPreview && "bg-purple-55 text-purple-700 border-purple-200"
           )}
         >
           <Eye size={14} /> Попередній перегляд
@@ -244,9 +244,9 @@ export function Announcements() {
 
       {/* Preview Banner */}
       {showPreview && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-          <p className="text-[10px] text-gray-400 font-semibold mb-2">Попередній перегляд бігучої стрічки:</p>
-          <div className="bg-gray-900 rounded-lg px-4 py-2.5 overflow-hidden">
+        <div className="admin-system-board">
+          <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider mb-2.5">Попередній перегляд бігучої стрічки:</p>
+          <div className="bg-gray-900 rounded-xl px-4 py-3 overflow-hidden border border-gray-800 shadow-inner">
             <div className="flex gap-6 whitespace-nowrap animate-marquee-preview text-sm">
               {announcements.filter(a => a.status === 'published').length === 0 ? (
                 <span className="text-gray-500 italic text-xs">Немає опублікованих оголошень для цієї дати</span>
@@ -255,9 +255,9 @@ export function Announcements() {
                   <span key={a.id} className="inline-flex items-center gap-2">
                     {i > 0 && <span className="text-gray-600 mx-2">•</span>}
                     {a.time_label && (
-                      <span className="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-full whitespace-nowrap">{a.time_label}</span>
+                      <span className="px-2.5 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-full whitespace-nowrap">{a.time_label}</span>
                     )}
-                    <span className="text-white text-xs">{a.text}</span>
+                    <span className="text-white text-xs font-medium">{a.text}</span>
                   </span>
                 ))
               )}
@@ -268,60 +268,69 @@ export function Announcements() {
 
       {/* Form (create/edit) */}
       {form && (
-        <div className="bg-white border border-blue-200 rounded-lg p-4 shadow-sm space-y-3">
+        <div className="admin-system-board border-blue-200 bg-blue-50/5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-gray-700">
+            <h4 className="text-sm font-bold text-gray-800">
               {editingId ? 'Редагування оголошення' : 'Нове оголошення'}
             </h4>
-            <button onClick={() => { setForm(null); setEditingId(null); }} className="p-1 text-gray-400 hover:text-gray-600"><X size={16} /></button>
+            <button onClick={() => { setForm(null); setEditingId(null); }} className="p-1.5 text-gray-400 hover:text-gray-650 hover:bg-gray-100 rounded-lg transition-colors"><X size={16} /></button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              type="text"
-              value={form.time_label}
-              onChange={(e) => setForm({ ...form, time_label: e.target.value })}
-              placeholder="Час (наприклад: 12:00-16:00)"
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:border-blue-400 bg-white"
-            />
-            <input
-              type="text"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="Заголовок (необов'язково)"
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:border-blue-400 bg-white"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider text-left">Час дії</label>
+              <input
+                type="text"
+                value={form.time_label}
+                onChange={(e) => setForm({ ...form, time_label: e.target.value })}
+                placeholder="Наприклад: 12:00-16:00"
+                className="admin-input"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider text-left">Заголовок (необов'язково)</label>
+              <input
+                type="text"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="Заголовок картки"
+                className="admin-input"
+              />
+            </div>
           </div>
-          <div className="relative">
-            <textarea
-              value={form.text}
-              onChange={(e) => {
-                if (e.target.value.length <= charMax) {
-                  setForm({ ...form, text: e.target.value });
-                }
-              }}
-              placeholder="Текст оголошення (вулиці, деталі...)"
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:border-blue-400 bg-white resize-none"
-            />
-            <span className={clsx(
-              "absolute bottom-2 right-3 text-[10px] font-mono",
-              charCount > charMax * 0.9 ? "text-red-500" : "text-gray-300"
-            )}>
-              {charCount}/{charMax}
-            </span>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider text-left">Текст оголошення</label>
+            <div className="relative">
+              <textarea
+                value={form.text}
+                onChange={(e) => {
+                  if (e.target.value.length <= charMax) {
+                    setForm({ ...form, text: e.target.value });
+                  }
+                }}
+                placeholder="Введіть перелік вулиць, черг або деталей відключення..."
+                rows={3}
+                className="admin-textarea"
+              />
+              <span className={clsx(
+                "absolute bottom-2.5 right-3.5 text-[10px] font-mono font-semibold",
+                charCount > charMax * 0.9 ? "text-red-500" : "text-gray-300"
+              )}>
+                {charCount}/{charMax}
+              </span>
+            </div>
           </div>
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2.5">
             <button
               onClick={() => handleSave('draft')}
               disabled={!form.text.trim()}
-              className="px-3 py-1.5 text-xs font-medium border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-40"
+              className="admin-btn-secondary"
             >
               Зберегти чернетку
             </button>
             <button
               onClick={() => handleSave('published')}
               disabled={!form.text.trim()}
-              className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-40"
+              className="admin-btn-primary"
             >
               <Send size={12} /> Опублікувати
             </button>
@@ -330,74 +339,73 @@ export function Announcements() {
       )}
 
       {/* Announcements List */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-3">
         {announcements.length === 0 ? (
-          <div className="bg-white border border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <Megaphone size={24} className="mx-auto text-gray-300 mb-2" />
-            <p className="text-sm text-gray-400">Немає оголошень на {shortDate(currentDate)}</p>
+          <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-12 text-center shadow-sm">
+            <Megaphone size={28} className="mx-auto text-gray-300 mb-3" />
+            <p className="text-sm font-semibold text-gray-400">Немає оголошень на {shortDate(currentDate)}</p>
+            <p className="text-xs text-gray-400 mt-1 max-w-xs mx-auto leading-normal">Ви можете додати нове оголошення або чернетку для цієї дати за допомогою кнопки нижче.</p>
           </div>
         ) : (
           announcements.map((item, index) => (
             <div
               key={item.id}
               className={clsx(
-                "bg-white border rounded-lg p-4 group transition-all",
-                item.status === 'published' ? "border-blue-200 bg-blue-50/30" : "border-gray-200"
+                "admin-list-item w-full flex items-start gap-4",
+                item.status === 'published' && "border-blue-200 bg-blue-50/10"
               )}
             >
-              <div className="flex items-start gap-3">
-                {/* Sort handle */}
-                <div className="flex flex-col items-center gap-0.5 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => handleMoveUp(index)} disabled={index === 0} className="p-0.5 text-gray-300 hover:text-gray-600 disabled:opacity-20"><ArrowUp size={12} /></button>
-                  <GripVertical size={12} className="text-gray-300" />
-                  <button onClick={() => handleMoveDown(index)} disabled={index === announcements.length - 1} className="p-0.5 text-gray-300 hover:text-gray-600 disabled:opacity-20"><ArrowDown size={12} /></button>
-                </div>
+              {/* Sort handle */}
+              <div className="flex flex-col items-center gap-1.5 pt-0.5 shrink-0">
+                <button onClick={() => handleMoveUp(index)} disabled={index === 0} className="p-0.5 text-gray-300 hover:text-gray-650 disabled:opacity-20 transition-colors" title="Перемістити вгору"><ArrowUp size={14} /></button>
+                <GripVertical size={14} className="text-gray-300" />
+                <button onClick={() => handleMoveDown(index)} disabled={index === announcements.length - 1} className="p-0.5 text-gray-300 hover:text-gray-650 disabled:opacity-20 transition-colors" title="Перемістити вниз"><ArrowDown size={14} /></button>
+              </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    {item.time_label && (
-                      <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-full whitespace-nowrap">
-                        {item.time_label}
-                      </span>
-                    )}
-                    <span className={clsx(
-                      "px-1.5 py-0.5 rounded text-[10px] font-bold",
-                      item.status === 'published' ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"
-                    )}>
-                      {item.status === 'published' ? 'Опубліковано' : 'Чернетка'}
+              {/* Content */}
+              <div className="flex-1 min-w-0 text-left">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  {item.time_label && (
+                    <span className="px-2.5 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-full whitespace-nowrap border border-orange-200/50">
+                      {item.time_label}
                     </span>
-                    {item.title && <span className="text-xs font-semibold text-gray-700 truncate">{item.title}</span>}
-                  </div>
-                  <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{item.text}</p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                  {item.status !== 'published' && (
-                    <button
-                      onClick={() => publishMutation.mutate(item.id)}
-                      className="p-1.5 text-gray-400 hover:text-emerald-600 rounded-md hover:bg-emerald-50 transition-colors"
-                      title="Опублікувати"
-                    >
-                      <Send size={14} />
-                    </button>
                   )}
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="p-1.5 text-gray-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition-colors"
-                    title="Редагувати"
-                  >
-                    <Edit2 size={14} />
-                  </button>
-                  <button
-                    onClick={() => { if (confirm('Видалити оголошення?')) deleteMutation.mutate(item.id); }}
-                    className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors"
-                    title="Видалити"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  <span className={clsx(
+                    "px-2 py-0.5 rounded text-[10px] font-bold border",
+                    item.status === 'published' ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-gray-50 text-gray-500 border-gray-100"
+                  )}>
+                    {item.status === 'published' ? 'Опубліковано' : 'Чернетка'}
+                  </span>
+                  {item.title && <span className="text-xs font-bold text-gray-700 truncate max-w-sm">{item.title}</span>}
                 </div>
+                <p className="text-sm text-gray-600 leading-relaxed font-medium">{item.text}</p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                {item.status !== 'published' && (
+                  <button
+                    onClick={() => publishMutation.mutate(item.id)}
+                    className="p-2 text-gray-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+                    title="Опублікувати"
+                  >
+                    <Send size={15} />
+                  </button>
+                )}
+                <button
+                  onClick={() => handleEdit(item)}
+                  className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                  title="Редагувати"
+                >
+                  <Edit2 size={15} />
+                </button>
+                <button
+                  onClick={() => { if (confirm('Видалити оголошення?')) deleteMutation.mutate(item.id); }}
+                  className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                  title="Видалити"
+                >
+                  <Trash2 size={15} />
+                </button>
               </div>
             </div>
           ))
@@ -408,9 +416,9 @@ export function Announcements() {
       {!form && (
         <button
           onClick={() => setForm(emptyForm(currentDate))}
-          className="w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/50 transition-all"
+          className="admin-btn-secondary w-full border-dashed py-3 flex items-center justify-center gap-2.5 text-sm hover:border-blue-400 hover:bg-blue-50/30"
         >
-          <Plus size={16} /> Додати оголошення
+          <Plus size={16} /> Додати нове оголошення
         </button>
       )}
 

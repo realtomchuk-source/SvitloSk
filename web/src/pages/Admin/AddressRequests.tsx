@@ -132,7 +132,7 @@ export const AddressRequests: React.FC = () => {
         </div>
         <button 
           onClick={() => refetch()} 
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded-lg transition-colors"
+          className="admin-btn-danger"
         >
           Спробувати знову
         </button>
@@ -141,56 +141,64 @@ export const AddressRequests: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-300 w-full text-left">
       {/* QUICK STATS CARDS */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-          <p className="text-xs text-gray-500 font-medium mb-1">Усього запитів</p>
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-gray-800">{stats.total}</span>
-            <div className="p-2 bg-gray-50 text-gray-500 rounded-lg"><MapPin size={20} /></div>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="flex items-center justify-between w-full">
+            <div className="space-y-1 text-left">
+              <p className="text-sm font-semibold text-gray-500">Усього запитів</p>
+              <p className="text-3xl font-extrabold text-gray-900 tracking-tight">{stats.total}</p>
+            </div>
+            <div className="p-3.5 bg-gray-50 text-gray-500 rounded-xl shrink-0 shadow-sm"><MapPin size={24} /></div>
           </div>
         </div>
         
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm border-amber-200 bg-amber-50/10">
-          <p className="text-xs text-gray-500 font-medium mb-1">Очікують опрацювання</p>
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-amber-700">{stats.pending}</span>
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-lg"><Clock size={20} /></div>
+        <div className="admin-stat-card border-amber-300 bg-amber-50/10">
+          <div className="flex items-center justify-between w-full">
+            <div className="space-y-1 text-left">
+              <p className="text-sm font-semibold text-gray-500">Очікують опрацювання</p>
+              <p className="text-3xl font-extrabold text-amber-700 tracking-tight">{stats.pending}</p>
+            </div>
+            <div className="p-3.5 bg-amber-50 text-amber-600 rounded-xl shrink-0 shadow-sm"><Clock size={24} /></div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm border-emerald-200 bg-emerald-50/10">
-          <p className="text-xs text-gray-500 font-medium mb-1">Схвалено (Додано)</p>
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-emerald-700">{stats.resolved}</span>
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><CheckCircle size={20} /></div>
+        <div className="admin-stat-card border-emerald-300 bg-emerald-50/10">
+          <div className="flex items-center justify-between w-full">
+            <div className="space-y-1 text-left">
+              <p className="text-sm font-semibold text-gray-500">Схвалено (Додано)</p>
+              <p className="text-3xl font-extrabold text-emerald-700 tracking-tight">{stats.resolved}</p>
+            </div>
+            <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-xl shrink-0 shadow-sm"><CheckCircle size={24} /></div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm border-red-200 bg-red-50/10">
-          <p className="text-xs text-gray-500 font-medium mb-1">Відхилено як спам</p>
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-red-700">{stats.rejected}</span>
-            <div className="p-2 bg-red-50 text-red-600 rounded-lg"><XCircle size={20} /></div>
+        <div className="admin-stat-card border-red-300 bg-red-50/10">
+          <div className="flex items-center justify-between w-full">
+            <div className="space-y-1 text-left">
+              <p className="text-sm font-semibold text-gray-500">Відхилено як спам</p>
+              <p className="text-3xl font-extrabold text-red-700 tracking-tight">{stats.rejected}</p>
+            </div>
+            <div className="p-3.5 bg-red-50 text-red-650 rounded-xl shrink-0 shadow-sm"><XCircle size={24} /></div>
           </div>
         </div>
       </div>
 
       {/* FILTER & SEARCH BAR */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="admin-system-board flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Filters stack */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs font-semibold text-gray-400 mr-2 hidden sm:inline flex-shrink-0">Фільтри:</span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-gray-400 mr-2.5 hidden sm:inline flex-shrink-0 uppercase tracking-wider">Фільтри:</span>
           {(['all', 'pending', 'resolved', 'rejected'] as FilterType[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={clsx(
-                "px-3 py-1.5 text-xs font-medium rounded-lg transition-all border",
+                "px-5 py-2.5 rounded-xl text-xs md:text-sm font-extrabold transition-all border cursor-pointer min-w-[110px] text-center shadow-sm duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98]",
                 filter === f
-                  ? "bg-blue-600 border-blue-600 text-white font-semibold shadow-sm"
-                  : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+                  ? "bg-blue-600 border-blue-600 text-white"
+                  : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
               )}
             >
               {f === 'all' && `Всі запити (${stats.total})`}
@@ -203,72 +211,72 @@ export const AddressRequests: React.FC = () => {
 
         {/* Search Input */}
         <div className="relative max-w-xs w-full">
-          <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Пошук за назвою..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full text-xs pl-9 pr-4 py-2 border border-gray-200 rounded-lg bg-gray-50/50 outline-none focus:border-blue-500 focus:bg-white transition-all font-medium"
+            className="admin-input !pl-9.5 !py-2"
           />
         </div>
       </div>
 
       {/* REQUESTS TABLE */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="admin-table-container">
         {filteredRequests.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="admin-table">
               <thead>
-                <tr className="bg-gray-50/70 border-b border-gray-100 text-[10px] uppercase font-bold text-gray-400 tracking-wider">
-                  <th className="px-6 py-4">Локація / Тип</th>
-                  <th className="px-6 py-4">Адреса запиту</th>
-                  <th className="px-6 py-4">Дата запиту</th>
-                  <th className="px-6 py-4">Статус</th>
-                  <th className="px-6 py-4 text-right">Дії</th>
+                <tr>
+                  <th className="admin-table-th">Локація / Тип</th>
+                  <th className="admin-table-th">Адреса запиту</th>
+                  <th className="admin-table-th">Дата запиту</th>
+                  <th className="admin-table-th">Статус</th>
+                  <th className="admin-table-th text-right pr-8">Дії</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50 text-xs font-medium text-gray-700">
+              <tbody className="divide-y divide-gray-100 text-xs font-medium text-gray-700">
                 {filteredRequests.map((req: any) => (
-                  <tr key={req.id} className="hover:bg-gray-50/40 transition-colors">
-                    <td className="px-6 py-4.5">
-                      <div className="flex flex-col gap-1">
+                  <tr key={req.id} className="admin-table-row">
+                    <td className="admin-table-td">
+                      <div className="flex flex-col gap-1 text-left">
                         <span className={clsx(
-                          "px-2 py-0.5 rounded text-[10px] font-bold w-max uppercase tracking-wide",
+                          "px-2 py-0.5 rounded text-[10px] font-bold w-max uppercase tracking-wide border",
                           req.location_type === 'city' 
-                            ? "bg-blue-50 text-blue-700 border border-blue-100" 
-                            : "bg-purple-50 text-purple-700 border border-purple-100"
+                            ? "bg-blue-50 text-blue-700 border-blue-100" 
+                            : "bg-purple-50 text-purple-700 border-purple-100"
                         )}>
                           {req.location_type === 'city' ? 'Місто' : 'Село'}
                         </span>
                         {req.assigned_subgroup && (
-                          <span className="text-[10px] text-gray-400">
-                            Призначено: <span className="font-bold text-emerald-600">{req.assigned_subgroup}</span>
+                          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                            Черга: <span className="font-bold text-emerald-600">{req.assigned_subgroup}</span>
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4.5">
-                      <div className="flex flex-col gap-0.5">
+                    <td className="admin-table-td">
+                      <div className="flex flex-col gap-0.5 text-left">
                         {req.location_type === 'rural' && (
-                          <span className="text-[10px] text-gray-400">
-                            {req.okrug} старостинський округ • с. {req.village}
+                          <span className="text-[10px] text-gray-450 font-bold uppercase tracking-wider">
+                            {req.okrug} округ • с. {req.village}
                           </span>
                         )}
-                        <span className="font-bold text-gray-800 text-sm">
+                        <span className="font-extrabold text-gray-800 text-sm">
                           {req.street}, буд. {req.house}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4.5 text-gray-400 font-mono text-[11px]">
+                    <td className="admin-table-td text-gray-450 font-mono text-[11px] font-semibold">
                       {formatDate(req.created_at)}
                     </td>
-                    <td className="px-6 py-4.5">
+                    <td className="admin-table-td">
                       <span className={clsx(
-                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold",
-                        req.status === 'pending' && "bg-amber-50 text-amber-700 border border-amber-100",
-                        req.status === 'resolved' && "bg-emerald-50 text-emerald-700 border border-emerald-100",
-                        req.status === 'rejected' && "bg-red-50 text-red-700 border border-red-100"
+                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border",
+                        req.status === 'pending' && "bg-amber-50 text-amber-700 border-amber-100",
+                        req.status === 'resolved' && "bg-emerald-50 text-emerald-700 border-emerald-100",
+                        req.status === 'rejected' && "bg-red-50 text-red-700 border-red-105"
                       )}>
                         <div className={clsx("w-1.5 h-1.5 rounded-full",
                           req.status === 'pending' && "bg-amber-500",
@@ -280,26 +288,26 @@ export const AddressRequests: React.FC = () => {
                         {req.status === 'rejected' && 'Відхилено'}
                       </span>
                     </td>
-                    <td className="px-6 py-4.5 text-right">
+                    <td className="admin-table-td text-right pr-8">
                       {req.status === 'pending' ? (
-                        <div className="inline-flex items-center gap-1.5 justify-end">
+                        <div className="inline-flex items-center gap-2 justify-end">
                           <button
                             onClick={() => { setSelectedRequest(req); setAssignedSubgroup('1.1'); }}
                             disabled={updateStatusMutation.isPending}
-                            className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] rounded-lg transition-colors flex items-center gap-1"
+                            className="admin-btn-primary !px-3 !py-2"
                           >
                             <span>Схвалити</span>
                           </button>
                           <button
                             onClick={() => handleReject(req.id)}
                             disabled={updateStatusMutation.isPending}
-                            className="px-2.5 py-1.5 border border-gray-200 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-gray-500 font-semibold text-[11px] rounded-lg transition-colors"
+                            className="admin-btn-danger !px-3 !py-2"
                           >
                             Відхилити
                           </button>
                         </div>
                       ) : (
-                        <span className="text-[10px] text-gray-400">Опрацьовано</span>
+                        <span className="text-[11px] text-gray-450 font-bold uppercase tracking-wider">Опрацьовано</span>
                       )}
                     </td>
                   </tr>
@@ -310,7 +318,7 @@ export const AddressRequests: React.FC = () => {
         ) : (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center gap-3">
             <div className="p-3 bg-gray-50 text-gray-300 rounded-full"><Search size={28} /></div>
-            <p className="text-gray-400 font-semibold text-sm">Не знайдено жодного запиту адрес</p>
+            <p className="text-gray-400 font-bold text-sm">Не знайдено жодного запиту адрес</p>
             <p className="text-gray-400 text-xs max-w-xs leading-normal">
               Жоден запис не відповідає вашим фільтрам або пошуковому запиту.
             </p>
@@ -320,41 +328,41 @@ export const AddressRequests: React.FC = () => {
 
       {/* ASSIGN SUBGROUP MODAL (Overlay Dialog) */}
       {selectedRequest && (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 animate-in fade-in duration-200">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedRequest(null)} />
           
           {/* Modal Container */}
-          <div className="relative bg-white border border-gray-200 w-full max-w-sm rounded-2xl shadow-2xl p-6 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col gap-4">
+          <div className="relative bg-white border border-gray-200 w-full max-w-md rounded-2xl shadow-2xl p-6.5 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col gap-5">
             <div>
-              <h4 className="text-lg font-bold text-gray-800">Схвалення нової адреси</h4>
-              <p className="text-xs text-gray-400 mt-0.5 leading-normal">
+              <h4 className="text-lg font-bold text-gray-800 leading-snug">Схвалення нової адреси</h4>
+              <p className="text-xs text-gray-400 mt-1 leading-normal font-semibold">
                 Присвойте номер черги погодинних відключень (ГПВ) для цієї адреси, щоб внести її в систему.
               </p>
             </div>
 
             {/* Address Details Card */}
-            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold text-gray-400 uppercase">Локація запиту</span>
-              <span className="font-bold text-gray-700 text-sm">
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-150 flex flex-col gap-1 text-left">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Локація запиту</span>
+              <span className="font-extrabold text-gray-700 text-sm">
                 {selectedRequest.location_type === 'rural' 
-                  ? `${selectedRequest.okrug} округ • с. ${selectedRequest.village}`
+                  ? `${selectedRequest.okrug} округ • с. {selectedRequest.village}`
                   : 'м. Старокостянтинів'
                 }
               </span>
-              <span className="text-xs text-gray-500 font-semibold mt-1">
+              <span className="text-xs text-gray-500 font-bold mt-1">
                 {selectedRequest.street}, буд. {selectedRequest.house}
               </span>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleApproveSubmit} className="flex flex-col gap-4">
+            <form onSubmit={handleApproveSubmit} className="flex flex-col gap-4 text-left">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Оберіть підчергу</label>
+                <label className="text-[10px] font-bold text-gray-450 uppercase tracking-wide">Оберіть підчергу</label>
                 <select
                   value={assignedSubgroup}
                   onChange={(e) => setAssignedSubgroup(e.target.value)}
-                  className="w-full text-xs font-semibold px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg outline-none focus:border-blue-500 focus:bg-white transition-colors"
+                  className="admin-input font-bold"
                 >
                   {GROUPS.map((g) => (
                     <option key={g} value={g}>Черга {g}</option>
@@ -363,19 +371,19 @@ export const AddressRequests: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-3 mt-2">
                 <button
                   type="button"
                   onClick={() => setSelectedRequest(null)}
                   disabled={updateStatusMutation.isPending}
-                  className="flex-1 py-2 border border-gray-200 text-xs font-semibold text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="admin-btn-secondary flex-1"
                 >
                   Скасувати
                 </button>
                 <button
                   type="submit"
                   disabled={updateStatusMutation.isPending}
-                  className="flex-[2] py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                  className="admin-btn-primary flex-[2]"
                 >
                   {updateStatusMutation.isPending ? 'Схвалення...' : 'Підтвердити адресу'}
                 </button>

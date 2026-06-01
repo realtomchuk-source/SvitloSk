@@ -45,12 +45,27 @@ export const fetchSystemStats = async () => {
     // 1. Total users
     const { count: totalUsers } = await supabase.from('user_profiles').select('*', { count: 'exact', head: true });
     
-    // 2. Group density (Subscriber count per group)
+    // 2. Group density (Subscriber count per group - Start group + Active Push slots!)
     const { data: profiles } = await supabase.from('user_profiles').select('start_group');
+    const { data: slots } = await supabase.from('notification_slots').select('data');
+    
     const density: Record<string, number> = {};
+    
+    // Count start groups
     profiles?.forEach(p => {
         const g = p.start_group || 'none';
-        density[g] = (density[g] || 0) + 1;
+        if (g !== 'none') {
+            density[g] = (density[g] || 0) + 1;
+        }
+    });
+
+    // Count active push slots
+    slots?.forEach(s => {
+        const slotData = s.data as any;
+        if (slotData && slotData.isActive && slotData.subGroup) {
+            const g = slotData.subGroup;
+            density[g] = (density[g] || 0) + 1;
+        }
     });
 
     // 3. Admin actions (last 24h)

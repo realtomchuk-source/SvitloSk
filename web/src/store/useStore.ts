@@ -91,7 +91,22 @@ export const useStore = create<AppState>()(
               .select('start_group, tomorrow_push, role')
               .eq('id', session.user.id)
               .single();
-              
+
+            if (data?.role === 'blocked') {
+              await supabase.auth.signOut();
+              alert('Ваш акаунт заблоковано адміністратором додатку SvitloSk.');
+              set({ user: null, slots: EMPTY_SLOTS, userConfig: DEFAULT_CONFIG, isAuthLoading: false });
+              return;
+            }
+
+            // Sync user profile info (email and full name) to public.user_profiles
+            const email = session.user.email;
+            const fullName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || '';
+            await supabase
+              .from('user_profiles')
+              .update({ email, full_name: fullName })
+              .eq('id', session.user.id);
+
             const userWithRole = data 
               ? { ...session.user, user_metadata: { ...session.user.user_metadata, role: data.role } }
               : session.user;

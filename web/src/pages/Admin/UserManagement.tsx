@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/services/supabaseClient';
-import { Users, Search, X, ShieldAlert, User, MoreVertical } from 'lucide-react';
+import { Users, Search, X, ShieldAlert, Shield, User, MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 import { clsx } from 'clsx';
 import { logAdminAction } from '@/services/adminService';
@@ -13,6 +13,7 @@ type UserProfile = {
   created_at: string;
   last_sign_in?: string;
   start_group?: string;
+  push_slots?: any[];
 };
 
 export const UserManagement = () => {
@@ -23,13 +24,32 @@ export const UserManagement = () => {
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['admin', 'users'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // 1. Fetch user profiles
+      const { data: profiles, error: pError } = await supabase
         .from('user_profiles')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data as UserProfile[];
+      if (pError) throw pError;
+
+      // 2. Fetch all notification slots (the 2 push subgroups)
+      const { data: slots, error: sError } = await supabase
+        .from('notification_slots')
+        .select('user_id, data');
+
+      if (sError) {
+        console.error('Failed to fetch notification slots:', sError);
+        return profiles.map(p => ({ ...p, push_slots: [] })) as UserProfile[];
+      }
+
+      // 3. Map slots to user profiles
+      return profiles.map(p => {
+        const userSlots = slots?.filter(s => s.user_id === p.id) || [];
+        return {
+          ...p,
+          push_slots: userSlots.map(us => us.data)
+        };
+      }) as UserProfile[];
     }
   });
 
@@ -69,76 +89,83 @@ export const UserManagement = () => {
         <ShieldAlert size={16} />
         <p className="font-semibold text-sm">Помилка завантаження</p>
       </div>
-      <p className="text-xs text-red-500">{(error as any).message}</p>
+      <p className="text-xs">{(error as any)?.message || 'Не вдалося завантажити дані'}</p>
     </div>
   );
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-300">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-300 w-full text-left">
       {/* Search + Counter */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative w-full sm:max-w-xs">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input 
             type="text" 
-            placeholder="Пошук (email, ім'я, ID)..." 
+            placeholder="Пошук користувачів (email, ім'я)..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-lg py-2.5 pl-9 pr-4 text-sm text-gray-700 outline-none focus:border-blue-400 transition-colors"
+            className="admin-input !pl-11"
           />
         </div>
-        <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold">
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold border border-blue-100 shrink-0 w-fit shadow-sm">
           <Users size={14} /> {filteredUsers?.length || 0} користувачів
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+      <div className="admin-table-container">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+          <table className="admin-table">
             <thead>
-              <tr className="bg-gray-50 text-xs text-gray-500 font-semibold border-b border-gray-200">
-                <th className="px-4 py-3">Користувач</th>
-                <th className="px-4 py-3">Підчерга</th>
-                <th className="px-4 py-3">Роль</th>
-                <th className="px-4 py-3">Реєстрація</th>
-                <th className="px-4 py-3 text-right">Дії</th>
+              <tr>
+                <th className="admin-table-th">Користувач</th>
+                <th className="admin-table-th">Черги ГПВ</th>
+                <th className="admin-table-th text-right pr-8">Дії</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 bg-white">
               {filteredUsers?.map(user => (
-                <tr key={user.id} className="hover:bg-gray-50 transition-colors group">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 group-hover:text-blue-500 transition-colors">
-                        <User size={16} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-800">{user.full_name || 'Без імені'}</p>
-                        <p className="text-xs text-gray-400 font-mono">{user.email || user.id.slice(0, 12) + '...'}</p>
-                      </div>
+                <tr key={user.id} className="admin-table-row">
+                  <td className="admin-table-td">
+                    <div className="flex flex-col text-left">
+                      {user.full_name ? (
+                        <>
+                          <p className="text-sm font-bold text-gray-800 leading-snug">{user.full_name}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{user.email}</p>
+                        </>
+                      ) : (
+                        <p className="text-sm font-bold text-gray-800 leading-snug">{user.email || 'Без email'}</p>
+                      )}
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm text-gray-600">{user.start_group || '—'}</span>
+                  <td className="admin-table-td">
+                    <div className="flex flex-wrap items-center gap-1.5 text-left">
+                      {/* Start/Default Subgroup */}
+                      <span 
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-100 text-xs font-extrabold shadow-sm"
+                        title="Стартова підчерга"
+                      >
+                        🏠 {user.start_group || '—'}
+                      </span>
+                      
+                      {/* Active Push Subgroups */}
+                      {user.push_slots && user.push_slots
+                        .filter((s: any) => s.isActive && s.subGroup)
+                        .map((slot: any) => (
+                          <span 
+                            key={slot.id} 
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-extrabold shadow-sm"
+                            title={`Пуш-підчерга: ${slot.name || `Черга ${slot.subGroup}`}`}
+                          >
+                            🔔 {slot.subGroup}
+                          </span>
+                        ))}
+                    </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className={clsx(
-                      "inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold",
-                      user.role === 'admin' ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600"
-                    )}>
-                      <div className={clsx("w-1.5 h-1.5 rounded-full", user.role === 'admin' ? "bg-red-500" : "bg-blue-500")} />
-                      {user.role === 'admin' ? 'Адмін' : 'Користувач'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="text-sm text-gray-600">{new Date(user.created_at).toLocaleDateString('uk-UA')}</p>
-                    <p className="text-xs text-gray-400">{user.last_sign_in ? `Останній: ${new Date(user.last_sign_in).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}` : 'Новий'}</p>
-                  </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="admin-table-td text-right pr-8">
                     <button 
                       onClick={() => setSelectedUser(user)}
-                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-450 hover:text-gray-655 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                     >
                       <MoreVertical size={16} />
                     </button>
@@ -151,60 +178,114 @@ export const UserManagement = () => {
         {filteredUsers?.length === 0 && (
           <div className="py-16 text-center">
             <Users size={32} className="mx-auto mb-3 text-gray-300" />
-            <p className="text-sm text-gray-400">Користувачів не знайдено</p>
+            <p className="text-sm text-gray-400 font-bold">Користувачів не знайдено</p>
           </div>
         )}
       </div>
 
       {/* Role Edit Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setSelectedUser(null)} />
-          <div className="relative w-full max-w-md bg-white border border-gray-200 rounded-xl p-6 shadow-xl animate-in zoom-in-95 duration-300">
-            <div className="flex justify-between items-center mb-5">
+        <div className="admin-modal-overlay">
+          <div className="admin-modal-backdrop" onClick={() => setSelectedUser(null)} />
+          <div className="admin-modal-container">
+            {/* Header */}
+            <div className="admin-modal-header">
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Зміна ролі</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{selectedUser.email || selectedUser.id}</p>
+                <h3 className="admin-modal-title">Дія з користувачем</h3>
+                <p className="admin-modal-subtitle">{selectedUser.full_name ? 'Перегляд та зміна ролі' : 'Адміністрування користувача'}</p>
               </div>
-              <button onClick={() => setSelectedUser(null)} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"><X size={18} /></button>
+              <button onClick={() => setSelectedUser(null)} className="admin-modal-close">
+                <X size={18} />
+              </button>
             </div>
             
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100 mb-5">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+            {/* User Profile Card */}
+            <div className="admin-modal-usercard">
+              <div className="admin-modal-usercard-icon">
                 <User size={20} />
               </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-800">{selectedUser.full_name || 'Без імені'}</p>
-                <p className="text-xs text-gray-400">Поточна роль: {selectedUser.role === 'admin' ? 'Адмін' : 'Користувач'}</p>
+              <div className="admin-modal-usercard-info">
+                <p className="admin-modal-usercard-name">
+                  {selectedUser.full_name || 'Користувач без імені'}
+                </p>
+                <p className="admin-modal-usercard-email">{selectedUser.email || 'Немає email'}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mb-5">
+            {/* Secondary Metadata Info (Moved from columns to Three-Dots Action menu) */}
+            <div className="admin-modal-meta">
+              <div className="admin-modal-meta-row">
+                <span className="admin-modal-meta-label">Статус / Роль</span>
+                <span className="admin-modal-meta-value">
+                  <span className={clsx(
+                    "px-2 py-0.5 rounded font-extrabold uppercase text-[9px] border",
+                    selectedUser.role === 'admin' && "bg-amber-50 text-amber-700 border-amber-250",
+                    selectedUser.role === 'blocked' && "bg-rose-50 text-rose-700 border-rose-250",
+                    (selectedUser.role === 'user' || !selectedUser.role) && "bg-blue-50 text-blue-700 border-blue-250"
+                  )}>
+                    {selectedUser.role === 'admin' ? 'Адмін' : selectedUser.role === 'blocked' ? 'Заблокований' : 'Користувач'}
+                  </span>
+                </span>
+              </div>
+              
+              <div className="admin-modal-meta-row">
+                <span className="admin-modal-meta-label">Дата реєстрації</span>
+                <span className="admin-modal-meta-value">{new Date(selectedUser.created_at).toLocaleDateString('uk-UA')}</span>
+              </div>
+
+              <div className="admin-modal-meta-row">
+                <span className="admin-modal-meta-label">Останній вхід</span>
+                <span className="admin-modal-meta-value">
+                  {selectedUser.last_sign_in 
+                    ? new Date(selectedUser.last_sign_in).toLocaleDateString('uk-UA') + ' ' + new Date(selectedUser.last_sign_in).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })
+                    : 'Новий користувач'
+                  }
+                </span>
+              </div>
+            </div>
+
+            {/* Role Changing Grid */}
+            <div className="admin-modal-grid">
+              {/* User Button */}
               <button 
                 onClick={() => updateRoleMutation.mutate({ userId: selectedUser.id, role: 'user' })}
                 className={clsx(
-                  "p-4 rounded-lg border flex flex-col items-center gap-2 transition-all text-sm",
-                  selectedUser.role === 'user' ? "bg-blue-50 border-blue-300 text-blue-700 font-semibold" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
+                  "admin-modal-grid-btn",
+                  (selectedUser.role === 'user' || !selectedUser.role) && "active-user"
                 )}
               >
-                <User size={24} />
-                <span className="text-xs font-semibold">Користувач</span>
+                <User size={20} />
+                <span>Користувач</span>
               </button>
+
+              {/* Admin Button */}
               <button 
                 onClick={() => updateRoleMutation.mutate({ userId: selectedUser.id, role: 'admin' })}
                 className={clsx(
-                  "p-4 rounded-lg border flex flex-col items-center gap-2 transition-all text-sm",
-                  selectedUser.role === 'admin' ? "bg-red-50 border-red-300 text-red-700 font-semibold" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
+                  "admin-modal-grid-btn",
+                  selectedUser.role === 'admin' && "active-admin"
                 )}
               >
-                <ShieldAlert size={24} />
-                <span className="text-xs font-semibold">Адмін</span>
+                <Shield size={20} />
+                <span>Адмін</span>
+              </button>
+
+              {/* Blocked Button */}
+              <button 
+                onClick={() => updateRoleMutation.mutate({ userId: selectedUser.id, role: 'blocked' })}
+                className={clsx(
+                  "admin-modal-grid-btn",
+                  selectedUser.role === 'blocked' && "active-blocked"
+                )}
+              >
+                <ShieldAlert size={20} />
+                <span>Блокувати</span>
               </button>
             </div>
 
             <button 
               onClick={() => setSelectedUser(null)}
-              className="w-full py-2.5 bg-gray-100 text-gray-600 font-medium text-sm rounded-lg hover:bg-gray-200 transition-colors"
+              className="admin-btn-secondary w-full py-2.5 cursor-pointer hover:scale-[1.01] transition-all"
             >
               Закрити
             </button>
