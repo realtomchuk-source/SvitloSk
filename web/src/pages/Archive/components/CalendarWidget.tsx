@@ -8,6 +8,8 @@ interface CalendarWidgetProps {
   savedDates: string[]; // List of YYYY-MM-DD that have data
   thresholdDate: string; // Today - 2 days (YYYY-MM-DD)
   onTransitClick: () => void; // Called when clicking yesterday/today
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
 const MONTHS_UK = [
@@ -22,9 +24,10 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   onSelectDate,
   savedDates,
   thresholdDate,
-  onTransitClick
+  onTransitClick,
+  isOpen,
+  setIsOpen
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [currentYear, setCurrentYear] = useState<number>(() => new Date(selectedDate).getFullYear());
   const [currentMonth, setCurrentMonth] = useState<number>(() => new Date(selectedDate).getMonth()); // 0-indexed
   const [showFastSelector, setShowFastSelector] = useState(false);
@@ -215,7 +218,7 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
     >
       {/* 1. COMPACT DATE PLATE */}
       <div 
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between select-none cursor-pointer"
         style={{ 
           height: '48px', 

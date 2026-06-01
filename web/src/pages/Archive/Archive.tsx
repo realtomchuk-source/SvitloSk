@@ -19,6 +19,7 @@ export const Archive: React.FC = () => {
 
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [showTransitModal, setShowTransitModal] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Set initial selected date once threshold date is resolved and database is initialized
   useEffect(() => {
@@ -61,6 +62,8 @@ export const Archive: React.FC = () => {
           savedDates={savedDates}
           thresholdDate={thresholdDate}
           onTransitClick={handleTransitAlert}
+          isOpen={isCalendarOpen}
+          setIsOpen={setIsCalendarOpen}
         />
 
         {/* 2. Harmonica / Details lists */}
@@ -108,7 +111,9 @@ export const Archive: React.FC = () => {
             </button>
           </div>
         ) : selectedDayData ? (
-          <QueueAccordionList dayData={selectedDayData} />
+          <div onClick={() => setIsCalendarOpen(false)}>
+            <QueueAccordionList dayData={selectedDayData} />
+          </div>
         ) : null}
 
       </main>
