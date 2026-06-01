@@ -87,7 +87,17 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
 
                     {/* Action Grid — top right */}
                     <div className={styles.profileActionsGrid}>
-                        {/* Row 1 */}
+                        {/* Row 1: Status Icon in the far top-right corner (next to empty cell) */}
+                        <div /> {/* Empty cell next to Lightbulb */}
+                        <div 
+                            className={clsx(styles.syncIconBtn, styles.statusIconAnonBtn)}
+                            onClick={!isAnon ? (e) => { e.stopPropagation(); onSignOut?.(); } : undefined}
+                            style={{ cursor: !isAnon ? 'pointer' : 'default' }}
+                        >
+                            <StatusLightbulbIcon active={!isAnon} />
+                        </div>
+
+                        {/* Row 2: Telegram and Google */}
                         <div className={styles.syncIconBtn} title="Telegram (незабаром)">
                             <TelegramIcon />
                         </div>
@@ -99,16 +109,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
                         >
                             <GoogleIcon active={!isAnon} />
                         </button>
-                        
-                        {/* Row 2: Status Icon in the far bottom-right corner (under Google) */}
-                        <div /> {/* Empty cell under Telegram */}
-                        <div 
-                            className={clsx(styles.syncIconBtn, styles.statusIconAnonBtn)}
-                            onClick={!isAnon ? (e) => { e.stopPropagation(); onSignOut?.(); } : undefined}
-                            style={{ cursor: !isAnon ? 'pointer' : 'default' }}
-                        >
-                            <StatusLightbulbIcon active={!isAnon} />
-                        </div>
                     </div>
 
                 </div>
