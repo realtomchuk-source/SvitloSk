@@ -76,7 +76,7 @@ export const useArchiveData = () => {
     setError(null);
     try {
       // 1. Try local cache
-      let day = await archiveDb.getDay(date);
+      let day: ArchivedDay | null = (await archiveDb.getDay(date)) || null;
 
       if (!day) {
         // 2. Try fetching static day JSON from server
@@ -89,12 +89,23 @@ export const useArchiveData = () => {
         }
         
         if (response && response.ok) {
-          const fetchedDay: ArchivedDay = await response.json();
-          await archiveDb.saveDay(fetchedDay);
-          day = fetchedDay;
-          await refreshSavedDates();
-        } else {
-          // 3. Fallback: No schedule exists for this date, assume 24h stable power
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            try {
+              const fetchedDay: ArchivedDay = await response.json();
+              await archiveDb.saveDay(fetchedDay);
+              day = fetchedDay;
+              await refreshSavedDates();
+            } catch (jsonErr) {
+              console.warn('Failed to parse fetched JSON:', jsonErr);
+            }
+          } else {
+            console.warn(`Server returned non-JSON response for date ${date} (content-type: ${contentType})`);
+          }
+        }
+
+        // 3. Fallback: No schedule exists for this date, assume 24h stable power
+        if (!day) {
           const emptyStats: Record<string, QueueStats> = {};
           const emptyQueues: Record<string, string> = {};
           

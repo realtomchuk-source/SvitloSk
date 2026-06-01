@@ -20,13 +20,13 @@ export const Archive: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [showTransitModal, setShowTransitModal] = useState(false);
 
-  // Set initial selected date once threshold date is resolved
+  // Set initial selected date once threshold date is resolved and database is initialized
   useEffect(() => {
-    if (thresholdDate) {
+    if (thresholdDate && !isInitializing) {
       setSelectedDate(thresholdDate);
       loadDayData(thresholdDate);
     }
-  }, [thresholdDate, loadDayData]);
+  }, [thresholdDate, isInitializing, loadDayData]);
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
@@ -35,12 +35,6 @@ export const Archive: React.FC = () => {
 
   const handleTransitAlert = () => {
     setShowTransitModal(true);
-  };
-
-  const formatUKDate = (isoString: string) => {
-    if (!isoString) return '';
-    const [year, month, day] = isoString.split('-');
-    return `${day}.${month}.${year}`;
   };
 
   if (isInitializing) {
@@ -68,15 +62,6 @@ export const Archive: React.FC = () => {
           thresholdDate={thresholdDate}
           onTransitClick={handleTransitAlert}
         />
-
-        {/* Selected date header */}
-        <div className="flex items-center justify-between py-1" style={{ paddingLeft: '36px', paddingRight: '36px', boxSizing: 'border-box' }}>
-          <div className="flex items-center gap-2">
-            <span className="text-[14px] font-black uppercase tracking-wider text-zinc-900 dark:text-white">
-              Дані за {formatUKDate(selectedDate)}
-            </span>
-          </div>
-        </div>
 
         {/* 2. Harmonica / Details lists */}
         {isLoading ? (
@@ -124,11 +109,7 @@ export const Archive: React.FC = () => {
           </div>
         ) : selectedDayData ? (
           <QueueAccordionList dayData={selectedDayData} />
-        ) : (
-          <div className="bg-zinc-100 dark:bg-zinc-900/20 border border-zinc-200 dark:border-white/5 text-center" style={{ padding: '40px', marginLeft: '20px', marginRight: '20px', borderRadius: '20px' }}>
-            <p className="text-zinc-500 italic">Виберіть дату на календарі для перегляду розкладу.</p>
-          </div>
-        )}
+        ) : null}
 
       </main>
 
