@@ -24,13 +24,13 @@ const GROUPS = [
 type AdminTab = 'dashboard' | 'users' | 'analytics' | 'editor' | 'announcements' | 'logs' | 'address_requests';
 
 const TAB_CONFIG: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
-  { id: 'dashboard', label: 'Панель', icon: <LayoutDashboard size={18} /> },
-  { id: 'users', label: 'Користувачі', icon: <Users size={18} /> },
-  { id: 'analytics', label: 'Аналітика', icon: <BarChart2 size={18} /> },
-  { id: 'editor', label: 'Редактор графіків', icon: <Grid3X3 size={18} /> },
-  { id: 'announcements', label: 'Оголошення', icon: <Megaphone size={18} /> },
-  { id: 'address_requests', label: 'Запити адрес', icon: <MapPin size={18} /> },
-  { id: 'logs', label: 'Логи', icon: <Terminal size={18} /> },
+  { id: 'dashboard', label: 'Панель', icon: <LayoutDashboard size={20} /> },
+  { id: 'users', label: 'Користувачі', icon: <Users size={20} /> },
+  { id: 'analytics', label: 'Аналітика', icon: <BarChart2 size={20} /> },
+  { id: 'editor', label: 'Редактор графіків', icon: <Grid3X3 size={20} /> },
+  { id: 'announcements', label: 'Оголошення', icon: <Megaphone size={20} /> },
+  { id: 'address_requests', label: 'Запити адрес', icon: <MapPin size={20} /> },
+  { id: 'logs', label: 'Логи', icon: <Terminal size={20} /> },
 ];
 
 export const Admin: React.FC = () => {
@@ -133,42 +133,42 @@ export const Admin: React.FC = () => {
   return (
     <div className="fixed inset-0 bg-gray-50 flex overflow-hidden font-sans antialiased">
       {/* SIDEBAR */}
-      <aside className="w-56 bg-white border-r border-gray-200 flex flex-col shrink-0">
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0">
         {/* Logo */}
-        <div className="p-5 pb-4 border-b border-gray-100">
+        <div className="p-6 pb-5 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-              <Shield size={18} />
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shrink-0">
+              <Shield size={20} />
             </div>
             <div>
-              <h1 className="font-bold text-sm text-gray-800 leading-none">SvitloSk</h1>
-              <span className="text-[10px] text-gray-400 font-medium">Адмін-панель</span>
+              <h1 className="font-extrabold text-base text-gray-800 leading-tight">SvitloSk</h1>
+              <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Адмін-панель</span>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
           {TAB_CONFIG.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={clsx(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all text-sm",
+                "w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-left transition-all text-[15px] font-medium",
                 activeTab === tab.id
-                  ? "bg-blue-50 text-blue-700 font-semibold"
+                  ? "bg-blue-50 text-blue-700 font-bold shadow-sm"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
               )}
             >
               <span className={clsx(activeTab === tab.id ? "text-blue-600" : "text-gray-400")}>{tab.icon}</span>
               <span>{tab.label}</span>
               {tab.id === 'logs' && (pendingResults?.length || 0) > 0 && (
-                <span className="ml-auto px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full min-w-[20px] text-center">
+                <span className="ml-auto px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full min-w-[22px] text-center">
                   {pendingResults?.length}
                 </span>
               )}
               {tab.id === 'address_requests' && pendingRequestsCount > 0 && (
-                <span className="ml-auto px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full min-w-[20px] text-center animate-pulse">
+                <span className="ml-auto px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full min-w-[22px] text-center animate-pulse">
                   {pendingRequestsCount}
                 </span>
               )}
@@ -242,36 +242,36 @@ export const Admin: React.FC = () => {
         </header>
 
         {/* Content */}
-        <div className="p-6 flex-1">
+        <div className="p-8 flex-1 max-w-[1280px] w-full mx-auto space-y-8">
           {/* --- DASHBOARD --- */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-6 animate-in fade-in duration-300">
+            <div className="space-y-8 animate-in fade-in duration-300">
               {/* Stat Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Користувачів" value={stats?.totalUsers?.toLocaleString() || '0'} icon={<Users size={20} />} color="blue" />
-                <StatCard label="Поточний графік" value={latestEntry?.target_date || '—'} icon={<BarChart2 size={20} />} color="emerald" />
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard label="Користувачів" value={stats?.totalUsers?.toLocaleString() || '0'} icon={<Users size={24} />} color="blue" />
+                <StatCard label="Поточний графік" value={latestEntry?.target_date || '—'} icon={<BarChart2 size={24} />} color="emerald" />
                 <StatCard
                   label="Очікує перевірки"
                   value={(pendingResults?.length || 0).toString()}
-                  icon={<Grid3X3 size={20} />}
+                  icon={<Grid3X3 size={24} />}
                   color="amber"
                   highlight={pendingResults && pendingResults.length > 0}
                 />
-                <StatCard label="Подій за 24г" value={stats?.recentActions?.toString() || '0'} icon={<Clock size={20} />} color="purple" />
+                <StatCard label="Подій за 24г" value={stats?.recentActions?.toString() || '0'} icon={<Clock size={24} />} color="purple" />
               </div>
 
               {/* System Status */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Стан системи</h3>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h3 className="text-base font-bold text-gray-800 mb-4">Стан системи</h3>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {systemStatus.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-md">
-                      <span className="text-xs text-gray-500">{s.label}</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className={clsx("text-xs font-semibold",
+                    <div key={i} className="flex items-center justify-between px-5 py-4 min-h-[56px] bg-gray-50 rounded-xl border border-gray-100 shadow-inner">
+                      <span className="text-sm font-semibold text-gray-500">{s.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className={clsx("text-sm font-bold",
                           s.status === 'ok' ? "text-emerald-600" : s.status === 'warning' ? "text-amber-600" : "text-gray-400"
                         )}>{s.value}</span>
-                        <div className={clsx("w-1.5 h-1.5 rounded-full",
+                        <div className={clsx("w-2 h-2 rounded-full",
                           s.status === 'ok' ? "bg-emerald-500" : s.status === 'warning' ? "bg-amber-500" : "bg-gray-300"
                         )} />
                       </div>
@@ -320,9 +320,9 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-center gap-3">
-                  <CheckCircle size={18} className="text-emerald-600" />
-                  <span className="text-sm text-emerald-700 font-medium">Всі графіки підтверджені</span>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl py-5 px-6 flex items-center gap-3 shadow-sm">
+                  <CheckCircle size={20} className="text-emerald-600" />
+                  <span className="text-base text-emerald-700 font-semibold">Всі графіки підтверджені</span>
                 </div>
               )}
             </div>
@@ -361,15 +361,15 @@ const StatCard = ({ label, value, icon, color, highlight }: any) => {
     purple: 'text-purple-600 bg-purple-50',
   };
   return (
-    <div className={clsx("bg-white border rounded-lg p-4 shadow-sm transition-all",
+    <div className={clsx("bg-white border rounded-2xl p-6 shadow-sm transition-all border-gray-150 hover:shadow-md",
       highlight ? "border-amber-300 bg-amber-50/30" : "border-gray-200"
     )}>
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs text-gray-500 font-medium mb-1">{label}</p>
-          <p className="text-2xl font-bold text-gray-800">{value}</p>
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-gray-500">{label}</p>
+          <p className="text-3xl font-extrabold text-gray-900 tracking-tight">{value}</p>
         </div>
-        <div className={clsx("p-2 rounded-lg", colorMap[color])}>{icon}</div>
+        <div className={clsx("p-3.5 rounded-xl shrink-0 shadow-sm", colorMap[color])}>{icon}</div>
       </div>
     </div>
   );

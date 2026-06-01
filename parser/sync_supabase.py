@@ -96,5 +96,29 @@ def process_schedule():
     except Exception as e:
         print(f"⚠️ Помилка відправки в Центр Верифікації: {e}")
 
+    # 6. Відправляємо автоматичне оголошення Gemini в систему як чернетку (draft)
+    user_announcement = latest.get("user_announcement", "")
+    if user_announcement and user_announcement.strip():
+        announcement_entry = {
+            "title": "🤖 Gemini Авто-Графік",
+            "text": user_announcement,
+            "time_label": "Автоматично",
+            "active_date": iso_date,
+            "status": "draft",
+            "is_active": False,
+            "sort_order": 1
+        }
+        
+        try:
+            # Перевіряємо, чи немає вже такого оголошення від Gemini на цю дату в базі
+            check_ann = requests.get(f"{SUPABASE_URL}/rest/v1/system_announcements?active_date=eq.{iso_date}&title=eq.🤖%20Gemini%20Авто-Графік", headers=headers)
+            if check_ann.status_code == 200 and not check_ann.json():
+                requests.post(f"{SUPABASE_URL}/rest/v1/system_announcements", headers=headers, json=announcement_entry)
+                print(f"📡 Авто-оголошення від Gemini для {iso_date} завантажено як Чернетку в адмінку.")
+            else:
+                print(f"📡 Авто-оголошення від Gemini на {iso_date} вже існує.")
+        except Exception as e:
+            print(f"⚠️ Помилка відправки авто-оголошення в Supabase: {e}")
+
 if __name__ == "__main__":
     process_schedule()
