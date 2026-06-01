@@ -31,7 +31,7 @@
 - `error_count`: integer
 - `avg_latency`: float
 
-### 4. `announcements` (Заплановано)
+### 4. `announcements` (Реалізовано)
 Глобальні повідомлення для користувачів.
 - `id`: uuid (PK)
 - `text`: text (markdown)
@@ -39,7 +39,7 @@
 - `created_at`: timestamp
 - `created_by`: uuid (references user_profiles)
 
-### 5. `admin_actions` (Заплановано)
+### 5. `admin_actions` (Реалізовано)
 Аудит-лог дій адміністратора.
 - `id`: uuid (PK)
 - `admin_id`: uuid
