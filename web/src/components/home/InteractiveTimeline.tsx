@@ -61,7 +61,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
   const majorTicks = [0, 3, 6, 9, 12, 15, 18, 21, 24];
 
   return (
-    <div className="section-container timeline-block-v2" style={{ padding: '0 34px', margin: '20px 0' }}>
+    <div className="section-container timeline-block-v2" style={{ padding: '0 34px', margin: '0' }}>
 
       {/* Light Theme Status Display */}
       <div

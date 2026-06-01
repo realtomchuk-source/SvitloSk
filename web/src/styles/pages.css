@@ -9,6 +9,15 @@
     padding-bottom: 100px;
 }
 
+#home-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
 .page-cabinet {
     background: #F5F5F7;
     min-height: 100vh;
@@ -22,3 +31,4 @@
     width: 100%;
     padding-top: var(--page-top-gap);
 }
+

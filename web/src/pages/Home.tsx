@@ -86,7 +86,7 @@ export const Home: React.FC = () => {
           isPast={displayContext.isPast}
         />
 
-        <MarqueeBanner />
+        <MarqueeBanner isOn={displayContext.isOn} />
         
         <InteractiveTimeline 
           queuesStr={currentQueuesStr} 

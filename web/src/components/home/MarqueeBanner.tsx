@@ -7,7 +7,7 @@ type BannerAnnouncement = {
   sort_order: number;
 };
 
-export function MarqueeBanner() {
+export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
   const [announcements, setAnnouncements] = useState<BannerAnnouncement[]>([]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
@@ -76,7 +76,7 @@ export function MarqueeBanner() {
     <>
       {announcements.map((a, i) => (
         <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-          {i > 0 && <span style={{ color: 'rgba(238,114,33,0.35)', padding: '0 14px', fontSize: '8px' }}>●</span>}
+          {i > 0 && <span style={{ color: isOn ? 'rgba(238,114,33,0.35)' : 'rgba(142,142,147,0.4)', padding: '0 14px', fontSize: '8px' }}>●</span>}
           <span style={{ color: '#3a3a3c', fontSize: '15px', fontWeight: 500, paddingRight: '6px' }}>{a.text}</span>
         </span>
       ))}
@@ -90,11 +90,38 @@ export function MarqueeBanner() {
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
       borderRadius: '16px',
-      margin: '4px 20px',
+      margin: '0 20px',
       boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
-      border: '1px solid rgba(238, 114, 33, 0.15)',
+      border: isOn ? '1px solid rgba(238, 114, 33, 0.25)' : '1.2px solid rgba(142, 142, 147, 0.3)',
       overflow: 'hidden',
+      height: '54px',
+      boxSizing: 'border-box',
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
     }}>
+      {/* Edge Fade Masks (Slightly narrower at 32px for subtle effect) */}
+      <div style={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: '32px',
+        background: 'linear-gradient(to right, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 100%)',
+        pointerEvents: 'none',
+        zIndex: 2,
+      }} />
+      <div style={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        width: '32px',
+        background: 'linear-gradient(to left, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 100%)',
+        pointerEvents: 'none',
+        zIndex: 2,
+      }} />
+
       <div
         ref={viewportRef}
         style={{
@@ -102,7 +129,11 @@ export function MarqueeBanner() {
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
-          padding: '14px 24px',
+          padding: '0 24px',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
         }}
       >
         <div style={{

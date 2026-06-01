@@ -26,7 +26,7 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
       WebkitBackdropFilter: 'blur(12px)',
       borderRadius: '16px',
       padding: '16px 24px',
-      margin: '12px 20px',
+      margin: '0 20px',
       boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
       border: '1px solid rgba(238, 114, 33, 0.15)',
       transition: 'all 0.3s ease'
