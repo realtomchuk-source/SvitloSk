@@ -210,7 +210,7 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
       style={{ 
         margin: '0 20px 12px 20px', 
         width: 'calc(100% - 40px)', 
-        borderRadius: '20px',
+        borderRadius: '16px',
         boxSizing: 'border-box',
         overflow: 'hidden',
         padding: 0
@@ -359,7 +359,7 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
                     className={clsx(
                       "text-[11px] font-black rounded-lg border transition-colors",
                       currentYear === y 
-                        ? "bg-orange-500 text-white border-orange-500" 
+                        ? "bg-[#EE7221] text-white border-[#EE7221]" 
                         : "bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/5 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white"
                     )}
                     style={{ paddingTop: '4px', paddingBottom: '4px', cursor: 'pointer', outline: 'none' }}
@@ -378,7 +378,7 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
                     className={clsx(
                       "text-[11px] font-black rounded-lg border transition-colors uppercase tracking-wide",
                       currentMonth === idx 
-                        ? "bg-orange-500 text-white border-orange-500" 
+                        ? "bg-[#EE7221] text-white border-[#EE7221]" 
                         : "bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/5 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-white"
                     )}
                     style={{ paddingTop: '6px', paddingBottom: '6px', cursor: 'pointer', outline: 'none' }}
@@ -424,7 +424,7 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
                   className={clsx(
                     "calendar-day relative flex flex-col items-center justify-center border transition-all duration-200 rounded-xl aspect-square",
                     isSelected && "active",
-                    !isSelected && status.isTransit && "border-zinc-500/40 text-orange-400 bg-zinc-800/20",
+                    !isSelected && status.isTransit && "border-zinc-500/40 text-[#EE7221] bg-zinc-800/20",
                     !isSelected && !status.isTransit && !status.isFuture && !status.hasData && "opacity-40 text-zinc-500 bg-transparent border-transparent",
                     !isSelected && !status.isTransit && !status.isFuture && status.hasData && "text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800/40 border-zinc-200 dark:border-white/5 hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-white/10",
                     status.isFuture && "opacity-15 text-zinc-600 bg-transparent border-transparent cursor-not-allowed"
@@ -434,11 +434,11 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
                   <span className="text-[13px] font-bold">{dayNum}</span>
                   
                   {status.isTransit && !isSelected && (
-                    <Zap size={8} className="absolute top-1 right-1 text-orange-400 fill-orange-400 animate-pulse" />
+                    <Zap size={8} className="absolute top-1 right-1 text-[#EE7221] fill-[#EE7221] animate-pulse" />
                   )}
                   
                   {status.hasData && !isSelected && (
-                    <div className="absolute bottom-1 w-1.5 h-1.5 bg-orange-500 rounded-full" />
+                    <div className="absolute bottom-1 w-1.5 h-1.5 bg-[#EE7221] rounded-full" />
                   )}
                 </button>
               );

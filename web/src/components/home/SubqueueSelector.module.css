@@ -1,7 +1,7 @@
 /* ── Outer wrapper ──────────────────────────────────────────────────────────── */
 .wrapper {
     width: 100%;
-    margin-top: 0;
+    margin-top: 14px;
     margin-bottom: 80px;
     padding: 0 20px;
     box-sizing: border-box;

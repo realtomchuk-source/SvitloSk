@@ -22,7 +22,7 @@ export const Tomorrow: React.FC = () => {
       <div className="pwa-page-label">ГРАФІК НА ЗАВТРА</div>
 
       {!tomorrowData && !loading ? (
-        <div className="bg-zinc-900/50 p-10 rounded-[2rem] border border-white/5 text-center mx-4">
+        <div className="bg-zinc-900/50 p-10 rounded-2xl border border-white/5 text-center mx-4">
             <p className="text-zinc-500 italic">Очікуємо публікації графіка на завтра...</p>
         </div>
       ) : (
@@ -54,7 +54,7 @@ export const Tomorrow: React.FC = () => {
       )}
 
       <div className="section-container" style={{ padding: '0 34px', marginTop: '20px' }}>
-         <div className="bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5 text-center italic text-zinc-500 text-sm leading-relaxed">
+         <div className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 text-center italic text-zinc-500 text-sm leading-relaxed">
             {tomorrowData?.message || "Графік на завтра зазвичай з'являється після 18:00."}
          </div>
       </div>

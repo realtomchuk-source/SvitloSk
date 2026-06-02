@@ -26,6 +26,13 @@ type FormData = {
   active_date: string;
 };
 
+const toLocalISODate = (date: Date) => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 const emptyForm = (date: string): FormData => ({
   title: '',
   text: '',
@@ -33,20 +40,22 @@ const emptyForm = (date: string): FormData => ({
   active_date: date,
 });
 
-/** YYYY-MM-DD for today */
-const todayISO = () => new Date().toISOString().split('T')[0];
+/** YYYY-MM-DD for today (local-timezone safe) */
+const todayISO = () => toLocalISODate(new Date());
 
-/** YYYY-MM-DD for tomorrow */
+/** YYYY-MM-DD for tomorrow (local-timezone safe) */
 const tomorrowISO = () => {
   const d = new Date();
   d.setDate(d.getDate() + 1);
-  return d.toISOString().split('T')[0];
+  return toLocalISODate(d);
 };
 
 /** DD.MM format */
 const shortDate = (iso: string) => {
-  const [, m, d] = iso.split('-');
-  return `${d}.${m}`;
+  if (!iso) return '';
+  const parts = iso.split('-');
+  if (parts.length < 3) return iso;
+  return `${parts[2]}.${parts[1]}`;
 };
 
 export function Announcements() {
@@ -111,14 +120,20 @@ export function Announcements() {
         }])
         .select().single();
       if (error) throw error;
-      await logAdminAction(isPublished ? 'publish_announcement' : 'draft_announcement', created.id, { title: data.title });
+      // Do not await to prevent any auth lock/storage deadlocks from blocking the UI
+      logAdminAction(isPublished ? 'publish_announcement' : 'draft_announcement', String(created.id), { title: data.title });
     },
     onSuccess: () => { invalidate(); setForm(null); setEditingId(null); },
+    onError: (err: any) => {
+      console.error('Create announcement error:', err);
+      alert(`Не вдалося створити оголошення: ${err.message || JSON.stringify(err)}`);
+    }
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, ...data }: FormData & { id: string; status: string }) => {
       const isPublished = data.status === 'published';
+      const targetId = typeof id === 'string' ? parseInt(id, 10) : id;
       const { error } = await supabase
         .from('system_announcements')
         .update({
@@ -129,30 +144,39 @@ export function Announcements() {
           status: data.status,
           is_active: isPublished,
         })
-        .eq('id', id);
+        .eq('id', targetId);
       if (error) throw error;
-      await logAdminAction('update_announcement_status', id, { title: data.title, status: data.status });
+      // Do not await to prevent any auth lock/storage deadlocks from blocking the UI
+      logAdminAction('update_announcement_status', String(id), { title: data.title, status: data.status });
     },
     onSuccess: () => { invalidate(); setForm(null); setEditingId(null); },
+    onError: (err: any) => {
+      console.error('Update announcement error:', err);
+      alert(`Не вдалося оновити оголошення: ${err.message || JSON.stringify(err)}`);
+    }
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('system_announcements').delete().eq('id', id);
+      const targetId = typeof id === 'string' ? parseInt(id, 10) : id;
+      const { error } = await supabase.from('system_announcements').delete().eq('id', targetId);
       if (error) throw error;
-      await logAdminAction('delete_announcement', id);
+      // Do not await to prevent any auth lock/storage deadlocks from blocking the UI
+      logAdminAction('delete_announcement', String(id));
     },
     onSuccess: invalidate,
   });
 
   const publishMutation = useMutation({
     mutationFn: async (id: string) => {
+      const targetId = typeof id === 'string' ? parseInt(id, 10) : id;
       const { error } = await supabase
         .from('system_announcements')
         .update({ status: 'published', is_active: true })
-        .eq('id', id);
+        .eq('id', targetId);
       if (error) throw error;
-      await logAdminAction('publish_announcement', id);
+      // Do not await to prevent any auth lock/storage deadlocks from blocking the UI
+      logAdminAction('publish_announcement', String(id));
     },
     onSuccess: invalidate,
   });

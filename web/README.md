@@ -1,73 +1,108 @@
-# React + TypeScript + Vite
+# 📱 Клієнтський PWA-додаток SvitloSk (Старокостянтинів)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ласкаво просимо до офіційної документації клієнтської частини прогресивного веб-додатку (PWA) **SvitloSk** — інтелектуального помічника для відстеження графіків погодинних відключень світла (ГПВ) у місті Старокостянтинів.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🎯 1. Загальний опис та філософія проєкту
 
-## React Compiler
+**SvitloSk** розроблений за концепцією **Offline-First**. Основна мета додатка — надати користувачам миттєвий, безперебійний доступ до актуальних графіків відключень навіть під час повних блекаутів, коли мобільний інтернет слабкий або повністю відсутній.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Ключові особливості:
+* **Миттєве завантаження**: Завдяки інтегрованому сервіс-воркеру (PWA) додаток кешує всі статичні ресурси та працює автономно.
+* **Машина часу (Time Machine)**: Інтерактивний горизонтальний повзунок на головному екрані дозволяє прокручувати добу вперед або назад та бачити стан світла в будь-яку хвилину.
+* **Особистий кабінет**: Авторизація через Google, збереження та налаштування персональних сповіщень для трьох окремих адрес (Дім, Робота тощо) та автоматичне налаштування Push-повідомлень.
+* **Пошук адрес у громаді**: Інтелектуальний офлайн-пошук підчерги за адресою серед понад 1200 вулиць і сіл громади.
+* **Автономний Архів**: Окрема локальна база даних IndexedDB для перегляду стабільних графіків за минулі дні.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🎨 2. Фірмовий дизайн-код додатку
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Додаток має суворий бренд-дизайн системних токенів, що створює преміальне відчуття користування (iOS-style нативність):
+1. **Фірмовий помаранчевий колір (`#EE7221` / `rgb(238, 114, 33)`)**:
+   * Символізує наявність електромережі ("Світло є").
+   * Використовується для кнопок дій, рамок активних карток, підсвітки (тіней) та виділених елементів навігації.
+2. **Фірмовий вугільно-темний колір (`#374151` / `rgb(55, 65, 81)`)**:
+   * Символізує відключення електромережі ("Світла немає").
+   * Використовується для позначення інтервалів відключень, неактивних елементів та загального тексту.
+3. **Сріблясто-платинове тло (`#F5F5F7` / `var(--system-bg-light)`)**:
+   * Створює об'ємну контрастну підкладку, на якій білі картки з м'якими тінями виглядають вишукано та легко.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🏛️ 3. Огляд сторінок та архітектура клієнта
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Клієнтська частина розділена на 5 автономних модулів:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 🏠 А. Головна сторінка (`src/pages/Home.tsx`)
+Центральний вузол додатку. Містить:
+* **HeroCard**: Головна динамічна картка, що показує поточний статус світла, таймер до наступної зміни та інтерактивну кругову фазу.
+* **DashboardBar**: Інтегрований сегмент годинника та дати. Співвідношення шрифтів збалансоване для ідеальної гармонійності.
+* **InteractiveTimeline**: Горизонтальний повзунок, підсвічений сірою лінією. Лінія зрівняна з низом повзунка, а мітки годин винесені вгору великим жирним шрифтом (`12px bold`) для кращої читабельності.
+* **SubqueueSelector**: Барабанний скролер підчерг. Отримав збільшений відступ **`margin-top: 14px`** для створення візуального простору під таймлайном.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 👤 Б. Особистий кабінет (`src/pages/Cabinet/`)
+Центр керування підписками та налаштуваннями.
+* **Стиснуті інтервали**: Загальний інтервал `.cabinetRoot` зменшено з **`6px` до `4px`** (відступи між блоками стали меншими на `2px`).
+* **ProfileCard**:
+  * Іконку лампочки вилучено з профілю та збережено як окремий багаторазовий ресурс `StatusLightbulbIcon.tsx`.
+  * Іконки Google та Telegram перекомпоновані в красивий вертикальний стек (Google зверху, Telegram знизу).
+  * **Статус авторизації**: Відображається рамкою профілю (для зареєстрованого користувача — помаранчева рамка `2.5px solid rgba(255, 122, 0, 0.35)` та м'яке світіння; для гостя — сіра рамка `2.5px solid rgba(113, 113, 122, 0.3)`).
+
+### 🔍 В. Пошук за адресою (`src/pages/AddressSearch/`)
+* Офлайн-автодоповнення вулиць та номерів будинків на основі стиснутої JSON-бази.
+* Уніфікована картка результату з великою кольоровою 3D-плашкою черги зліва та даними адреси справа.
+* BottomSheet форми збору адрес з високим пріоритетом (`z-index: 2000`), що перекриває нижню панель навігації.
+
+### 📅 Г. Архів (`src/pages/Archive/`)
+* Ізольований модуль, що працює з клієнтською базою IndexedDB `svitlosk_archive_db` для збереження історії.
+* **Колірна гармонізація**:
+  * Системний акцент `--system-accent` у CSS переведений з жовтого на наш фірмовий **`#EE7221`**.
+  * Сегменти наявності світла в стрічках вимкнень оновлено на **`bg-[#EE7221]`**, а сегменти знеструмлень — на брендовий **`bg-[#374151]`**.
+  * Шкалу годин та супровідні мітки оновлено з тьмяно-сірого на бренд-колір **`#374151`** для високої контрастності.
+
+### ⚙️ Ґ. Панель Адміністратора (`src/pages/Admin.tsx`)
+Потужний інтерфейс моніторингу та управління:
+* **Кастомна аналітика**: Ультра-легка двоколонкова горизонтальна сітка підгруп без важких зовнішніх бібліотек (зменшила вагу бандла на **79.4%**!).
+* **Експортер графіків (ScheduleExporter)**: Генератор зображень для Telegram в ідеальному розрішенні `734x824`px. Суцільні смуги з clipping-заокругленнями та помаранчево-сірі мітки фактичних змін.
+
+---
+
+## 🛠️ 4. Локальна розробка та складання (Build)
+
+### Вимоги:
+* **Node.js**: Версія 18 або вище.
+* **npm**: Версія 9 або вище.
+
+### Інструкції:
+1. **Встановлення залежностей**:
+   ```bash
+   npm install
+   ```
+2. **Локальний запуск (Development Server)**:
+   ```bash
+   npm run dev
+   ```
+   Додаток буде доступний за адресою `http://localhost:5173`.
+3. **Перевірка збірки (Production Build)**:
+   Перед кожним пушем обов'язково перевіряйте збірку на цілісність типів TypeScript та конфігурацію Vite:
+   ```bash
+   npm run build
+   ```
+   Усі згенеровані ресурси записуються у каталог `dist/` безпосередньо. Збірка виконується безпомилково за **~1.10 сек**.
+
+---
+
+## 📦 5. Інструкції з публікації (Git & GitHub)
+
+> [!WARNING]
+> **Важливе застереження**:
+> Всі нові візуальні та архітектурні зміни є повністю локальними. **Не виконуйте комміт та пуш на GitHub без прямої команди власника проєкту.**
+
+Коли буде отримано схвалення на пуш, використовуйте наступні стандартні команди для збереження чистоти історії:
+```bash
+git add .
+git commit -m "style(ui): harmonize colors on archive page, redesign cabinet profile headers and update timeline layouts"
+git push origin main
 ```

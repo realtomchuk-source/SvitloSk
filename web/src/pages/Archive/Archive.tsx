@@ -68,8 +68,8 @@ export const Archive: React.FC = () => {
 
         {/* 2. Harmonica / Details lists */}
         {isLoading ? (
-          <div className="bg-zinc-100 dark:bg-zinc-900/40 border border-zinc-200 dark:border-white/5 text-center flex flex-col items-center justify-center" style={{ padding: '48px', marginLeft: '20px', marginRight: '20px', borderRadius: '20px' }}>
-            <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-orange-500 rounded-full animate-spin mb-4" />
+          <div className="bg-zinc-100 dark:bg-zinc-900/40 border border-zinc-200 dark:border-white/5 text-center flex flex-col items-center justify-center" style={{ padding: '48px', marginLeft: '20px', marginRight: '20px', borderRadius: '16px' }}>
+            <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-[#EE7221] rounded-full animate-spin mb-4" />
             <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider">Завантаження розкладів...</p>
           </div>
         ) : error ? (
@@ -79,7 +79,7 @@ export const Archive: React.FC = () => {
               padding: '24px', 
               marginLeft: '20px', 
               marginRight: '20px', 
-              borderRadius: '20px',
+              borderRadius: '16px',
               border: '1px solid rgba(55, 65, 81, 0.15)',
               display: 'flex',
               flexDirection: 'column',
@@ -130,8 +130,8 @@ export const Archive: React.FC = () => {
               boxSizing: 'border-box' 
             }}
           >
-            <div className="w-12 h-12 bg-orange-500/10 border border-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle size={24} className="text-orange-500" />
+            <div className="w-12 h-12 bg-[#EE7221]/10 border border-[#EE7221]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle size={24} className="text-[#EE7221]" />
             </div>
 
             <h3 className="text-[16px] font-black text-zinc-900 dark:text-white uppercase tracking-wide mb-2">
@@ -148,7 +148,7 @@ export const Archive: React.FC = () => {
                   setShowTransitModal(false);
                   navigate('/');
                 }}
-                className="w-full bg-orange-500 text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-orange-600 active:scale-95 transition-all shadow-[0_4px_12px_rgba(238,114,33,0.3)] border-none"
+                className="w-full bg-[#EE7221] text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#d96216] active:scale-95 transition-all shadow-[0_4px_12px_rgba(238,114,33,0.3)] border-none"
                 style={{ height: '44px', cursor: 'pointer', outline: 'none' }}
               >
                 Перейти на Головну

@@ -100,13 +100,13 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
             <span>{calculatedStats.hoursOn} ГОД</span>
           </div>
           <span className="text-zinc-300 dark:text-zinc-700 opacity-30 font-normal">|</span>
-          <div className="flex items-center" style={{ gap: '4px', color: '#8e8e93' }}>
+          <div className="flex items-center" style={{ gap: '4px', color: '#374151' }}>
             <span 
               style={{ 
                 width: '5px', 
                 height: '5px', 
                 borderRadius: '50%', 
-                backgroundColor: '#8e8e93', 
+                backgroundColor: '#374151', 
                 display: 'inline-block' 
               }} 
             />
@@ -187,8 +187,8 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
                 className={clsx(
                   "flex-1 h-full transition-colors duration-150",
                   isLit 
-                    ? "bg-orange-500" 
-                    : "bg-zinc-400 dark:bg-zinc-600"
+                    ? "bg-[#EE7221]" 
+                    : "bg-[#374151]"
                 )}
               />
             );
@@ -199,7 +199,7 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '16px', pointerEvents: 'none' }}>
           {/* Start label at 00:00 (if outage) */}
           {!isStartLit && (
-            <span style={{ position: 'absolute', left: 0, bottom: 0, color: '#8e8e93', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
+            <span style={{ position: 'absolute', left: 0, bottom: 0, color: '#374151', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
               00:00
             </span>
           )}
@@ -219,7 +219,7 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
                     transform: 'translateX(-50%)', 
                     width: '1.2px', 
                     height: '6px', 
-                    backgroundColor: '#8e8e93',
+                    backgroundColor: '#374151',
                     opacity: 0.6
                   }} 
                 />
@@ -230,7 +230,7 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
                     left: `${leftPercent}%`, 
                     bottom: 0,
                     transform: 'translateX(-50%)', 
-                    color: '#8e8e93', 
+                    color: '#374151', 
                     fontSize: '10px', 
                     fontWeight: 900, 
                     letterSpacing: '0.05em',
@@ -245,7 +245,7 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
 
           {/* End label at 24:00 (if outage) */}
           {!isEndLit && (
-            <span style={{ position: 'absolute', right: 0, bottom: 0, color: '#8e8e93', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
+            <span style={{ position: 'absolute', right: 0, bottom: 0, color: '#374151', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
               24:00
             </span>
           )}

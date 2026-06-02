@@ -115,12 +115,12 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
                     className="scale__label"
                     style={{
                       position: 'absolute',
-                      top: '-16px',
+                      top: '-18px',
                       transform: 'translateX(-50%)',
-                      fontSize: '10px',
-                      color: '#8E8E93',
+                      fontSize: '12px',
+                      color: '#4b5563',
                       fontVariantNumeric: 'tabular-nums',
-                      fontWeight: '500',
+                      fontWeight: '700',
                       left: `${leftPercent}%`
                     }}
                   >
@@ -208,13 +208,13 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
           {/* Crosshair Drop line (Time Machine indicator) */}
           <div style={{
             position: 'absolute',
-            top: '50%',
+            bottom: '0px',
             left: '50%',
             width: '1px',
-            height: '46px',
-            background: '#C2C5CA',
-            transform: 'translate(-50%, -50%)',
-            opacity: 1,
+            height: '76px',
+            background: 'rgba(148, 163, 184, 0.45)',
+            transform: 'translateX(-50%)',
+            pointerEvents: 'none',
             zIndex: 1
           }} />
         </div>

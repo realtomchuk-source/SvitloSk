@@ -20,7 +20,7 @@
 
     --system-text-neutral: #86868B;
 
-    --system-accent: #FF9500;
+    --system-accent: #EE7221;
 
 
 
@@ -2315,7 +2315,7 @@ body {
 .is-on .tick-label {
     top: -14px;
     transform: translateX(-50%);
-    color: #FF9500;
+    color: #EE7221;
     opacity: 1;
 }
 
@@ -2345,7 +2345,7 @@ body {
 .badge-on {
     top: -14px;
     transform: translateX(-50%);
-    background: #FF9500;
+    background: #EE7221;
     color: #FFFFFF;
 }
 
@@ -2366,8 +2366,8 @@ body {
 }
 
 .step-on {
-    background: #FF9500;
-    box-shadow: 0 0 6px rgba(255, 149, 0, 0.6);
+    background: #EE7221;
+    box-shadow: 0 0 6px rgba(238, 114, 33, 0.6);
 }
 
 .step-off {
@@ -2539,13 +2539,13 @@ body {
 }
 
 .status-on {
-    background: rgba(255, 149, 0, 0.15);
-    color: #FF9500;
-    border-color: rgba(255, 149, 0, 0.3);
+    background: rgba(238, 114, 33, 0.15);
+    color: #EE7221;
+    border-color: rgba(238, 114, 33, 0.3);
 }
 
 .status-on.current-hour {
-    background: #FF9500;
+    background: #EE7221;
     color: white;
 }
 
@@ -2647,7 +2647,7 @@ body {
     margin-bottom: 8px;
     background: var(--glass-bg-light);
     border: 1px solid var(--glass-border-light);
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
 }
 
@@ -2710,11 +2710,11 @@ body {
 }
 
 .mini-slider-segment.on {
-    background: #FF9500;
+    background: #EE7221;
 }
 
 .mini-slider-segment.off {
-    background: #8E8E93;
+    background: #374151;
 }
 
 /* Tooltip */

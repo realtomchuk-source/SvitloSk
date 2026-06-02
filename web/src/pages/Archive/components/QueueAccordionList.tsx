@@ -83,8 +83,8 @@ export const QueueAccordionList: React.FC<QueueAccordionListProps> = ({ dayData 
             key={qNum} 
             className={clsx(
               "archive-accordion transition-all duration-300 border",
-              isOpen ? "border-orange-500/20 shadow-md" : "border-zinc-200 dark:border-white/5",
-              isUserPrimary && !isOpen && "border-orange-500/10 bg-orange-500/[0.02]"
+              isOpen ? "border-[#EE7221]/20 shadow-md" : "border-zinc-200 dark:border-white/5",
+              isUserPrimary && !isOpen && "border-[#EE7221]/15 bg-[#EE7221]/[0.02]"
             )}
             style={{ 
               margin: '0 20px 8px 20px', 
@@ -109,9 +109,9 @@ export const QueueAccordionList: React.FC<QueueAccordionListProps> = ({ dayData 
                         width: '6px', 
                         height: '6px', 
                         borderRadius: '50%', 
-                        backgroundColor: '#f97316', 
+                        backgroundColor: '#EE7221', 
                         display: 'inline-block', 
-                        boxShadow: '0 0 6px #f97316', 
+                        boxShadow: '0 0 6px #EE7221', 
                         marginLeft: '2px'
                       }} 
                       title="Ваша черга" 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { clsx } from 'clsx';
 import { BrandIcon } from '../../../assets/brand/BrandIcon';
 import styles from '../Cabinet.module.css';
 
@@ -28,17 +27,6 @@ const TelegramIcon: React.FC = () => (
     </svg>
 );
 
-const StatusLightbulbIcon: React.FC<{ active: boolean }> = ({ active }) => {
-    // Registered: Orange bulb (#ee7221)
-    // Guest: Gray bulb (#d4d4d8)
-    const bulbColor = active ? "#ee7221" : "#d4d4d8";
-    return (
-        <svg width="16" height="22" viewBox="0 0 90.61 125" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22.58,106.06c0,10.46,8.47,18.94,18.94,18.94h7.57c10.46,0,18.94-8.47,18.94-18.94v-3.79H22.58v3.79Z" fill={bulbColor} />
-            <path d="M45.31.03C6.31-1.32-15.03,49.85,12.34,76.74c3.9,4.12,7.38,8.9,9.09,14.18h47.76c1.73-5.28,5.18-10.06,9.09-14.18C105.65,49.85,84.3-1.33,45.31.03Z" fill={bulbColor} />
-        </svg>
-    );
-};
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
@@ -62,7 +50,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
             onClick={isAnon ? onClick : undefined}
             style={{ cursor: isAnon ? 'pointer' : 'default' }}
         >
-            <div className={styles.solidCard}>
+            <div className={isAnon ? styles.profileCardGuest : styles.profileCardReg}>
                 <div className={styles.profileHeader}>
 
                     {/* Avatar / Brand icon */}
@@ -85,22 +73,9 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
                         </div>
                     </div>
 
-                    {/* Action Grid — top right */}
-                    <div className={styles.profileActionsGrid}>
-                        {/* Row 1: Status Icon in the far top-right corner (next to empty cell) */}
-                        <div /> {/* Empty cell next to Lightbulb */}
-                        <div 
-                            className={clsx(styles.syncIconBtn, styles.statusIconAnonBtn)}
-                            onClick={!isAnon ? (e) => { e.stopPropagation(); onSignOut?.(); } : undefined}
-                            style={{ cursor: !isAnon ? 'pointer' : 'default' }}
-                        >
-                            <StatusLightbulbIcon active={!isAnon} />
-                        </div>
-
-                        {/* Row 2: Telegram and Google */}
-                        <div className={styles.syncIconBtn} title="Telegram (незабаром)">
-                            <TelegramIcon />
-                        </div>
+                    {/* Action Grid — top right (stacked vertically: Google on top, Telegram below) */}
+                    <div className={styles.profileActionsGrid} style={{ display: 'flex', flexDirection: 'column', gap: '6px', gridTemplateColumns: 'none' }}>
+                        {/* Google Icon (Top, where the lightbulb was) */}
                         <button
                             className={styles.syncIconBtn}
                             onClick={!isAnon ? (e) => { e.stopPropagation(); onSignOut?.(); } : undefined}
@@ -109,6 +84,11 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onClick, onSignO
                         >
                             <GoogleIcon active={!isAnon} />
                         </button>
+
+                        {/* Telegram Icon (below Google) */}
+                        <div className={styles.syncIconBtn} title="Telegram (незабаром)">
+                            <TelegramIcon />
+                        </div>
                     </div>
 
                 </div>

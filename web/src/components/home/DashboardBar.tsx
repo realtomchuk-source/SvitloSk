@@ -32,19 +32,19 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
       transition: 'all 0.3s ease'
     }}>
       {/* Date Segment */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-        <span style={{ fontSize: '16px', fontWeight: 800, color: '#FF7A00' }}>{dayStr}</span>
-        <span style={{ fontSize: '16px', fontWeight: 600, color: '#1C1C1E', letterSpacing: '0.5px' }}>{dateNum}</span>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+        <span style={{ fontSize: '16px', fontWeight: 800, color: '#FF7A00', letterSpacing: '0.02em' }}>{dayStr}</span>
+        <span style={{ fontSize: '16px', fontWeight: 700, color: '#1C1C1E', letterSpacing: '0.2px' }}>{dateNum}</span>
       </div>
 
       {/* Clock Segment */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1px', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px', fontFamily: 'Inter, sans-serif' }}>
         <span style={{ 
-          fontSize: '20px', 
+          fontSize: '16px', 
           fontWeight: 800, 
           color: clockColor, 
-          letterSpacing: '-0.5px', 
-          lineHeight: 1,
+          letterSpacing: '-0.2px', 
+          lineHeight: '1',
           transition: 'color 0.3s ease'
         }}>
           {timeStr}
@@ -56,12 +56,12 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
             fontSize: '11px',
             fontWeight: 600,
             color: '#A0A0A0',
-            lineHeight: 1,
-            marginTop: '2px',
+            lineHeight: '1',
             fontVariantNumeric: 'tabular-nums',  /* A: однакова ширина кожної цифри */
-            display: 'inline-block',             /* B: фіксований блок */
+            display: 'inline-block',             /* B: фіксований block */
             width: '16px',                       /* B: постійна ширина — не змінюється */
             textAlign: 'left',
+            marginLeft: '3px'
           }}>
             {secStr}
           </span>
