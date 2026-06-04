@@ -17,9 +17,6 @@ import { clsx } from 'clsx';
 import styles from './Cabinet.module.css';
 import { subscribeToPushNotifications } from '@/pushService';
 import { supabase } from '@/services/supabaseClient';
-import { usePWA } from '@/hooks/usePWA';
-import { PWAInstallSheet } from './components/PWAInstallSheet';
-import { Download } from 'lucide-react';
 
 export const Cabinet: React.FC = () => {
     const { user, userConfig, updateUserConfig, slots, addSlot, updateSlot, deleteSlot, signInWithGoogle, signOut } = useStore();
@@ -31,8 +28,6 @@ export const Cabinet: React.FC = () => {
     const [isAboutSheetOpen, setAboutSheetOpen] = useState(false);
     const [isSignOutSheetOpen, setSignOutSheetOpen] = useState(false);
     const [editingSlot, setEditingSlot] = useState<Slot | null>(null);
-    const { canInstall, install, isIOS } = usePWA();
-    const [isInstallSheetOpen, setInstallSheetOpen] = useState(false);
 
     const isAnon = !user || user.is_anonymous;
 
@@ -210,19 +205,6 @@ export const Cabinet: React.FC = () => {
                 onRequireAuth={() => setAuthSheetOpen(true)}
             />
             
-            {canInstall && (
-                <div className={`${styles.section} ${styles.pwaInstallSection}`}>
-                    <div className={styles.solidCard}>
-                        <CabinetRow
-                            icon={<Download size={18} strokeWidth={2.5} />}
-                            label="Встановити застосунок"
-                            onClick={() => setInstallSheetOpen(true)}
-                            className={styles.controlPanelRow}
-                        />
-                    </div>
-                </div>
-            )}
-            
             <AboutSection
                 onShare={handleShare}
                 onFeedback={handleFeedback}
@@ -260,13 +242,6 @@ export const Cabinet: React.FC = () => {
             <AboutSheet
                 isOpen={isAboutSheetOpen}
                 onClose={() => setAboutSheetOpen(false)}
-            />
-
-            <PWAInstallSheet
-                isOpen={isInstallSheetOpen}
-                onClose={() => setInstallSheetOpen(false)}
-                isIOS={isIOS}
-                onInstall={install}
             />
         </div>
     );

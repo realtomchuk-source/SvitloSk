@@ -100,7 +100,11 @@ export const Home: React.FC = () => {
           <div 
             onClick={handleBannerClick}
             style={{
-              margin: '12px 20px 0 20px',
+              position: 'fixed',
+              top: '12px',
+              left: '20px',
+              right: '20px',
+              zIndex: 1000,
               background: '#ffffff',
               border: '1.5px solid #e4e4e7',
               borderRadius: '12px',
@@ -110,7 +114,7 @@ export const Home: React.FC = () => {
               justifyContent: 'space-between',
               gap: '12px',
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -129,10 +133,7 @@ export const Home: React.FC = () => {
               </div>
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: '13px', fontWeight: '700', color: '#374151' }}>
-                  Встановити SvitloSk
-                </div>
-                <div style={{ fontSize: '11px', color: '#71717a', marginTop: '1px' }}>
-                  Додайте іконку на робочий стіл
+                  Додай SvitloSk на робочий стіл
                 </div>
               </div>
             </div>
