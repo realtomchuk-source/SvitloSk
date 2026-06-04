@@ -6,9 +6,10 @@ interface InteractiveTimelineProps {
   activeSlot: number;
   currentRealSlot: number;
   onScrub?: (percent: number | null) => void;
+  pointerPercent: number;
 }
 
-export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queuesStr, activeSlot, currentRealSlot, onScrub }) => {
+export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queuesStr, activeSlot, currentRealSlot, onScrub, pointerPercent }) => {
   const SLOTS_COUNT = 48;
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +51,6 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
 
   // Use activeSlot from parent props
   const displaySlot = activeSlot;
-  const slotPercent = (displaySlot / (SLOTS_COUNT - 1)) * 100;
   const isSlotAvailable = queuesStr[Math.floor(displaySlot / 2)] === '1';
 
   const h = Math.floor(displaySlot / 2).toString().padStart(2, '0');
@@ -176,7 +176,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ queues
           style={{
             position: 'absolute',
             top: '39px',
-            left: `${slotPercent}%`,
+            left: `${pointerPercent}%`,
             width: '18px',
             height: '28px',
             background: 'linear-gradient(145deg, #FFFFFF 0%, #F5F7FA 50%, #E6E9EF 100%)',

@@ -35,17 +35,22 @@ export default defineConfig({
         name: 'SvitloSk',
         short_name: 'Svitlo',
         description: 'Svitlo-Starkon Schedule App',
-        theme_color: '#1976d2',
+        theme_color: '#f4f4f5',
+        background_color: '#ffffff',
+        display: 'standalone',
+        orientation: 'portrait',
         icons: [
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           }
         ]
       }

@@ -7,6 +7,9 @@ import { DashboardBar } from '@/components/home/DashboardBar';
 import { SubqueueSelector } from '@/components/home/SubqueueSelector';
 import { InteractiveTimeline } from '@/components/home/InteractiveTimeline';
 import { MarqueeBanner } from '@/components/home/MarqueeBanner';
+import { usePWA } from '@/hooks/usePWA';
+import { PWAInstallSheet } from '@/pages/Cabinet/components/PWAInstallSheet';
+import { Download, X } from 'lucide-react';
 
 import '@/styles/legacy/home.css';
 import '@/styles/legacy/tech-ui.css';
@@ -29,6 +32,29 @@ export const Home: React.FC = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const { canInstall, install, isIOS } = usePWA();
+  const [showBanner, setShowBanner] = useState(false);
+  const [isInstallSheetOpen, setInstallSheetOpen] = useState(false);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem('sssk_pwa_banner_dismissed') === 'true';
+    if (canInstall && !dismissed) {
+      setShowBanner(true);
+    } else {
+      setShowBanner(false);
+    }
+  }, [canInstall]);
+
+  const handleDismissBanner = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    localStorage.setItem('sssk_pwa_banner_dismissed', 'true');
+    setShowBanner(false);
+  };
+
+  const handleBannerClick = () => {
+    setInstallSheetOpen(true);
+  };
 
   // CENTRALIZED DISPLAY CONTEXT (The 'Time Machine' Hub)
   const displayContext = React.useMemo(() => {
@@ -64,12 +90,87 @@ export const Home: React.FC = () => {
   // Discrete slot for labels (0 - 47)
   const currentRealSlot = Math.floor((realTime.getHours() * 60 + realTime.getMinutes()) / 30);
   const activeSlot = scrubPercent !== null 
-    ? Math.max(0, Math.min(47, Math.round(scrubPercent * 47))) 
+    ? Math.max(0, Math.min(47, Math.floor(scrubPercent * 48))) 
     : currentRealSlot;
 
   return (
     <div className={clsx("page-home", !displayContext.isOn && "status-off")}>
       <section id="home-section" className="animate-in fade-in duration-700">
+        {showBanner && (
+          <div 
+            onClick={handleBannerClick}
+            style={{
+              margin: '12px 20px 0 20px',
+              background: '#ffffff',
+              border: '1.5px solid #e4e4e7',
+              borderRadius: '12px',
+              padding: '10px 14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: 'rgba(238, 114, 33, 0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#EE7221',
+                flexShrink: 0
+              }}>
+                <Download size={16} />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: '13px', fontWeight: '700', color: '#374151' }}>
+                  Встановити SvitloSk
+                </div>
+                <div style={{ fontSize: '11px', color: '#71717a', marginTop: '1px' }}>
+                  Додайте іконку на робочий стіл
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span 
+                style={{
+                  background: '#EE7221',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                }}
+              >
+                Встановити
+              </span>
+              <button 
+                onClick={handleDismissBanner}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#a1a1aa',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                aria-label="Закрити"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
         <HeroCard 
           isOn={displayContext.isOn}
           timeH={displayContext.timeH}
@@ -77,6 +178,7 @@ export const Home: React.FC = () => {
           nextChangeHour={displayContext.nextChangeHour}
           queuesStr={currentQueuesStr}
           currentTimePercent={pointerPercent}
+          isVirtual={displayContext.isVirtual}
         />
 
         <DashboardBar 
@@ -93,10 +195,18 @@ export const Home: React.FC = () => {
           activeSlot={activeSlot}
           currentRealSlot={currentRealSlot}
           onScrub={setScrubPercent}
+          pointerPercent={pointerPercent}
         />
 
         <SubqueueSelector />
       </section>
+
+      <PWAInstallSheet 
+        isOpen={isInstallSheetOpen}
+        onClose={() => setInstallSheetOpen(false)}
+        isIOS={isIOS}
+        onInstall={install}
+      />
     </div>
   );
 };

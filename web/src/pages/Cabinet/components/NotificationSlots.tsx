@@ -34,7 +34,7 @@ export const NotificationSlots: React.FC<NotificationSlotsProps> = ({ slots, isL
         }
 
         return (
-            <div className={styles.slotCard}>
+            <div className={clsx(styles.slotCard, styles.slotCardConfigured)}>
                 {slot.isActive && <div className={styles.activeIndicator} />}
                 
                 <div className={styles.slotTopRow}>

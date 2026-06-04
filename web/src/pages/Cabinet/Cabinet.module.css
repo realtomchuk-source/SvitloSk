@@ -34,6 +34,14 @@
     gap: 0;
 }
 
+.generalSettingsSection {
+    margin-top: 4px;
+}
+
+.pwaInstallSection {
+    margin-top: 4px;
+}
+
 .cardSection {
     display: flex;
     flex-direction: column;
@@ -47,7 +55,7 @@
     letter-spacing: 0.05em;
     color: #71717a;
     padding: 0 20px 0 16px; /* Optimized 20px right padding for better optical balance */
-    margin-top: 4px;
+    margin-top: 1px;
     margin-bottom: 0px;
     text-align: right;
 }
@@ -217,6 +225,10 @@
     overflow: hidden;
 }
 
+.slotCardConfigured {
+    padding: 10px 16px; /* Tighter padding for configured slots to maintain height symmetry */
+}
+
 .slotTopRow {
     display: flex;
     justify-content: space-between;
@@ -259,8 +271,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
-    padding-top: 8px;
+    margin-top: 0px;
+    padding-top: 3px;
     border-top: 1px solid #f4f4f5;
 }
 

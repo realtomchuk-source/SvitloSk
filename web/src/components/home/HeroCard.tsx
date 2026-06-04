@@ -10,6 +10,7 @@ interface HeroCardProps {
   nextChangeHour: number;
   queuesStr: string;
   currentTimePercent: number; // For the pointer
+  isVirtual?: boolean;
 }
 
 export const HeroCard: React.FC<HeroCardProps> = ({
@@ -19,6 +20,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   nextChangeHour,
   queuesStr,
   currentTimePercent,
+  isVirtual,
 }) => {
   const statusClass = isOn ? 'status-on' : 'status-off';
   const iconSrc = isOn ? powerOffIcon : powerOnIcon;
@@ -72,7 +74,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           })}
         </div>
         {/* Pure Silver Handle (Match sssk-modern.css) */}
-        <div style={{ position: 'absolute', top: '50%', transform: 'translate(-50%, -50%)', left: `${currentTimePercent}%`, width: '10px', height: '10px', background: '#FFFFFF', border: '1px solid #E0E0E0', borderRadius: '50%', boxShadow: '0 0 10px #FFFFFF, 0 0 20px rgba(255,255,255,0.4)', zIndex: 5, transition: 'left 0.1s linear' }} />
+        <div style={{ position: 'absolute', top: '50%', transform: 'translate(-50%, -50%)', left: `${currentTimePercent}%`, width: '10px', height: '10px', background: '#FFFFFF', border: '1px solid #E0E0E0', borderRadius: '50%', boxShadow: '0 0 10px #FFFFFF, 0 0 20px rgba(255,255,255,0.4)', zIndex: 5, transition: isVirtual ? 'none' : 'left 0.1s linear' }} />
       </div>
     </div>
   );

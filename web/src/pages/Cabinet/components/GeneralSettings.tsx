@@ -19,7 +19,7 @@ export const GeneralSettings: React.FC<GeneralSettingsProps> = ({
     onRequireAuth
 }) => {
     return (
-        <div className={styles.section}>
+        <div className={`${styles.section} ${styles.generalSettingsSection}`}>
             <div className={styles.solidCard}>
 
                 <CabinetRow
