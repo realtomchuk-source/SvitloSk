@@ -53,7 +53,7 @@ export const Archive: React.FC = () => {
     <div className="page-archive min-h-screen text-zinc-900 dark:text-zinc-100 bg-[#F5F5F7] dark:bg-[#08060d] transition-colors duration-500" style={{ paddingBottom: '96px' }}>
 
       {/* Main Container */}
-      <main className="max-w-[450px] mx-auto" style={{ marginTop: '0px', paddingLeft: 0, paddingRight: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <main className="max-w-[450px] mx-auto" style={{ marginTop: '0px', paddingLeft: 0, paddingRight: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
         {/* 1. Calendar Widget */}
         <CalendarWidget 
