@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/services/supabaseClient';
-import { Megaphone, Trash2, Send, Plus, Clock, Edit2, ArrowUp, ArrowDown, Eye, X, GripVertical } from 'lucide-react';
+import { Megaphone, Trash2, Send, Plus, Clock, Edit2, ArrowUp, ArrowDown, X, GripVertical } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { clsx } from 'clsx';
 import { logAdminAction } from '@/services/adminService';
@@ -26,11 +26,17 @@ type FormData = {
   active_date: string;
 };
 
-const toLocalISODate = (date: Date) => {
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
+const toKyivISODate = (date: Date) => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Kyiv',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  const parts = formatter.formatToParts(date);
+  const dateMap: Record<string, string> = {};
+  parts.forEach(p => { dateMap[p.type] = p.value; });
+  return `${dateMap.year}-${dateMap.month}-${dateMap.day}`;
 };
 
 const emptyForm = (date: string): FormData => ({
@@ -40,14 +46,14 @@ const emptyForm = (date: string): FormData => ({
   active_date: date,
 });
 
-/** YYYY-MM-DD for today (local-timezone safe) */
-const todayISO = () => toLocalISODate(new Date());
+/** YYYY-MM-DD for today in Kyiv timezone */
+const todayISO = () => toKyivISODate(new Date());
 
-/** YYYY-MM-DD for tomorrow (local-timezone safe) */
+/** YYYY-MM-DD for tomorrow in Kyiv timezone */
 const tomorrowISO = () => {
   const d = new Date();
   d.setDate(d.getDate() + 1);
-  return toLocalISODate(d);
+  return toKyivISODate(d);
 };
 
 /** DD.MM format */
@@ -62,13 +68,51 @@ export function Announcements() {
   const [activeTab, setActiveTab] = useState<'today' | 'tomorrow'>('today');
   const [form, setForm] = useState<FormData | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
   const { user } = useStore();
   const queryClient = useQueryClient();
 
   const today = todayISO();
   const tomorrow = tomorrowISO();
   const currentDate = activeTab === 'today' ? today : tomorrow;
+
+  // --- Fetch feed mode settings ---
+  const { data: feedSettings } = useQuery({
+    queryKey: ['admin', 'feedSettings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('news_feed_settings')
+        .select('*');
+      if (error) throw error;
+      return data as { active_date: string; mode: 'append' | 'override' }[];
+    }
+  });
+
+  const currentFeedMode = useMemo(() => {
+    const setting = feedSettings?.find(s => s.active_date === currentDate);
+    return setting?.mode || 'append'; // default is append
+  }, [feedSettings, currentDate]);
+
+  const setFeedModeMutation = useMutation({
+    mutationFn: async (mode: 'append' | 'override') => {
+      const { error } = await supabase
+        .from('news_feed_settings')
+        .upsert({
+          active_date: currentDate,
+          mode,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'active_date' });
+      if (error) throw error;
+      // Do not await to prevent any auth lock/storage deadlocks from blocking the UI
+      logAdminAction('change_feed_mode', currentDate, { mode });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'feedSettings'] });
+    },
+    onError: (err: any) => {
+      console.error('Failed to change feed mode:', err);
+      alert(`Не вдалося змінити режим стрічки: ${err.message || JSON.stringify(err)}`);
+    }
+  });
 
   // --- Fetch all announcements ---
   const { data: allAnnouncements, isLoading } = useQuery({
@@ -255,40 +299,41 @@ export function Announcements() {
             {tomorrowCount > 0 && <span className="ml-1.5 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full">{tomorrowCount}</span>}
           </button>
         </div>
-        <button
-          onClick={() => setShowPreview(p => !p)}
-          className={clsx(
-            "admin-btn-secondary",
-            showPreview && "bg-purple-55 text-purple-700 border-purple-200"
-          )}
-        >
-          <Eye size={14} /> Попередній перегляд
-        </button>
       </div>
 
-      {/* Preview Banner */}
-      {showPreview && (
-        <div className="admin-system-board">
-          <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider mb-2.5">Попередній перегляд бігучої стрічки:</p>
-          <div className="bg-gray-900 rounded-xl px-4 py-3 overflow-hidden border border-gray-800 shadow-inner">
-            <div className="flex gap-6 whitespace-nowrap animate-marquee-preview text-sm">
-              {announcements.filter(a => a.status === 'published').length === 0 ? (
-                <span className="text-gray-500 italic text-xs">Немає опублікованих оголошень для цієї дати</span>
-              ) : (
-                announcements.filter(a => a.status === 'published').map((a, i) => (
-                  <span key={a.id} className="inline-flex items-center gap-2">
-                    {i > 0 && <span className="text-gray-600 mx-2">•</span>}
-                    {a.time_label && (
-                      <span className="px-2.5 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-full whitespace-nowrap">{a.time_label}</span>
-                    )}
-                    <span className="text-white text-xs font-medium">{a.text}</span>
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
+      {/* Налаштування джерела стрічки новин */}
+      <div className="admin-system-board bg-white border border-gray-200 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h4 className="text-sm font-bold text-gray-850">Режим стрічки новин</h4>
+          <p className="text-xs text-gray-400">Оберіть варіант відображення стрічки на {activeTab === 'today' ? 'сьогодні' : 'завтра'}.</p>
         </div>
-      )}
+        <div className="flex flex-col sm:flex-row gap-2.5">
+          <button
+            onClick={() => setFeedModeMutation.mutate('append')}
+            disabled={setFeedModeMutation.isPending}
+            className={clsx(
+              "px-4 py-2.5 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-2",
+              currentFeedMode === 'append'
+                ? "bg-[#EE7221]/10 text-[#EE7221] border-[#EE7221]"
+                : "bg-gray-50 text-[#374151] border-gray-200 hover:bg-gray-100"
+            )}
+          >
+            <span>🔗 Автоматична + мої новини</span>
+          </button>
+          <button
+            onClick={() => setFeedModeMutation.mutate('override')}
+            disabled={setFeedModeMutation.isPending}
+            className={clsx(
+              "px-4 py-2.5 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-2",
+              currentFeedMode === 'override'
+                ? "bg-[#EE7221]/10 text-[#EE7221] border-[#EE7221]"
+                : "bg-gray-50 text-[#374151] border-gray-200 hover:bg-gray-100"
+            )}
+          >
+            <span>🚫 Тільки мої новини</span>
+          </button>
+        </div>
+      </div>
 
       {/* Form (create/edit) */}
       {form && (
@@ -445,17 +490,6 @@ export function Announcements() {
           <Plus size={16} /> Додати нове оголошення
         </button>
       )}
-
-      {/* Inline marquee preview CSS */}
-      <style>{`
-        @keyframes marquee-preview-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee-preview {
-          animation: marquee-preview-scroll 15s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }

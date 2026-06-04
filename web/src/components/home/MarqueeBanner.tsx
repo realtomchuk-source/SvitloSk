@@ -7,32 +7,192 @@ type BannerAnnouncement = {
   sort_order: number;
 };
 
+// Kyiv Timezone Helpers
+const getKyivDateTime = (date: Date = new Date()) => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Kyiv',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  
+  const parts = formatter.formatToParts(date);
+  const dateMap: Record<string, string> = {};
+  parts.forEach(p => { dateMap[p.type] = p.value; });
+  
+  const hour = parseInt(dateMap.hour, 10);
+  const minute = parseInt(dateMap.minute, 10);
+  
+  return {
+    dateISO: `${dateMap.year}-${dateMap.month}-${dateMap.day}`, // YYYY-MM-DD
+    hour,
+    minute,
+    minutesOfDay: hour * 60 + minute
+  };
+};
+
+const getKyivTomorrowDateISO = () => {
+  const now = new Date();
+  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  return getKyivDateTime(tomorrow).dateISO;
+};
+
 export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
   const [announcements, setAnnouncements] = useState<BannerAnnouncement[]>([]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const speedRef = useRef(0.7);
 
+  const currentLoadedDateRef = useRef<string>('');
+  const lastFetchedTimeRef = useRef<number>(0);
+  const currentFeedTextRef = useRef<string>('');
+
   useEffect(() => {
-    const now = new Date();
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    
+    const kyivInfo = getKyivDateTime();
+    currentLoadedDateRef.current = kyivInfo.dateISO;
+
     const load = async () => {
-      const { data, error } = await supabase
-        .from('system_announcements')
-        .select('id, text, sort_order')
-        .eq('status', 'published')
-        .eq('is_active', true)
-        .eq('active_date', today)
-        .order('sort_order', { ascending: true });
-      
-      if (!error && data && data.length > 0) {
-        setAnnouncements(data);
+      const now = new Date();
+      const currentKyiv = getKyivDateTime(now);
+      const todayISO = currentKyiv.dateISO;
+      const tomorrowISO = getKyivTomorrowDateISO();
+      const isWindow = currentKyiv.minutesOfDay >= 1410; // 23:30 is 23*60 + 30 = 1410 minutes
+
+      // 1. Fetch settings from Supabase for today
+      let mode: 'append' | 'override' = 'append';
+      try {
+        const { data: settingsData } = await supabase
+          .from('news_feed_settings')
+          .select('mode')
+          .eq('active_date', todayISO)
+          .maybeSingle();
+        if (settingsData && settingsData.mode) {
+          mode = settingsData.mode as 'append' | 'override';
+        }
+      } catch (e) {
+        console.warn('Failed to fetch feed settings', e);
       }
+
+      // 2. Fetch custom announcements from Supabase for today
+      let customText = '';
+      if (mode === 'append' || mode === 'override') {
+        try {
+          const { data: dbData } = await supabase
+            .from('system_announcements')
+            .select('text')
+            .eq('status', 'published')
+            .eq('is_active', true)
+            .eq('active_date', todayISO)
+            .order('sort_order', { ascending: true });
+          if (dbData && dbData.length > 0) {
+            customText = dbData.map(a => a.text).join(' | ');
+          }
+        } catch (e) {
+          console.warn('Failed to fetch system announcements', e);
+        }
+      }
+
+      // 3. Handle GitHub feed fetching
+      let githubFeed = '';
+      if (mode === 'append') {
+        const feedUrl = `https://raw.githubusercontent.com/realtomchuk-source/OutagesSk/main/data/feed.txt?t=${Date.now()}`;
+        
+        if (isWindow) {
+          // 23:30-00:00 - GitHub raw text file is updated with tomorrow's feed.
+          // Fetch it and store as tomorrow's feed.
+          try {
+            const res = await fetch(feedUrl);
+            if (res.ok) {
+              const text = await res.text();
+              const trimmed = text.trim();
+              if (trimmed) {
+                localStorage.setItem(`sssk_github_feed_${tomorrowISO}`, trimmed);
+              }
+            }
+          } catch (e) {
+            console.error('Failed to pre-fetch tomorrow feed:', e);
+          }
+
+          // Display today's cached feed if available, or fall back to immediate fetch
+          const cachedToday = localStorage.getItem(`sssk_github_feed_${todayISO}`);
+          if (cachedToday) {
+            githubFeed = cachedToday;
+          } else {
+            try {
+              const res = await fetch(feedUrl);
+              if (res.ok) {
+                githubFeed = (await res.text()).trim();
+              }
+            } catch (e) {
+              console.error('Failed to load fallback github feed:', e);
+            }
+          }
+        } else {
+          // Normal hours: 00:00-23:30. Fetch today's feed from GitHub.
+          try {
+            const res = await fetch(feedUrl);
+            if (res.ok) {
+              const text = await res.text();
+              const trimmed = text.trim();
+              if (trimmed) {
+                githubFeed = trimmed;
+                localStorage.setItem(`sssk_github_feed_${todayISO}`, trimmed);
+              }
+            }
+          } catch (e) {
+            console.error('Failed to fetch github feed:', e);
+            // Fallback to cache
+            githubFeed = localStorage.getItem(`sssk_github_feed_${todayISO}`) || '';
+          }
+        }
+      }
+
+      // 4. Combine
+      let finalFeedText = '';
+      if (mode === 'override') {
+        finalFeedText = customText;
+      } else {
+        // mode === 'append'
+        if (githubFeed && customText) {
+          finalFeedText = `${githubFeed} | ${customText}`;
+        } else {
+          finalFeedText = githubFeed || customText;
+        }
+      }
+
+      // 5. Update state only if text changed (prevents marquee resetting/glitching)
+      if (finalFeedText !== currentFeedTextRef.current) {
+        currentFeedTextRef.current = finalFeedText;
+        if (finalFeedText) {
+          setAnnouncements([{ id: 'feed', text: finalFeedText, sort_order: 1 }]);
+        } else {
+          setAnnouncements([]);
+        }
+      }
+      
+      lastFetchedTimeRef.current = Date.now();
     };
 
     load();
-    const interval = setInterval(load, 5 * 60 * 1000);
+
+    // Check date change every 60 seconds (Kyiv time)
+    // Poll updates from GitHub every 15 minutes
+    const interval = setInterval(() => {
+      const now = new Date();
+      const currentKyiv = getKyivDateTime(now);
+      
+      if (currentKyiv.dateISO !== currentLoadedDateRef.current) {
+        currentLoadedDateRef.current = currentKyiv.dateISO;
+        load();
+      } else if (Date.now() - lastFetchedTimeRef.current >= 15 * 60 * 1000) {
+        load();
+      }
+    }, 60 * 1000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -101,7 +261,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
       alignItems: 'center',
       position: 'relative',
     }}>
-      {/* Edge Fade Masks (Slightly narrower at 32px for subtle effect) */}
+      {/* Edge Fade Masks */}
       <div style={{
         position: 'absolute',
         left: 0,
