@@ -70,11 +70,11 @@ export const QueueAccordionList: React.FC<QueueAccordionListProps> = ({ dayData 
         const sq1 = `${qNum}.1`;
         const sq2 = `${qNum}.2`;
 
-        const bitstring1 = dayData.queues[sq1] || '1'.repeat(48);
-        const bitstring2 = dayData.queues[sq2] || '1'.repeat(48);
+        const bitstring1 = dayData.queues?.[sq1] || '1'.repeat(48);
+        const bitstring2 = dayData.queues?.[sq2] || '1'.repeat(48);
 
-        const stats1 = dayData.meta.stats?.[sq1];
-        const stats2 = dayData.meta.stats?.[sq2];
+        const stats1 = dayData.meta?.stats?.[sq1];
+        const stats2 = dayData.meta?.stats?.[sq2];
 
         const isUserPrimary = selectedGroup ? parseInt(selectedGroup.split('.')[0], 10) === qNum : false;
 

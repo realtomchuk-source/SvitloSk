@@ -8,6 +8,7 @@ const Admin = lazy(() => import('@/pages/Admin').then(m => ({ default: m.Admin }
 const Archive = lazy(() => import('@/pages/Archive/Archive').then(m => ({ default: m.Archive })));
 const AddressSearch = lazy(() => import('@/pages/AddressSearch/AddressSearch').then(m => ({ default: m.AddressSearch })));
 import { BottomNav } from '@/components/navigation/BottomNav';
+import { saveScheduleToArchive } from '@/pages/Archive/services/archiveSyncService';
 
 import { Login } from '@/pages/Admin/Login';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -25,6 +26,7 @@ function AppContent() {
         const data = await fetchSchedule('today');
         setScheduleData(data);
         setError(null);
+        saveScheduleToArchive(data);
       } catch (err) {
         console.error(err);
         setError('Помилка завантаження даних');

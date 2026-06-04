@@ -110,6 +110,29 @@ export const Archive: React.FC = () => {
               Спробувати ще раз
             </button>
           </div>
+        ) : selectedDayData?.isUnverified ? (
+          <div 
+            className="bg-white dark:bg-[#121118] border border-zinc-200 dark:border-white/10 text-center animate-in fade-in duration-350" 
+            style={{ 
+              padding: '32px 24px', 
+              marginLeft: '20px', 
+              marginRight: '20px', 
+              borderRadius: '16px',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.04)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px'
+            }}
+          >
+            <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800/60 rounded-full flex items-center justify-center">
+              <AlertTriangle size={22} className="text-zinc-500 dark:text-zinc-400" />
+            </div>
+            <p className="text-zinc-700 dark:text-zinc-300 text-sm font-semibold leading-relaxed" style={{ margin: 0 }}>
+              Ці дані наразі недоступні в додатку. Архів формується поступово лише з об'єктивних та верифікованих даних.
+            </p>
+          </div>
         ) : selectedDayData ? (
           <div onClick={() => setIsCalendarOpen(false)}>
             <QueueAccordionList dayData={selectedDayData} />

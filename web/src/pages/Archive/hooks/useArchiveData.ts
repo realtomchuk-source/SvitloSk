@@ -75,6 +75,14 @@ export const useArchiveData = () => {
     setIsLoading(true);
     setError(null);
     try {
+      const isDemo = ['2026-05-26', '2026-05-27', '2026-05-28'].includes(date);
+      const isVerified = date >= '2026-05-29';
+      if (!isDemo && !isVerified) {
+        setSelectedDayData({ date, isUnverified: true });
+        setIsLoading(false);
+        return;
+      }
+
       // 1. Try local cache
       let day: ArchivedDay | null = (await archiveDb.getDay(date)) || null;
 

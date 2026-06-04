@@ -204,6 +204,12 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
     return `${day}.${month}.${year}`;
   };
 
+  const isVerified = useMemo(() => {
+    const demoDates = ['2026-05-26', '2026-05-27', '2026-05-28'];
+    if (demoDates.includes(selectedDate)) return true;
+    return selectedDate >= '2026-05-29';
+  }, [selectedDate]);
+
   return (
     <div 
       className="archive-calendar-card" 
@@ -213,7 +219,13 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
         borderRadius: '16px',
         boxSizing: 'border-box',
         overflow: 'hidden',
-        padding: 0
+        padding: 0,
+        border: isVerified ? '2.5px solid rgba(255, 122, 0, 0.35)' : '2.5px solid rgba(113, 113, 122, 0.3)',
+        boxShadow: isVerified ? '0 10px 30px rgba(255, 122, 0, 0.08)' : '0 8px 24px rgba(0, 0, 0, 0.05)',
+        background: isVerified 
+          ? 'linear-gradient(135deg, rgba(255, 122, 0, 0.03) 0%, #ffffff 100%)' 
+          : 'linear-gradient(135deg, rgba(113, 113, 122, 0.03) 0%, #ffffff 100%)',
+        transition: 'all 0.3s ease'
       }}
     >
       {/* 1. COMPACT DATE PLATE */}

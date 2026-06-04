@@ -5,12 +5,13 @@ export interface QueueStats {
 
 export interface ArchivedDay {
   date: string;              // Унікальний ключ у форматі YYYY-MM-DD (Primary Key)
-  queues: Record<string, string>; // Зв'язка: "підчерга" (від "1.1" до "6.2") -> 48-символьний бітовий рядок (напр., "1111000011...")
-  meta: {
+  queues?: Record<string, string>; // Зв'язка: "підчерга" (від "1.1" до "6.2") -> 48-символьний бітовий рядок (напр., "1111000011...")
+  meta?: {
     savedAt: string;         // ISO Timestamp збереження в БД
     source: 'parser' | 'manual' | 'ocr'; // Джерело даних
     stats: Record<string, QueueStats>;   // Статистика годин для кожної підчерги ("1.1", "1.2" і т.д.)
   };
+  isUnverified?: boolean;
 }
 
 export type CalendarDayType = 
