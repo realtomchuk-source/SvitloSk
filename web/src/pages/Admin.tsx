@@ -15,6 +15,7 @@ import { ScheduleEditor } from './Admin/ScheduleEditor';
 import { AddressRequests } from './Admin/AddressRequests';
 // AuditLogsViewer is rendered inside LogsViewer as a sub-tab
 import { useStore } from '@/store/useStore';
+import { BrandIcon } from '@/assets/brand/BrandIcon';
 
 const GROUPS = [
   '1.1', '1.2', '2.1', '2.2', '3.1', '3.2',
@@ -137,8 +138,8 @@ export const Admin: React.FC = () => {
         {/* Logo */}
         <div className="admin-sidebar-logo">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm">
-              <Shield size={20} />
+            <div className="w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center shrink-0 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+              <BrandIcon variant="logo" size={24} color="var(--color-orange)" />
             </div>
             <div>
               <h1 className="font-extrabold text-base text-gray-800 leading-tight">SvitloSk</h1>
