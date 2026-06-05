@@ -4,6 +4,7 @@ import { AlertTriangle } from 'lucide-react';
 import { useArchiveData } from './hooks/useArchiveData';
 import { CalendarWidget } from './components/CalendarWidget';
 import { QueueAccordionList } from './components/QueueAccordionList';
+import { MainLogoIcon } from '@/assets/brand/MainLogoIcon';
 
 export const Archive: React.FC = () => {
   const navigate = useNavigate();
@@ -126,11 +127,15 @@ export const Archive: React.FC = () => {
               gap: '16px'
             }}
           >
-            <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800/60 rounded-full flex items-center justify-center">
-              <AlertTriangle size={22} className="text-zinc-500 dark:text-zinc-400" />
+            <div className="flex flex-col items-center gap-1.5">
+              <MainLogoIcon size={56} />
+              <h3 className="text-[18px] font-bold flex items-center gap-[1px] m-0" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <span className="text-[#ee7221] dark:text-[var(--color-orange)]">Svitlo</span>
+                <span className="text-[#374151] dark:text-[#a1a1aa]">Sk</span>
+              </h3>
             </div>
             <p className="text-zinc-700 dark:text-zinc-300 text-sm font-semibold leading-relaxed" style={{ margin: 0 }}>
-              Ці дані наразі недоступні в додатку. Архів формується поступово лише з об'єктивних та верифікованих даних.
+              Ці дані поки що відсутні в SvitloSk. Ми поступово наповнюємо архів, використовуючи лише перевірені та достовірні джерела.
             </p>
           </div>
         ) : selectedDayData ? (
