@@ -31,7 +31,20 @@
   --gap-main: 6px;
   --gap-small: 8px;
   --page-top-gap: 20px;
-  --color-orange: #EE7221;
+
+  /* Centralized Orange Tokens */
+  --color-orange-rgb: 238, 114, 33; /* #EE7221 */
+  --color-orange: rgb(var(--color-orange-rgb));
+  --color-orange-light-rgb: 255, 122, 0; /* #FF7A00 */
+  --color-orange-light: rgb(var(--color-orange-light-rgb));
+
+  --color-orange-glow-03: rgba(var(--color-orange-rgb), 0.03);
+  --color-orange-glow-05: rgba(var(--color-orange-rgb), 0.05);
+  --color-orange-glow-08: rgba(var(--color-orange-rgb), 0.08);
+  --color-orange-glow-10: rgba(var(--color-orange-rgb), 0.1);
+  --color-orange-glow-20: rgba(var(--color-orange-rgb), 0.2);
+  --color-orange-glow-35: rgba(var(--color-orange-rgb), 0.35);
+
   --color-dark: #374151;
   --color-bg-gray: #f4f4f5;
   --color-border: #f1f1f4;

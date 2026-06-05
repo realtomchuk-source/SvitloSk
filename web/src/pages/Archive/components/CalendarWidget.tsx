@@ -220,10 +220,10 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
         boxSizing: 'border-box',
         overflow: 'hidden',
         padding: 0,
-        border: isVerified ? '2.5px solid rgba(255, 122, 0, 0.35)' : '2.5px solid rgba(113, 113, 122, 0.3)',
-        boxShadow: isVerified ? '0 10px 30px rgba(255, 122, 0, 0.08)' : '0 8px 24px rgba(0, 0, 0, 0.05)',
+        border: isVerified ? '2.5px solid var(--color-orange-glow-35)' : '2.5px solid rgba(113, 113, 122, 0.3)',
+        boxShadow: isVerified ? '0 10px 30px var(--color-orange-glow-08)' : '0 8px 24px rgba(0, 0, 0, 0.05)',
         background: isVerified 
-          ? 'linear-gradient(135deg, rgba(255, 122, 0, 0.03) 0%, #ffffff 100%)' 
+          ? 'linear-gradient(135deg, var(--color-orange-glow-03) 0%, #ffffff 100%)' 
           : 'linear-gradient(135deg, rgba(113, 113, 122, 0.03) 0%, #ffffff 100%)',
         transition: 'all 0.3s ease'
       }}
@@ -271,7 +271,7 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({
             className={clsx("transition-transform duration-300", isOpen && "rotate-180")} 
             style={{ display: 'inline-flex', alignItems: 'center' }}
           >
-            <ChevronDown size={14} style={{ color: '#EE7221' }} />
+            <ChevronDown size={14} style={{ color: 'var(--color-orange)' }} />
           </span>
         </div>
 

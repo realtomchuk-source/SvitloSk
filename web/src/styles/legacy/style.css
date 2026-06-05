@@ -20,13 +20,13 @@
 
     --system-text-neutral: #86868B;
 
-    --system-accent: #EE7221;
+    --system-accent: var(--color-orange);
 
 
 
     /* Industrial Matte Palette */
 
-    --matte-bulb-orange: #ee7221;
+    --matte-bulb-orange: var(--color-orange);
 
     --matte-dark-grey: #374151;
 
@@ -53,7 +53,7 @@
     /* Volume Shadows (Industrial Standard) */
     --volume-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
     --volume-shadow-light: 0 12px 40px rgba(0, 0, 0, 0.08);
-    --volume-shadow-glow: 0 0 15px rgba(238, 114, 33, 0.1);
+    --volume-shadow-glow: 0 0 15px rgba(var(--color-orange-rgb), 0.1);
 
     /* Shadow Hierarchy */
     --shadow-hero: 0 8px 24px rgba(0, 0, 0, 0.08); /* Integrated shadow instead of floating */
@@ -290,7 +290,7 @@ body {
 
     transform: scale(0.9);
 
-    background: rgba(255, 149, 0, 0.1);
+    background: var(--color-orange-glow-10);
 
     color: var(--system-accent);
 
@@ -394,11 +394,11 @@ body {
 
     margin-top: 16px;
 
-    background: rgba(255, 149, 0, 0.1);
+    background: var(--color-orange-glow-10);
 
     color: var(--system-accent);
 
-    border: 1px solid rgba(255, 149, 0, 0.2);
+    border: 1px solid var(--color-orange-glow-20);
 
     padding: 10px 20px;
 
@@ -422,7 +422,7 @@ body {
 
     0% {
 
-        box-shadow: 0 0 0 0 rgba(255, 149, 0, 0.2);
+        box-shadow: 0 0 0 0 var(--color-orange-glow-20);
 
     }
 
@@ -430,7 +430,7 @@ body {
 
     70% {
 
-        box-shadow: 0 0 0 10px rgba(255, 149, 0, 0);
+        box-shadow: 0 0 0 10px rgba(var(--color-orange-rgb), 0);
 
     }
 
@@ -438,7 +438,7 @@ body {
 
     100% {
 
-        box-shadow: 0 0 0 0 rgba(255, 149, 0, 0);
+        box-shadow: 0 0 0 0 rgba(var(--color-orange-rgb), 0);
 
     }
 
@@ -514,9 +514,9 @@ body {
 
 .nav-item.active {
 
-    color: #ee7221; /* Matte Bulb Orange */
+    color: var(--color-orange); /* Matte Bulb Orange */
 
-    background: rgba(238, 114, 33, 0.1);
+    background: var(--color-orange-glow-10);
 
 }
 
@@ -532,7 +532,7 @@ body {
 
     align-items: center;
 
-    background: linear-gradient(135deg, rgba(255, 149, 0, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
+    background: linear-gradient(135deg, var(--color-orange-glow-05) 0%, rgba(0, 0, 0, 0) 100%);
 
     border-radius: 30px;
 
@@ -942,7 +942,7 @@ body {
 
     transform: scale(1.05);
 
-    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-orange-rgb), 0.3);
 
 }
 
@@ -986,7 +986,7 @@ body {
 
     0% {
 
-        box-shadow: 0 0 10px rgba(255, 149, 0, 0.5), 0 0 20px rgba(255, 149, 0, 0.3);
+        box-shadow: 0 0 10px rgba(var(--color-orange-rgb), 0.5), 0 0 20px rgba(var(--color-orange-rgb), 0.3);
 
         transform: scale(1);
 
@@ -996,7 +996,7 @@ body {
 
     50% {
 
-        box-shadow: 0 0 20px rgba(255, 149, 0, 0.8), 0 0 30px rgba(255, 149, 0, 0.5);
+        box-shadow: 0 0 20px rgba(var(--color-orange-rgb), 0.8), 0 0 30px rgba(var(--color-orange-rgb), 0.5);
 
         transform: scale(1.02);
 
@@ -1006,7 +1006,7 @@ body {
 
     100% {
 
-        box-shadow: 0 0 10px rgba(255, 149, 0, 0.5), 0 0 20px rgba(255, 149, 0, 0.3);
+        box-shadow: 0 0 10px rgba(var(--color-orange-rgb), 0.5), 0 0 20px rgba(var(--color-orange-rgb), 0.3);
 
         transform: scale(1);
 
@@ -1018,7 +1018,7 @@ body {
 
 .btn-tomorrow {
 
-    background: linear-gradient(135deg, #FF9500 0%, #FF3200 100%);
+    background: linear-gradient(135deg, var(--color-orange) 0%, #FF3200 100%);
 
     color: white;
 
@@ -1038,7 +1038,7 @@ body {
 
     cursor: pointer;
 
-    box-shadow: 0 4px 15px rgba(255, 149, 0, 0.4);
+    box-shadow: 0 4px 15px rgba(var(--color-orange-rgb), 0.4);
 
     transition: all 0.3s ease;
 
@@ -1619,9 +1619,9 @@ body {
 
 .preview-on {
 
-    background: rgba(255, 149, 0, 0.9);
+    background: rgba(var(--color-orange-rgb), 0.9);
 
-    box-shadow: 0 4px 20px rgba(255, 149, 0, 0.4);
+    box-shadow: 0 4px 20px rgba(var(--color-orange-rgb), 0.4);
 
 }
 
@@ -1687,11 +1687,11 @@ body {
 
 .page-home .preview-on {
 
-    background: rgba(255, 149, 0, 0.95) !important;
+    background: rgba(var(--color-orange-rgb), 0.95) !important;
 
     border-color: rgba(255, 255, 255, 0.3) !important;
 
-    box-shadow: 0 10px 30px rgba(255, 149, 0, 0.4) !important;
+    box-shadow: 0 10px 30px rgba(var(--color-orange-rgb), 0.4) !important;
 
 }
 
@@ -1803,7 +1803,7 @@ body {
 .date-btn-wd {
     font-size: 9px !important;
     font-weight: 800 !important;
-    color: #FF9500 !important;
+    color: var(--color-orange) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.12em !important;
     white-space: nowrap !important;
@@ -1896,7 +1896,7 @@ body {
 .slot-card.active {
     background: #FFF5E6;
     /* Global light-orange accent */
-    border: 1px solid rgba(255, 149, 0, 0.15);
+    border: 1px solid rgba(var(--color-orange-rgb), 0.15);
 }
 
 .slot-card.silent {

@@ -35,8 +35,8 @@
 }
 
 .legend-color-p.orange {
-    background: #FF7A00;
-    box-shadow: 0 4px 12px rgba(255, 122, 0, 0.2);
+    background: var(--color-orange-light);
+    box-shadow: 0 4px 12px rgba(var(--color-orange-light-rgb), 0.2);
 }
 
 .legend-color-p.grey {
@@ -134,26 +134,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #FF9500;
+    background: var(--color-orange);
     min-width: 58px;
     padding: 0 10px;
     height: 40px;
     border-radius: var(--radius-inner);
-    box-shadow: 0 0 15px rgba(255, 149, 0, 0.4);
+    box-shadow: 0 0 15px rgba(var(--color-orange-rgb), 0.4);
     animation: pulse-orange 2.5s infinite ease-in-out;
 }
 
 @keyframes pulse-orange {
     0% {
-        box-shadow: 0 0 10px rgba(255, 149, 0, 0.3);
+        box-shadow: 0 0 10px rgba(var(--color-orange-rgb), 0.3);
     }
 
     50% {
-        box-shadow: 0 0 22px rgba(255, 149, 0, 0.6);
+        box-shadow: 0 0 22px rgba(var(--color-orange-rgb), 0.6);
     }
 
     100% {
-        box-shadow: 0 0 10px rgba(255, 149, 0, 0.3);
+        box-shadow: 0 0 10px rgba(var(--color-orange-rgb), 0.3);
     }
 }
 
@@ -337,7 +337,7 @@
 }
 
 .dashboard-tablo.tablo-off .date-square {
-    color: #ee7221;
+    color: var(--color-orange);
     /* Matte Orange */
 }
 
@@ -428,7 +428,7 @@
     letter-spacing: -1.5px;
     margin-bottom: 4px;
     transition: all 0.4s ease;
-    color: var(--hero-color, #EE7221);
+    color: var(--hero-color, var(--color-orange));
     text-shadow: 0 0 15px var(--hero-glow);
 }
 
@@ -536,9 +536,9 @@
     }
 
     .group-btn.active {
-        background: #FF9500 !important;
-        border-color: #FF9500 !important;
-        box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3) !important;
+        background: var(--color-orange) !important;
+        border-color: var(--color-orange) !important;
+        box-shadow: 0 4px 15px rgba(var(--color-orange-rgb), 0.3) !important;
     }
 
     .group-num {
@@ -556,7 +556,7 @@
         width: 6px !important;
         height: 6px !important;
         border-radius: 50% !important;
-        background: #FF9500 !important;
+        background: var(--color-orange) !important;
         flex-shrink: 0 !important;
     }
 
@@ -927,7 +927,7 @@
 
 
     .wheel-item.is-active {
-        color: #FF7A00 !important;
+        color: var(--color-orange) !important;
         font-size: 34px !important;
         font-weight: 950 !important;
         text-shadow:
@@ -1107,7 +1107,7 @@
         border: 1px solid #2D3748;
         box-shadow:
             inset 0 4px 15px rgba(0, 0, 0, 0.9),
-            0 0 25px rgba(238, 114, 33, 0.25),
+            0 0 25px rgba(var(--color-orange-rgb), 0.25),
             /* Outer Glow */
             0 0 0 1px rgba(0, 0, 0, 0.4);
     }
@@ -1139,11 +1139,11 @@
 
     /* Status: Power ON (Vibrant Orange & Glowing Val) */
     .active-queue-tablo.status-on {
-        border-color: #ee7221;
+        border-color: var(--color-orange);
         background: #1A1D21;
         box-shadow:
             inset 0 2px 8px rgba(0, 0, 0, 0.8),
-            0 0 15px rgba(238, 114, 33, 0.2);
+            0 0 15px rgba(var(--color-orange-rgb), 0.2);
     }
 
     .active-queue-tablo.status-on #active-queue-val {
@@ -1152,9 +1152,9 @@
         text-shadow:
             0 0 8px rgba(255, 255, 255, 0.8),
             /* Inner White Glow */
-            0 0 15px rgba(238, 114, 33, 0.9),
+            0 0 15px rgba(var(--color-orange-rgb), 0.9),
             /* Outer Orange Brand Glow */
-            0 0 30px rgba(238, 114, 33, 0.5);
+            0 0 30px rgba(var(--color-orange-rgb), 0.5);
     }
 
     /* Status: Power OFF (Muted Grey) */

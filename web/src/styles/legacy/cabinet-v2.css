@@ -7,7 +7,7 @@
     --bg-page: #F9FAFB;
     --bg-card: #FFFFFF;
     --bg-muted: #F3F4F6;
-    --accent: #EE7221;
+    --accent: var(--color-orange);
     --text-primary: #111827;
     --text-secondary: #374151;
     --text-muted: #6B7280;
@@ -431,7 +431,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(var(--color-orange-rgb), 0.2);
     transition: all 0.2s ease;
 }
 
@@ -471,5 +471,5 @@
     background: var(--accent);
     border-color: transparent;
     color: white;
-    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-orange-rgb), 0.3);
 }

@@ -6,7 +6,7 @@
     --cb-anchor-x: 16px;          /* Point of origin for 'The Red Line' */
     --cb-icon-box-size: 28px;     /* Slightly smaller for tighter alignment */
     --cb-icon-gap: 8px;          /* Tightened gap */
-    --cb-brand-orange: #EE7221;
+    --cb-brand-orange: var(--color-orange);
     --cb-bg-gray: #f4f4f5;
     --cb-item-radius: 8px;
     
@@ -68,10 +68,10 @@
 }
 
 .profileCardReg {
-    background: linear-gradient(135deg, rgba(255, 122, 0, 0.03) 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--color-orange-glow-03) 0%, #ffffff 100%);
     border-radius: var(--radius-main);
-    border: 2.5px solid rgba(255, 122, 0, 0.35);
-    box-shadow: 0 10px 30px rgba(255, 122, 0, 0.08);
+    border: 2.5px solid var(--color-orange-glow-35);
+    box-shadow: 0 10px 30px var(--color-orange-glow-08);
     overflow: hidden;
     transition: all 0.3s ease;
 }
@@ -164,9 +164,9 @@
 }
 
 .statusIconReg {
-    background: rgba(238, 114, 33, 0.08);
-    border: 1px solid rgba(238, 114, 33, 0.2);
-    color: #EE7221;
+    background: rgba(var(--color-orange-rgb), 0.08);
+    border: 1px solid rgba(var(--color-orange-rgb), 0.2);
+    color: var(--color-orange);
 }
 
 .statusIconActive {
@@ -194,7 +194,7 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    color: #EE7221;
+    color: var(--color-orange);
     flex-shrink: 0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
@@ -203,7 +203,7 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(238, 114, 33, 0.1) 0%, rgba(238, 114, 33, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(var(--color-orange-rgb), 0.1) 0%, rgba(var(--color-orange-rgb), 0.05) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -336,7 +336,7 @@
 .iconBox {
     width: var(--cb-icon-box-size);
     height: var(--cb-icon-box-size);
-    background: rgba(238, 114, 33, 0.08); /* Soft Orange Tint */
+    background: rgba(var(--color-orange-rgb), 0.08); /* Soft Orange Tint */
     border: none; /* Removed heavy border */
     border-radius: var(--cb-item-radius);
     display: flex;

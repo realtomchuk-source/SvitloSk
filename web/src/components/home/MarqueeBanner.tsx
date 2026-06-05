@@ -248,27 +248,27 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
 
       if (match[1]) {
         parts.push(
-          <span key={`update-${matchIndex}`} style={{ color: '#EE7221', fontWeight: 700 }}>
+          <span key={`update-${matchIndex}`} style={{ color: 'var(--color-orange)', fontWeight: 700 }}>
             {match[1]}
           </span>
         );
       } else if (match[3]) {
         parts.push(match[2]);
         parts.push(
-          <span key={`village-${matchIndex}`} style={{ color: '#EE7221', fontWeight: 700 }}>
+          <span key={`village-${matchIndex}`} style={{ color: 'var(--color-orange)', fontWeight: 700 }}>
             {match[3]}
           </span>
         );
         parts.push(match[4]);
       } else if (match[5]) {
         parts.push(
-          <span key={`city-${matchIndex}`} style={{ color: '#EE7221', fontWeight: 700 }}>
+          <span key={`city-${matchIndex}`} style={{ color: 'var(--color-orange)', fontWeight: 700 }}>
             {match[5]}
           </span>
         );
       } else if (match[6]) {
         parts.push(
-          <span key={`sep-${matchIndex}`} style={{ color: '#EE7221', fontWeight: 700, padding: '0 4px' }}>
+          <span key={`sep-${matchIndex}`} style={{ color: 'var(--color-orange)', fontWeight: 700, padding: '0 4px' }}>
             {match[6]}
           </span>
         );
@@ -288,7 +288,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
     <>
       {announcements.map((a, i) => (
         <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-          {i > 0 && <span style={{ color: isOn ? 'rgba(238,114,33,0.35)' : 'rgba(142,142,147,0.4)', padding: '0 14px', fontSize: '8px' }}>●</span>}
+          {i > 0 && <span style={{ color: isOn ? 'var(--color-orange-glow-35)' : 'rgba(142,142,147,0.4)', padding: '0 14px', fontSize: '8px' }}>●</span>}
           <span style={{ color: '#3a3a3c', fontSize: '15px', fontWeight: 500, paddingRight: '6px' }}>
             {parseAnnouncementText(a.text)}
           </span>
@@ -308,7 +308,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
         borderRadius: '16px',
         margin: '0 20px',
         boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
-        border: isOn ? '1px solid rgba(238, 114, 33, 0.25)' : '1.2px solid rgba(142, 142, 147, 0.3)',
+        border: isOn ? '1px solid var(--color-orange-glow-20)' : '1.2px solid rgba(142, 142, 147, 0.3)',
         overflow: 'hidden',
         height: '54px',
         boxSizing: 'border-box',

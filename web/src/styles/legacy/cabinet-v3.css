@@ -4,7 +4,7 @@
 */
 
 :root {
-    --v3-accent: #FF9500;
+    --v3-accent: var(--color-orange);
     --v3-accent-dynamic: var(--v3-accent);
     --v3-text-primary: #111827;
     --v3-text-secondary: #4B5563;
@@ -347,7 +347,7 @@
 .v3-icon-box {
     width: 32px;
     height: 32px;
-    background: rgba(238, 114, 33, 0.1); /* Soft Orange Backdrop */
+    background: var(--color-orange-glow-10); /* Soft Orange Backdrop */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -610,7 +610,7 @@
     background: var(--v3-accent);
     border-color: var(--v3-accent);
     color: #ffffff;
-    box-shadow: 0 4px 10px rgba(238, 114, 33, 0.2);
+    box-shadow: 0 4px 10px rgba(var(--color-orange-rgb), 0.2);
 }
 
 .time-slider {
