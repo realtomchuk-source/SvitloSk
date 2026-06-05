@@ -74,10 +74,16 @@ export const fetchSystemStats = async () => {
         .select('*', { count: 'exact', head: true })
         .gt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
+    // 4. Active push tokens (real dynamic count)
+    const { count: activePushTokens } = await supabase
+        .from('user_push_tokens')
+        .select('*', { count: 'exact', head: true });
+
     return {
         totalUsers: totalUsers || 0,
         groupDensity: density,
         recentActions: recentActions || 0,
+        activePushTokens: activePushTokens || 0,
         health: 'stable'
     };
 };
