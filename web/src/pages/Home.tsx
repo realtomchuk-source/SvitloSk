@@ -182,14 +182,14 @@ export const Home: React.FC = () => {
           isVirtual={displayContext.isVirtual}
         />
 
+        <MarqueeBanner isOn={displayContext.isOn} />
+
         <DashboardBar 
           isOn={displayContext.isOn} 
           realTime={displayContext.referenceDate} 
           isVirtual={displayContext.isVirtual}
           isPast={displayContext.isPast}
         />
-
-        <MarqueeBanner isOn={displayContext.isOn} />
         
         <InteractiveTimeline 
           queuesStr={currentQueuesStr} 

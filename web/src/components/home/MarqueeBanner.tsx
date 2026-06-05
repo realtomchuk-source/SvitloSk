@@ -60,7 +60,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
       const currentKyiv = getKyivDateTime(now);
       const todayISO = currentKyiv.dateISO;
       const tomorrowISO = getKyivTomorrowDateISO();
-      const isWindow = currentKyiv.minutesOfDay >= 1410; // 23:30 is 23*60 + 30 = 1410 minutes
+      const isWindow = currentKyiv.minutesOfDay >= 1400; // 23:20 is 23*60 + 20 = 1400 minutes
 
       // 1. Fetch settings from Supabase for today
       let mode: 'append' | 'override' = 'append';
@@ -102,7 +102,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
         const feedUrl = `https://raw.githubusercontent.com/realtomchuk-source/OutagesSk/main/data/feed.txt?t=${Date.now()}`;
         
         if (isWindow) {
-          // 23:30-00:00 - GitHub raw text file is updated with tomorrow's feed.
+          // 23:20-00:00 - GitHub raw text file is updated with tomorrow's feed.
           // Fetch it and store as tomorrow's feed.
           try {
             const res = await fetch(feedUrl);
@@ -132,7 +132,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
             }
           }
         } else {
-          // Normal hours: 00:00-23:30. Fetch today's feed from GitHub.
+          // Normal hours: 00:00-23:20. Fetch today's feed from GitHub.
           try {
             const res = await fetch(feedUrl);
             if (res.ok) {
@@ -231,14 +231,67 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
     };
   }, [announcements]);
 
-  if (announcements.length === 0) return null;
+  const isLoading = announcements.length === 0;
+
+  const parseAnnouncementText = (text: string) => {
+    const regex = /([Оо]новлено\s+[оо0]\s+\d{1,2}:\d{2})|([Зз]неструмлення:\s*)([а-яА-ЯёЁіІїЇєЄґҐ\s'-]+?)(\s*\()|([Сс]тарокостянтинів[а-яА-ЯёЁіІїЇєЄґҐ]*)|(\|)/g;
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      const matchIndex = match.index;
+      
+      if (matchIndex > lastIndex) {
+        parts.push(text.substring(lastIndex, matchIndex));
+      }
+
+      if (match[1]) {
+        parts.push(
+          <span key={`update-${matchIndex}`} style={{ color: '#EE7221', fontWeight: 700 }}>
+            {match[1]}
+          </span>
+        );
+      } else if (match[3]) {
+        parts.push(match[2]);
+        parts.push(
+          <span key={`village-${matchIndex}`} style={{ color: '#EE7221', fontWeight: 700 }}>
+            {match[3]}
+          </span>
+        );
+        parts.push(match[4]);
+      } else if (match[5]) {
+        parts.push(
+          <span key={`city-${matchIndex}`} style={{ color: '#EE7221', fontWeight: 700 }}>
+            {match[5]}
+          </span>
+        );
+      } else if (match[6]) {
+        parts.push(
+          <span key={`sep-${matchIndex}`} style={{ color: '#EE7221', fontWeight: 700, padding: '0 4px' }}>
+            {match[6]}
+          </span>
+        );
+      }
+
+      lastIndex = regex.lastIndex;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    return parts;
+  };
 
   const renderContent = () => (
     <>
       {announcements.map((a, i) => (
         <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
           {i > 0 && <span style={{ color: isOn ? 'rgba(238,114,33,0.35)' : 'rgba(142,142,147,0.4)', padding: '0 14px', fontSize: '8px' }}>●</span>}
-          <span style={{ color: '#3a3a3c', fontSize: '15px', fontWeight: 500, paddingRight: '6px' }}>{a.text}</span>
+          <span style={{ color: '#3a3a3c', fontSize: '15px', fontWeight: 500, paddingRight: '6px' }}>
+            {parseAnnouncementText(a.text)}
+          </span>
         </span>
       ))}
       <span style={{ padding: '0 40px' }} />
@@ -246,21 +299,24 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
   );
 
   return (
-    <div style={{
-      background: 'rgba(255, 255, 255, 0.85)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      borderRadius: '16px',
-      margin: '0 20px',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
-      border: isOn ? '1px solid rgba(238, 114, 33, 0.25)' : '1.2px solid rgba(142, 142, 147, 0.3)',
-      overflow: 'hidden',
-      height: '54px',
-      boxSizing: 'border-box',
-      display: 'flex',
-      alignItems: 'center',
-      position: 'relative',
-    }}>
+    <div 
+      className={isLoading ? "animate-pulse" : ""}
+      style={{
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderRadius: '16px',
+        margin: '0 20px',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
+        border: isOn ? '1px solid rgba(238, 114, 33, 0.25)' : '1.2px solid rgba(142, 142, 147, 0.3)',
+        overflow: 'hidden',
+        height: '54px',
+        boxSizing: 'border-box',
+        display: 'flex',
+        alignItems: 'center',
+        position: 'relative',
+      }}
+    >
       {/* Edge Fade Masks */}
       <div style={{
         position: 'absolute',
@@ -303,8 +359,12 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
           whiteSpace: 'nowrap',
           minWidth: 'max-content',
         }}>
-          {renderContent()}
-          {renderContent()}
+          {!isLoading && (
+            <>
+              {renderContent()}
+              {renderContent()}
+            </>
+          )}
         </div>
       </div>
       <style>{`.mq-viewport::-webkit-scrollbar { display: none; }`}</style>
