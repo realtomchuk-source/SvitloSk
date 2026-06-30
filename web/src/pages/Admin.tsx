@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { triggerParserWorkflow, fetchHealthStatus, fetchParserState, fetchPendingResults, approveResult, logAdminAction, fetchSystemStats, fetchAddressRequests } from '@/services/adminService';
+import { triggerParserWorkflow, fetchHealthStatus, fetchParserState, fetchScheduleTimeline, revokeSchedule, logAdminAction, fetchSystemStats, fetchAddressRequests } from '@/services/adminService';
 import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard, Users, BarChart2, Grid3X3, Megaphone, Terminal,
-  Play, CheckCircle, RotateCcw, AlertCircle,
+  Play, CheckCircle, RotateCcw, AlertCircle, Clock, Ban,
   Shield, Key, ExternalLink, MapPin, LogOut, ArrowUpRight
 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -42,7 +42,7 @@ export const Admin: React.FC = () => {
 
   const { data: health } = useQuery({ queryKey: ['admin', 'health'], queryFn: fetchHealthStatus });
   const { data: latestEntry } = useQuery({ queryKey: ['admin', 'latest-entry'], queryFn: fetchParserState });
-  const { data: pendingResults, refetch: refetchPending } = useQuery({ queryKey: ['admin', 'pending'], queryFn: fetchPendingResults });
+  const { data: scheduleTimeline, refetch: refetchTimeline } = useQuery({ queryKey: ['admin', 'timeline'], queryFn: fetchScheduleTimeline });
   const { data: stats } = useQuery({ queryKey: ['admin', 'stats'], queryFn: fetchSystemStats, refetchInterval: 60000 });
   const { data: addressRequests } = useQuery({ queryKey: ['admin', 'addressRequests'], queryFn: fetchAddressRequests });
 
@@ -51,7 +51,7 @@ export const Admin: React.FC = () => {
     return addressRequests.filter((r: any) => r.status === 'pending').length;
   }, [addressRequests]);
 
-  const [selectedVerification, setSelectedVerification] = useState<any>(null);
+  const [selectedReview, setSelectedReview] = useState<any>(null);
   const [isTriggering, setIsTriggering] = useState(false);
 
   // System status (real data)
@@ -86,15 +86,16 @@ export const Admin: React.FC = () => {
     }
   };
 
-  const handleApprove = async (id: number) => {
+  const handleRevoke = async (id: number) => {
+    if (!window.confirm('Ви впевнені, що хочете відкликати цей графік?')) return;
     try {
-      await approveResult(id);
-      alert('Графік підтверджено.');
-      await logAdminAction('APPROVE_RESULT', id.toString());
-      setSelectedVerification(null);
-      refetchPending();
+      await revokeSchedule(id);
+      alert('Графік відкликано.');
+      await logAdminAction('REVOKE_SCHEDULE', id.toString());
+      setSelectedReview(null);
+      refetchTimeline();
     } catch (err: any) {
-      alert(`Помилка підтвердження: ${err.message}`);
+      alert(`Помилка відкликання: ${err.message}`);
     }
   };
 
@@ -161,11 +162,7 @@ export const Admin: React.FC = () => {
             >
               <span className={clsx(activeTab === tab.id ? "text-blue-600" : "text-gray-400")}>{tab.icon}</span>
               <span>{tab.label}</span>
-              {tab.id === 'logs' && (pendingResults?.length || 0) > 0 && (
-                <span className="ml-auto px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full min-w-[22px] text-center">
-                  {pendingResults?.length}
-                </span>
-              )}
+
               {tab.id === 'address_requests' && pendingRequestsCount > 0 && (
                 <span className="ml-auto px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full min-w-[22px] text-center animate-pulse">
                   {pendingRequestsCount}
@@ -277,12 +274,11 @@ export const Admin: React.FC = () => {
                   highlight={pendingRequestsCount > 0}
                 />
                 <StatCard
-                  label="Очікує перевірки"
-                  value={(pendingResults?.length || 0).toString()}
+                  label="Останній графік"
+                  value={scheduleTimeline?.[0]?.target_date || '—'}
                   icon={<Grid3X3 size={24} />}
-                  color="amber"
-                  highlight={pendingResults && pendingResults.length > 0}
-                  badge={pendingResults && pendingResults.length > 0 ? "Потребує уваги" : "Підтверджено"}
+                  color="emerald"
+                  badge="Авто ✓"
                 />
               </div>
 
@@ -353,51 +349,83 @@ export const Admin: React.FC = () => {
                 </div>
               </div>
 
-              {/* Pending Verification */}
-              {pendingResults && pendingResults.length > 0 ? (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <AlertCircle size={18} className="text-amber-600" />
-                      <h3 className="text-sm font-semibold text-amber-800">
-                        {pendingResults.length} {pendingResults.length === 1 ? 'графік очікує' : 'графіків очікують'} підтвердження
-                      </h3>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    {pendingResults.map((res: any) => (
-                      <div key={res.id} className="flex items-center justify-between bg-white border border-amber-100 rounded-lg px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-medium text-gray-700">Графік #{res.id}</span>
-                          <span className="text-xs text-gray-400">•</span>
-                          <span className="text-sm text-gray-500">{res.target_date}</span>
-                          <span className="text-xs text-gray-400">•</span>
-                          <span className="text-xs text-gray-400">{new Date(res.created_at).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}</span>
+              {/* Schedule Timeline */}
+              {scheduleTimeline && scheduleTimeline.length > 0 && (() => {
+                const latest = scheduleTimeline[0];
+                const fmtKyiv = (iso: string | null) => {
+                  if (!iso) return '—';
+                  return new Date(iso).toLocaleString('uk-UA', {
+                    timeZone: 'Europe/Kyiv',
+                    day: '2-digit', month: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                  });
+                };
+                const isRevoked = latest.status === 'revoked';
+                return (
+                  <div className={clsx(
+                    "rounded-xl border p-5 space-y-4",
+                    isRevoked
+                      ? "bg-red-50/50 border-red-200"
+                      : "bg-emerald-50/50 border-emerald-200"
+                  )}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className={clsx(
+                          "w-8 h-8 rounded-lg flex items-center justify-center",
+                          isRevoked ? "bg-red-100" : "bg-emerald-100"
+                        )}>
+                          {isRevoked
+                            ? <Ban size={16} className="text-red-600" />
+                            : <CheckCircle size={16} className="text-emerald-600" />
+                          }
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setSelectedVerification(res)}
-                            className="px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-                          >
-                            Переглянути
-                          </button>
-                          <button
-                            onClick={() => handleApprove(res.id)}
-                            className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 transition-colors"
-                          >
-                            Підтвердити
-                          </button>
+                        <div>
+                          <h3 className="text-sm font-bold text-gray-800">Графік на {latest.target_date}</h3>
+                          <span className={clsx(
+                            "text-xs font-semibold",
+                            isRevoked ? "text-red-600" : "text-emerald-600"
+                          )}>
+                            {isRevoked ? 'Відкликано' : 'Активний'}
+                          </span>
                         </div>
                       </div>
-                    ))}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setSelectedReview(latest)}
+                          className="px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-white transition-colors"
+                        >
+                          👁 Переглянути
+                        </button>
+                        {!isRevoked && (
+                          <button
+                            onClick={() => handleRevoke(latest.id)}
+                            className="px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            Відкликати
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center gap-2.5 bg-white/80 rounded-lg px-3.5 py-2.5 border border-gray-100">
+                        <Clock size={14} className="text-blue-500 shrink-0" />
+                        <div>
+                          <p className="text-[10px] text-gray-400 font-semibold uppercase">Отримано системою</p>
+                          <p className="text-sm font-bold text-gray-800">{fmtKyiv(latest.received_at)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5 bg-white/80 rounded-lg px-3.5 py-2.5 border border-gray-100">
+                        <CheckCircle size={14} className="text-emerald-500 shrink-0" />
+                        <div>
+                          <p className="text-[10px] text-gray-400 font-semibold uppercase">Опубліковано в PWA</p>
+                          <p className="text-sm font-bold text-gray-800">{fmtKyiv(latest.published_at) || 'Очікує'}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="admin-alert-banner">
-                  <CheckCircle size={20} className="text-emerald-600 shrink-0" />
-                  <span className="text-base text-emerald-800 font-semibold">Всі графіки підтверджені</span>
-                </div>
-              )}
+                );
+              })()}
             </div>
           )}
 
@@ -411,12 +439,12 @@ export const Admin: React.FC = () => {
         </div>
       </main>
 
-      {/* Verification Detail Panel (overlay) */}
-      {selectedVerification && (
+      {/* Schedule Review Panel (overlay) */}
+      {selectedReview && (
         <VerificationPanel
-          result={selectedVerification}
-          onClose={() => setSelectedVerification(null)}
-          onApprove={handleApprove}
+          result={selectedReview}
+          onClose={() => setSelectedReview(null)}
+          onRevoke={handleRevoke}
           GROUPS={GROUPS}
         />
       )}
@@ -467,13 +495,16 @@ const StatCard = ({ label, value, icon, color, highlight, badge }: any) => {
 
 
 
-/** Verification detail panel (slide-over) — light theme */
-const VerificationPanel = ({ result, onClose, onApprove, GROUPS }: any) => {
-  const [editedData, setEditedData] = useState(result.raw_data || {});
-  const handleCellToggle = (group: string, hourIndex: number) => {
-    const current = editedData[group] || '1'.repeat(24);
-    const bit = current[hourIndex] === '1' ? '0' : '1';
-    setEditedData({ ...editedData, [group]: current.substring(0, hourIndex) + bit + current.substring(hourIndex + 1) });
+/** Schedule review panel (slide-over) — read-only with revoke option */
+const VerificationPanel = ({ result, onClose, onRevoke, GROUPS }: any) => {
+  const gridData = result.raw_data || {};
+  const fmtKyiv = (iso: string | null) => {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleString('uk-UA', {
+      timeZone: 'Europe/Kyiv',
+      day: '2-digit', month: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
   };
 
   return (
@@ -483,8 +514,8 @@ const VerificationPanel = ({ result, onClose, onApprove, GROUPS }: any) => {
         {/* Header */}
         <header className="px-6 py-4 border-b border-gray-200 flex justify-between items-center shrink-0">
           <div>
-            <h4 className="text-lg font-bold text-gray-800">Перевірка графіка #{result.id}</h4>
-            <p className="text-sm text-gray-500">Дата: {result.target_date} • Отримано: {new Date(result.created_at).toLocaleTimeString('uk-UA')}</p>
+            <h4 className="text-lg font-bold text-gray-800">Перегляд графіка #{result.id}</h4>
+            <p className="text-sm text-gray-500">Дата: {result.target_date} • Отримано: {fmtKyiv(result.received_at || result.created_at)}</p>
           </div>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
             <ExternalLink size={18} />
@@ -508,24 +539,23 @@ const VerificationPanel = ({ result, onClose, onApprove, GROUPS }: any) => {
             </div>
           </div>
 
-          {/* Grid editor */}
+          {/* Grid (read-only) */}
           <div>
-            <h5 className="text-sm font-semibold text-gray-700 mb-2">Розпізнаний графік (редагувати)</h5>
+            <h5 className="text-sm font-semibold text-gray-700 mb-2">Розпізнаний графік</h5>
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 overflow-x-auto">
               <div className="min-w-[700px] space-y-1">
                 {GROUPS.map((group: string) => (
                   <div key={group} className="flex items-center gap-2">
                     <span className="w-8 text-xs font-semibold text-gray-500 font-mono text-right">{group}</span>
                     <div className="flex-1 flex gap-0.5">
-                      {(editedData[group] || '1'.repeat(24)).split('').map((bit: string, i: number) => (
-                        <button
+                      {(gridData[group] || '1'.repeat(24)).split('').map((bit: string, i: number) => (
+                        <div
                           key={i}
-                          onClick={() => handleCellToggle(group, i)}
                           className={clsx(
-                            "flex-1 h-6 rounded transition-all border",
+                            "flex-1 h-6 rounded border",
                             bit === '1'
                               ? "bg-emerald-400 border-emerald-500"
-                              : "bg-gray-200 border-gray-300 hover:bg-gray-300"
+                              : "bg-gray-200 border-gray-300"
                           )}
                         />
                       ))}
@@ -540,11 +570,13 @@ const VerificationPanel = ({ result, onClose, onApprove, GROUPS }: any) => {
         {/* Footer */}
         <footer className="px-6 py-4 border-t border-gray-200 flex gap-3 shrink-0">
           <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-            Скасувати
+            Закрити
           </button>
-          <button onClick={() => onApprove(result.id)} className="flex-[2] py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition-colors">
-            Підтвердити графік
-          </button>
+          {result.status !== 'revoked' && (
+            <button onClick={() => onRevoke(result.id)} className="flex-1 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors">
+              🚫 Відкликати графік
+            </button>
+          )}
         </footer>
       </div>
     </div>

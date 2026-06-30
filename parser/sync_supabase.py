@@ -2,6 +2,7 @@ import json
 import os
 import requests
 from datetime import datetime
+import pytz
 
 # 1. Налаштування підключення до Supabase (беруться з безпечних секретів GitHub)
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
@@ -33,9 +34,15 @@ def process_schedule():
         return
         
     # Конвертуємо "11.04" у правильний формат бази даних "YYYY-MM-DD"
-    current_year = datetime.now().year
+    kyiv_tz = pytz.timezone('Europe/Kyiv')
+    now_kyiv = datetime.now(kyiv_tz)
+    current_year = now_kyiv.year
+    today_str = now_kyiv.strftime("%d.%m")
     day, month = target_date_str.split('.')
     iso_date = f"{current_year}-{month}-{day}"
+    
+    # Визначаємо чи це графік на завтра
+    is_tomorrow_schedule = (target_date_str != today_str)
 
     events_to_insert = []
     
@@ -73,21 +80,25 @@ def process_schedule():
         # Вставляємо нові події оптом
         res = requests.post(f"{SUPABASE_URL}/rest/v1/schedules_sync", headers=headers, json=events_to_insert)
         
-        # 4. Даємо команду нашому SQL-Мозку перерахувати пуші!
-        requests.post(f"{SUPABASE_URL}/rest/v1/rpc/build_push_queue", headers=headers)
-        print(f"✅ Успіх! Графік на {iso_date} завантажено в БД. Згенеровано пушів для черг.")
+        # 4. Пуші — тільки для графіка на сьогодні (завтрашні пуші тимчасово відкладені)
+        if not is_tomorrow_schedule:
+            requests.post(f"{SUPABASE_URL}/rest/v1/rpc/build_push_queue", headers=headers)
+            print(f"✅ Успіх! Графік на {iso_date} завантажено в БД. Push-сповіщення згенеровано.")
+        else:
+            print(f"✅ Графік на {iso_date} завантажено в БД. ⏸️ Push для завтрашнього графіка — ВІДКЛАДЕНО.")
 
     # 5. Відправляємо дані в Центр Верифікації (parser_results)
     verification_entry = {
         "target_date": target_date_str,
         "raw_data": latest["queues"],
-        "status": "pending",
+        "status": "auto_approved",
+        "received_at": now_kyiv.isoformat(),
         "source_media_url": latest.get("source_url") or latest.get("img_url")
     }
     
     try:
         # Перевіряємо, чи немає вже запису на цю дату, щоб не плодити дублікати в черзі
-        check_res = requests.get(f"{SUPABASE_URL}/rest/v1/parser_results?target_date=eq.{target_date_str}&status=eq.pending", headers=headers)
+        check_res = requests.get(f"{SUPABASE_URL}/rest/v1/parser_results?target_date=eq.{target_date_str}&status=in.(pending,auto_approved)", headers=headers)
         if check_res.status_code == 200 and not check_res.json():
             requests.post(f"{SUPABASE_URL}/rest/v1/parser_results", headers=headers, json=verification_entry)
             print(f"📡 Дані на {target_date_str} відправлено в Центр Верифікації.")

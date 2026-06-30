@@ -90,21 +90,21 @@ export const fetchSystemStats = async () => {
 
 import { supabase } from './supabaseClient';
 
-export const fetchPendingResults = async () => {
+export const fetchScheduleTimeline = async () => {
     const { data, error } = await supabase
         .from('parser_results')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
+        .select('id, target_date, status, received_at, published_at, source_media_url, raw_data, created_at')
+        .order('created_at', { ascending: false })
+        .limit(7);
     
     if (error) throw error;
     return data;
 };
 
-export const approveResult = async (id: number) => {
+export const revokeSchedule = async (id: number) => {
     const { error } = await supabase
         .from('parser_results')
-        .update({ status: 'approved' })
+        .update({ status: 'revoked' })
         .eq('id', id);
     
     if (error) throw error;

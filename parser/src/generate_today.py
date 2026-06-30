@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import logging
+import requests
 from datetime import datetime, timedelta
 
 # Ensure we can import from the same directory
@@ -12,6 +13,29 @@ from config import UNIFIED_DB, DATA_DIR, TODAY_JSON_FILE, TOMORROW_JSON_FILE, DE
 logger = logging.getLogger("SSSK-GenerateToday")
 
 STATUS_FILE = os.path.join(DATA_DIR, "parser_status.json")
+
+def update_published_at(target_date_str):
+    """Оновлює published_at в parser_results при публікації today.json."""
+    supabase_url = os.environ.get("SUPABASE_URL")
+    supabase_key = os.environ.get("SUPABASE_SERVICE_KEY")
+    if not supabase_url or not supabase_key:
+        return
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}",
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+    }
+    now_iso = get_now().isoformat()
+    try:
+        requests.patch(
+            f"{supabase_url}/rest/v1/parser_results?target_date=eq.{target_date_str}&published_at=is.null",
+            headers=headers,
+            json={"published_at": now_iso}
+        )
+        logger.info(f"📌 published_at оновлено для {target_date_str}")
+    except Exception as e:
+        logger.warning(f"Не вдалося оновити published_at: {e}")
 
 # Full list of queues as requested by user
 FULL_QUEUES_LIST = [
@@ -151,6 +175,8 @@ def generate_files():
     
     save_json(TODAY_JSON_FILE, today_data)
     logger.info(f"G1 (Today) saved to {TODAY_JSON_FILE}")
+    if best_today:
+        update_published_at(today_str)
     archive_day(today_data)
 
     # 2. G2: TOMORROW

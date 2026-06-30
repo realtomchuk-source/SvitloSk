@@ -6,6 +6,9 @@ on:
     - cron: '*/15 16-20 * * *'
     # Standard mode: Every 5 hours
     - cron: '0 */5 * * *'
+    # Midnight Kyiv — switch tomorrow→today JSON for PWA
+    - cron: '0 21 * * *'  # 00:00 Kyiv (summer EEST=UTC+3)
+    - cron: '0 22 * * *'  # 00:00 Kyiv (winter EET=UTC+2)
   workflow_dispatch:
     inputs:
       force:
@@ -21,10 +24,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -55,6 +58,9 @@ jobs:
           python history_crawler.py
 
       - name: Generate today/tomorrow JSON for PWA
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           cd parser/src
           python generate_today.py
@@ -84,5 +90,5 @@ jobs:
           git config --global user.name "SSSK-Bot"
           git config --global user.email "bot@svitlo-starkon.com"
           git add parser/data/*.json web/public/data/*.json web/public/data/archive/*.json || true
-          git commit -m "Auto-update schedules [skip ci]" || echo "No changes to commit"
+          git commit -m "Auto-update schedules" || echo "No changes to commit"
           git push
