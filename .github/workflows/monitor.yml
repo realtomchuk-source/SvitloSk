@@ -86,9 +86,24 @@ jobs:
 
       # ===== Commit results =====
       - name: Commit and Push
+        id: commit
         run: |
           git config --global user.name "SSSK-Bot"
           git config --global user.email "bot@svitlo-starkon.com"
           git add parser/data/*.json web/public/data/*.json web/public/data/archive/*.json || true
-          git commit -m "Auto-update schedules" || echo "No changes to commit"
-          git push
+          if git commit -m "Auto-update schedules"; then
+            git push
+            echo "committed=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changes to commit"
+            echo "committed=false" >> $GITHUB_OUTPUT
+          fi
+
+      # ===== Trigger deploy (GITHUB_TOKEN can't trigger on:push, but CAN trigger workflow_dispatch) =====
+      - name: Trigger Deploy
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy.yml --ref main
+          echo "🚀 Deploy triggered!"
