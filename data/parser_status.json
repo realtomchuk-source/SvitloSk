@@ -1,0 +1,13 @@
+{
+  "last_sync": "2026-07-01T15:54:59.420055+03:00",
+  "today": {
+    "date": "01.07",
+    "state": "parser_found",
+    "updated": "01.07.2026 15:54"
+  },
+  "tomorrow": {
+    "date": "02.07",
+    "state": "pending",
+    "updated": "01.07.2026 15:54"
+  }
+}
