@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { triggerParserWorkflow, fetchHealthStatus, fetchParserState, fetchScheduleTimeline, revokeSchedule, logAdminAction, fetchSystemStats, fetchAddressRequests } from '@/services/adminService';
+import { triggerParserWorkflow, fetchHealthStatus, fetchParserState, fetchParserStatus, fetchScheduleTimeline, revokeSchedule, logAdminAction, fetchSystemStats, fetchAddressRequests } from '@/services/adminService';
 import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard, Users, BarChart2, Grid3X3, Megaphone, Terminal,
@@ -42,6 +42,7 @@ export const Admin: React.FC = () => {
 
   const { data: health } = useQuery({ queryKey: ['admin', 'health'], queryFn: fetchHealthStatus });
   const { data: latestEntry } = useQuery({ queryKey: ['admin', 'latest-entry'], queryFn: fetchParserState });
+  const { data: parserStatus } = useQuery({ queryKey: ['admin', 'parser-status'], queryFn: fetchParserStatus });
   const { data: scheduleTimeline, refetch: refetchTimeline } = useQuery({ queryKey: ['admin', 'timeline'], queryFn: fetchScheduleTimeline });
   const { data: stats } = useQuery({ queryKey: ['admin', 'stats'], queryFn: fetchSystemStats, refetchInterval: 60000 });
   const { data: addressRequests } = useQuery({ queryKey: ['admin', 'addressRequests'], queryFn: fetchAddressRequests });
@@ -264,7 +265,7 @@ export const Admin: React.FC = () => {
               {/* Stat Cards */}
               <div className="admin-stats-grid">
                 <StatCard label="Користувачів в БД" value={stats?.totalUsers?.toLocaleString() || '0'} icon={<Users size={24} />} color="blue" />
-                <StatCard label="Поточний графік" value={latestEntry?.target_date || '—'} icon={<BarChart2 size={24} />} color="emerald" badge="Актуальний" />
+                <StatCard label="Поточний графік" value={latestEntry?.date || latestEntry?.target_date || '—'} icon={<BarChart2 size={24} />} color="emerald" badge="Актуальний" />
                 <StatCard 
                   label="Запити адрес" 
                   value={pendingRequestsCount.toString()} 
@@ -348,6 +349,65 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Стан автоматичного парсингу графіків */}
+              {parserStatus && (
+                <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                    <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <Grid3X3 size={16} className="text-blue-500" />
+                      Моніторинг та парсинг графіків (Авто-парсер)
+                    </h3>
+                    <span className="text-[11px] text-gray-400 font-medium">
+                      Останнє сканування: {parserStatus.last_sync ? new Date(parserStatus.last_sync).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) : '—'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Today & Tomorrow status */}
+                    {(['today', 'tomorrow'] as const).map((dayKey) => {
+                      const dayData = parserStatus[dayKey];
+                      if (!dayData) return null;
+
+                      let statusBadge = "bg-gray-100 text-gray-800 border-gray-200";
+                      let statusText = "Очікується";
+                      let statusDesc = "Парсер ще не перевіряв або графік очікує на публікацію.";
+
+                      if (dayData.state === 'parser_found') {
+                        statusBadge = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                        statusText = "Знайдено графік (Зображення)";
+                        statusDesc = "Парсер успішно зчитав зображення графіка з сайту обленерго та опублікував його.";
+                      } else if (dayData.state === 'no_outages_fallback') {
+                        statusBadge = "bg-blue-100 text-blue-800 border-blue-200";
+                        statusText = "Графік відсутній (Світло є)";
+                        statusDesc = "Обленерго не опублікувало обмежень. Система автоматично увімкнула режим без відключень.";
+                      }
+
+                      return (
+                        <div key={dayKey} className="rounded-xl border border-gray-100 bg-gray-50/50 p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                              {dayKey === 'today' ? 'Сьогодні' : 'Завтра'} ({dayData.date})
+                            </span>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadge}`}>
+                              {statusText}
+                            </span>
+                          </div>
+                          
+                          <p className="text-xs text-gray-600 leading-relaxed font-medium">
+                            {statusDesc}
+                          </p>
+
+                          <div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-semibold uppercase">
+                            <Clock size={11} />
+                            <span>Оновлено: {dayData.updated || '—'}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Schedule Timeline */}
               {scheduleTimeline && scheduleTimeline.length > 0 && (() => {

@@ -34,11 +34,15 @@ export const fetchHealthStatus = async () => {
 };
 
 export const fetchParserState = async () => {
-    // Note: In development, this might be in web/public/data or relative to parser
-    const response = await fetch(`${import.meta.env.BASE_URL}data/unified_schedules.json?t=${Date.now()}`);
+    const response = await fetch(`${import.meta.env.BASE_URL}data/today.json?t=${Date.now()}`);
     if (!response.ok) throw new Error('Parser state not found');
-    const history = await response.json();
-    return history[history.length - 1];
+    return response.json();
+};
+
+export const fetchParserStatus = async () => {
+    const response = await fetch(`${import.meta.env.BASE_URL}data/parser_status.json?t=${Date.now()}`);
+    if (!response.ok) throw new Error('Parser status not found');
+    return response.json();
 };
 
 export const fetchSystemStats = async () => {

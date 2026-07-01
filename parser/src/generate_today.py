@@ -8,11 +8,11 @@ from datetime import datetime, timedelta
 # Ensure we can import from the same directory
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from modules.utils import load_json, save_json, get_now
-from config import UNIFIED_DB, DATA_DIR, TODAY_JSON_FILE, TOMORROW_JSON_FILE, DEADLINE_HOUR, DEADLINE_MINUTE
+from config import UNIFIED_DB, DATA_DIR, TODAY_JSON_FILE, TOMORROW_JSON_FILE, DEADLINE_HOUR, DEADLINE_MINUTE, HEALTH_FILE
 
 logger = logging.getLogger("SSSK-GenerateToday")
 
-STATUS_FILE = os.path.join(DATA_DIR, "parser_status.json")
+STATUS_FILE = os.path.join(os.path.dirname(TODAY_JSON_FILE), "parser_status.json")
 
 def update_published_at(target_date_str):
     """Оновлює published_at в parser_results при публікації today.json."""
@@ -252,6 +252,15 @@ def write_status(status, today, tomorrow):
         }
     }
     save_json(STATUS_FILE, status_data)
+
+    health_data = {
+        "timestamp": now.isoformat(),
+        "status": status,
+        "mode": today.get("mode", "schedule").upper(),
+        "message": f"Парсер успішно відпрацював о {now.strftime('%H:%M')}",
+        "version": "2.1-Adaptive"
+    }
+    save_json(HEALTH_FILE, health_data)
 
 def generate_today_json():
     """Legacy entry point used by parse_schedule.py"""

@@ -205,6 +205,31 @@ def process_image_and_text(img_bytes, source_used, raw_path, state, html_content
     }
 
     save_to_sqlite(entry)
+    
+    # Write to unified_schedules.json (PWA pipeline compatibility)
+    try:
+        db = load_json(UNIFIED_DB, default=[])
+        new_json_entry = {
+            "timestamp": get_now().isoformat(),
+            "target_date": structured.get("date"),
+            "source": source_used,
+            "type": "schedule",
+            "processed": True,
+            "raw_path": raw_path,
+            "queues": structured.get("queues", {}),
+            "queues_raw": structured.get("queues", {}).copy(),
+            "announcements": [],
+            "mode": structured.get("mode"),
+            "date": structured.get("date"),
+            "date_full": structured.get("date_full"),
+            "message": structured.get("message")
+        }
+        db.append(new_json_entry)
+        save_json(UNIFIED_DB, db)
+        logger.info(f"SUCCESS: Exported schedule for {structured.get('date')} to unified_schedules.json")
+    except Exception as e:
+        logger.error(f"Failed to export to unified_schedules.json: {e}")
+
     logger.info(f"SUCCESS: Processed {source_used} schedule. Status: {status}")
     return True
 
