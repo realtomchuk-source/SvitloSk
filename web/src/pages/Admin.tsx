@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { triggerParserWorkflow, fetchHealthStatus, fetchParserState, fetchParserStatus, fetchScheduleTimeline, revokeSchedule, logAdminAction, fetchSystemStats, fetchAddressRequests } from '@/services/adminService';
+import { triggerParserWorkflow, fetchHealthStatus, fetchParserStatus, fetchScheduleTimeline, revokeSchedule, logAdminAction, fetchSystemStats, fetchAddressRequests } from '@/services/adminService';
 import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard, Users, BarChart2, Grid3X3, Megaphone, Terminal,
@@ -41,11 +41,19 @@ export const Admin: React.FC = () => {
   const [showTokenInput, setShowTokenInput] = useState(false);
 
   const { data: health } = useQuery({ queryKey: ['admin', 'health'], queryFn: fetchHealthStatus });
-  const { data: latestEntry } = useQuery({ queryKey: ['admin', 'latest-entry'], queryFn: fetchParserState });
   const { data: parserStatus } = useQuery({ queryKey: ['admin', 'parser-status'], queryFn: fetchParserStatus });
   const { data: scheduleTimeline, refetch: refetchTimeline } = useQuery({ queryKey: ['admin', 'timeline'], queryFn: fetchScheduleTimeline });
   const { data: stats } = useQuery({ queryKey: ['admin', 'stats'], queryFn: fetchSystemStats, refetchInterval: 60000 });
   const { data: addressRequests } = useQuery({ queryKey: ['admin', 'addressRequests'], queryFn: fetchAddressRequests });
+
+  const fmtTime = (iso: string | null | undefined) => {
+    if (!iso) return '';
+    return new Date(iso).toLocaleString('uk-UA', {
+      timeZone: 'Europe/Kyiv',
+      day: '2-digit', month: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+  };
 
   const pendingRequestsCount = useMemo(() => {
     if (!addressRequests) return 0;
@@ -265,7 +273,22 @@ export const Admin: React.FC = () => {
               {/* Stat Cards */}
               <div className="admin-stats-grid">
                 <StatCard label="Користувачів в БД" value={stats?.totalUsers?.toLocaleString() || '0'} icon={<Users size={24} />} color="blue" />
-                <StatCard label="Поточний графік" value={latestEntry?.date || latestEntry?.target_date || '—'} icon={<BarChart2 size={24} />} color="emerald" badge="Актуальний" />
+                <StatCard 
+                  label="Графік на сьогодні" 
+                  value={parserStatus?.today?.date || '—'} 
+                  icon={<BarChart2 size={24} />} 
+                  color={parserStatus?.today?.state === 'parser_found' ? 'emerald' : parserStatus?.today?.state === 'no_outages_fallback' ? 'blue' : 'amber'} 
+                  badge={parserStatus?.today?.state === 'parser_found' ? 'Зображення' : parserStatus?.today?.state === 'no_outages_fallback' ? 'Світло є' : 'Очікується'}
+                  subtext={parserStatus?.today?.captured_at ? `Знайдено: ${fmtTime(parserStatus.today.captured_at)}` : (parserStatus?.today?.state === 'no_outages_fallback' ? 'Авто-заглушка' : 'Не зафіксовано')}
+                />
+                <StatCard 
+                  label="Графік на завтра" 
+                  value={parserStatus?.tomorrow?.date || '—'} 
+                  icon={<Grid3X3 size={24} />} 
+                  color={parserStatus?.tomorrow?.state === 'parser_found' ? 'emerald' : parserStatus?.tomorrow?.state === 'no_outages_fallback' ? 'blue' : 'amber'} 
+                  badge={parserStatus?.tomorrow?.state === 'parser_found' ? 'Зображення' : parserStatus?.tomorrow?.state === 'no_outages_fallback' ? 'Світло є' : 'Очікується'}
+                  subtext={parserStatus?.tomorrow?.captured_at ? `Знайдено: ${fmtTime(parserStatus.tomorrow.captured_at)}` : (parserStatus?.tomorrow?.state === 'no_outages_fallback' ? 'Авто-заглушка' : 'Не зафіксовано')}
+                />
                 <StatCard 
                   label="Запити адрес" 
                   value={pendingRequestsCount.toString()} 
@@ -273,13 +296,6 @@ export const Admin: React.FC = () => {
                   color="purple" 
                   badge={pendingRequestsCount > 0 ? "Очікують" : "Оброблені"}
                   highlight={pendingRequestsCount > 0}
-                />
-                <StatCard
-                  label="Останній графік"
-                  value={scheduleTimeline?.[0]?.target_date || '—'}
-                  icon={<Grid3X3 size={24} />}
-                  color="emerald"
-                  badge="Авто ✓"
                 />
               </div>
 
@@ -514,7 +530,7 @@ export const Admin: React.FC = () => {
 
 // ─── Sub-components ─────────────────────────────────────────
 
-const StatCard = ({ label, value, icon, color, highlight, badge }: any) => {
+const StatCard = ({ label, value, icon, color, highlight, badge, subtext }: any) => {
   const colorMap: Record<string, string> = {
     blue: 'text-blue-600 bg-blue-50',
     emerald: 'text-emerald-600 bg-emerald-50',
@@ -526,7 +542,7 @@ const StatCard = ({ label, value, icon, color, highlight, badge }: any) => {
       highlight && "border-amber-300 bg-amber-50/30"
     )}>
       <div className="flex items-center justify-between w-full">
-        <div className="space-y-1 text-left">
+        <div className="space-y-1 text-left w-full">
           <p className="text-sm font-semibold text-gray-500">{label}</p>
           <div className="flex items-baseline gap-2">
             <p className="text-3xl font-extrabold text-gray-900 tracking-tight">{value}</p>
@@ -535,17 +551,20 @@ const StatCard = ({ label, value, icon, color, highlight, badge }: any) => {
                 "px-2 py-0.5 text-[9px] font-bold rounded-md border flex items-center gap-1 shrink-0 select-none",
                 highlight 
                   ? "bg-amber-50 text-amber-700 border-amber-200" 
-                  : label === "Поточний графік" || badge === "Підтверджено"
+                  : label.includes("графік") || badge === "Підтверджено" || badge === "Зображення" || badge === "Актуальний"
                     ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                     : "bg-gray-50 text-gray-600 border-gray-200"
               )}>
                 <span className={clsx("w-1 h-1 rounded-full", 
-                  highlight ? "bg-amber-500" : label === "Поточний графік" || badge === "Підтверджено" ? "bg-emerald-500" : "bg-gray-400"
+                  highlight ? "bg-amber-500" : label.includes("графік") || badge === "Підтверджено" || badge === "Зображення" || badge === "Актуальний" ? "bg-emerald-500" : "bg-gray-400"
                 )} />
                 {badge}
               </span>
             )}
           </div>
+          {subtext && (
+            <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mt-1">{subtext}</p>
+          )}
         </div>
         <div className={clsx("p-3.5 rounded-xl shrink-0 shadow-sm", colorMap[color])}>{icon}</div>
       </div>

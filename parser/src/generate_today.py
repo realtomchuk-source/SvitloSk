@@ -144,7 +144,6 @@ def generate_files():
         if entry.get("processed") and entry.get("target_date") == today_str:
             best_today = entry
             break
-            
     if best_today:
         today_data = {
             "date": today_str,
@@ -155,7 +154,8 @@ def generate_files():
             "meta": {
                 "generated_at": now.strftime("%d.%m.%Y %H:%M"),
                 "state": "parser_found",
-                "target_date": today_str
+                "target_date": today_str,
+                "captured_at": best_today.get("timestamp")
             }
         }
     else:
@@ -185,7 +185,6 @@ def generate_files():
         if entry.get("processed") and entry.get("target_date") == tomorrow_str:
             best_tomorrow = entry
             break
-            
     if best_tomorrow:
         tomorrow_data = {
             "date": tomorrow_str,
@@ -196,7 +195,8 @@ def generate_files():
             "meta": {
                 "generated_at": now.strftime("%d.%m.%Y %H:%M"),
                 "state": "parser_found",
-                "target_date": tomorrow_str
+                "target_date": tomorrow_str,
+                "captured_at": best_tomorrow.get("timestamp")
             }
         }
     else:
@@ -243,12 +243,14 @@ def write_status(status, today, tomorrow):
         "today": {
             "date": today.get("date"),
             "state": today.get("meta", {}).get("state"),
-            "updated": today.get("meta", {}).get("generated_at")
+            "updated": today.get("meta", {}).get("generated_at"),
+            "captured_at": today.get("meta", {}).get("captured_at")
         },
         "tomorrow": {
             "date": tomorrow.get("date"),
             "state": tomorrow.get("meta", {}).get("state"),
-            "updated": tomorrow.get("meta", {}).get("generated_at")
+            "updated": tomorrow.get("meta", {}).get("generated_at"),
+            "captured_at": tomorrow.get("meta", {}).get("captured_at")
         }
     }
     save_json(STATUS_FILE, status_data)
