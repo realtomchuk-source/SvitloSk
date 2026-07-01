@@ -39,6 +39,12 @@ export const fetchParserState = async () => {
     return response.json();
 };
 
+export const fetchTomorrowState = async () => {
+    const response = await fetch(`${import.meta.env.BASE_URL}data/tomorrow.json?t=${Date.now()}`);
+    if (!response.ok) throw new Error('Tomorrow state not found');
+    return response.json();
+};
+
 export const fetchParserStatus = async () => {
     const response = await fetch(`${import.meta.env.BASE_URL}data/parser_status.json?t=${Date.now()}`);
     if (!response.ok) throw new Error('Parser status not found');

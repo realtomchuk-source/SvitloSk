@@ -155,7 +155,8 @@ def generate_files():
                 "generated_at": now.strftime("%d.%m.%Y %H:%M"),
                 "state": "parser_found",
                 "target_date": today_str,
-                "captured_at": best_today.get("timestamp")
+                "captured_at": best_today.get("timestamp"),
+                "source_media_url": best_today.get("source_url") or best_today.get("img_url")
             }
         }
     else:
@@ -196,7 +197,8 @@ def generate_files():
                 "generated_at": now.strftime("%d.%m.%Y %H:%M"),
                 "state": "parser_found",
                 "target_date": tomorrow_str,
-                "captured_at": best_tomorrow.get("timestamp")
+                "captured_at": best_tomorrow.get("timestamp"),
+                "source_media_url": best_tomorrow.get("source_url") or best_tomorrow.get("img_url")
             }
         }
     else:
@@ -244,13 +246,15 @@ def write_status(status, today, tomorrow):
             "date": today.get("date"),
             "state": today.get("meta", {}).get("state"),
             "updated": today.get("meta", {}).get("generated_at"),
-            "captured_at": today.get("meta", {}).get("captured_at")
+            "captured_at": today.get("meta", {}).get("captured_at"),
+            "source_media_url": today.get("meta", {}).get("source_media_url")
         },
         "tomorrow": {
             "date": tomorrow.get("date"),
             "state": tomorrow.get("meta", {}).get("state"),
             "updated": tomorrow.get("meta", {}).get("generated_at"),
-            "captured_at": tomorrow.get("meta", {}).get("captured_at")
+            "captured_at": tomorrow.get("meta", {}).get("captured_at"),
+            "source_media_url": tomorrow.get("meta", {}).get("source_media_url")
         }
     }
     save_json(STATUS_FILE, status_data)

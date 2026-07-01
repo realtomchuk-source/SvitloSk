@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { triggerParserWorkflow, fetchHealthStatus, fetchParserStatus, fetchScheduleTimeline, revokeSchedule, logAdminAction, fetchSystemStats, fetchAddressRequests } from '@/services/adminService';
+import { triggerParserWorkflow, fetchHealthStatus, fetchParserState, fetchTomorrowState, fetchParserStatus, revokeSchedule, logAdminAction, fetchSystemStats, fetchAddressRequests } from '@/services/adminService';
 import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard, Users, BarChart2, Grid3X3, Megaphone, Terminal,
-  Play, CheckCircle, RotateCcw, AlertCircle, Clock, Ban,
+  Play, RotateCcw, AlertCircle, Clock,
   Shield, Key, ExternalLink, MapPin, LogOut, ArrowUpRight
 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -41,8 +41,9 @@ export const Admin: React.FC = () => {
   const [showTokenInput, setShowTokenInput] = useState(false);
 
   const { data: health } = useQuery({ queryKey: ['admin', 'health'], queryFn: fetchHealthStatus });
-  const { data: parserStatus } = useQuery({ queryKey: ['admin', 'parser-status'], queryFn: fetchParserStatus });
-  const { data: scheduleTimeline, refetch: refetchTimeline } = useQuery({ queryKey: ['admin', 'timeline'], queryFn: fetchScheduleTimeline });
+  const { data: todayState, refetch: refetchToday } = useQuery({ queryKey: ['admin', 'today-state'], queryFn: fetchParserState });
+  const { data: tomorrowState, refetch: refetchTomorrow } = useQuery({ queryKey: ['admin', 'tomorrow-state'], queryFn: fetchTomorrowState });
+  const { data: parserStatus, refetch: refetchStatus } = useQuery({ queryKey: ['admin', 'parser-status'], queryFn: fetchParserStatus });
   const { data: stats } = useQuery({ queryKey: ['admin', 'stats'], queryFn: fetchSystemStats, refetchInterval: 60000 });
   const { data: addressRequests } = useQuery({ queryKey: ['admin', 'addressRequests'], queryFn: fetchAddressRequests });
 
@@ -102,7 +103,9 @@ export const Admin: React.FC = () => {
       alert('Графік відкликано.');
       await logAdminAction('REVOKE_SCHEDULE', id.toString());
       setSelectedReview(null);
-      refetchTimeline();
+      refetchToday();
+      refetchTomorrow();
+      refetchStatus();
     } catch (err: any) {
       alert(`Помилка відкликання: ${err.message}`);
     }
@@ -385,6 +388,9 @@ export const Admin: React.FC = () => {
                       const dayData = parserStatus[dayKey];
                       if (!dayData) return null;
 
+                      const dayStateObj = dayKey === 'today' ? todayState : tomorrowState;
+                      const hasData = !!dayStateObj;
+
                       let statusBadge = "bg-gray-100 text-gray-800 border-gray-200";
                       let statusText = "Очікується";
                       let statusDesc = "Парсер ще не перевіряв або графік очікує на публікацію.";
@@ -400,23 +406,44 @@ export const Admin: React.FC = () => {
                       }
 
                       return (
-                        <div key={dayKey} className="rounded-xl border border-gray-100 bg-gray-50/50 p-4 space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                              {dayKey === 'today' ? 'Сьогодні' : 'Завтра'} ({dayData.date})
-                            </span>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadge}`}>
-                              {statusText}
-                            </span>
+                        <div key={dayKey} className="rounded-xl border border-gray-100 bg-gray-50/50 p-4 space-y-4 flex flex-col justify-between">
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                {dayKey === 'today' ? 'Сьогодні' : 'Завтра'} ({dayData.date})
+                              </span>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadge}`}>
+                                {statusText}
+                              </span>
+                            </div>
+                            
+                            <p className="text-xs text-gray-600 leading-relaxed font-medium">
+                              {statusDesc}
+                            </p>
                           </div>
-                          
-                          <p className="text-xs text-gray-600 leading-relaxed font-medium">
-                            {statusDesc}
-                          </p>
 
-                          <div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-semibold uppercase">
-                            <Clock size={11} />
-                            <span>Оновлено: {dayData.updated || '—'}</span>
+                          <div className="flex items-center justify-between pt-2 border-t border-gray-100/50">
+                            <div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-semibold uppercase">
+                              <Clock size={11} />
+                              <span>Оновлено: {dayData.updated || '—'}</span>
+                            </div>
+                            {hasData && (
+                              <button
+                                onClick={() => {
+                                  setSelectedReview({
+                                    id: dayKey === 'today' ? 'Сьогодні' : 'Завтра',
+                                    target_date: dayData.date,
+                                    created_at: dayData.captured_at,
+                                    source_media_url: dayData.source_media_url,
+                                    raw_data: dayStateObj?.queues || {}
+                                  });
+                                }}
+                                className="px-2.5 py-1 bg-white hover:bg-gray-100 text-gray-700 hover:text-gray-900 border border-gray-200 hover:border-gray-300 font-bold rounded-lg text-[10px] transition-all cursor-pointer flex items-center gap-1"
+                              >
+                                <ExternalLink size={10} />
+                                Переглянути
+                              </button>
+                            )}
                           </div>
                         </div>
                       );
@@ -424,84 +451,6 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
               )}
-
-              {/* Schedule Timeline */}
-              {scheduleTimeline && scheduleTimeline.length > 0 && (() => {
-                const latest = scheduleTimeline[0];
-                const fmtKyiv = (iso: string | null) => {
-                  if (!iso) return '—';
-                  return new Date(iso).toLocaleString('uk-UA', {
-                    timeZone: 'Europe/Kyiv',
-                    day: '2-digit', month: '2-digit',
-                    hour: '2-digit', minute: '2-digit'
-                  });
-                };
-                const isRevoked = latest.status === 'revoked';
-                return (
-                  <div className={clsx(
-                    "rounded-xl border p-5 space-y-4",
-                    isRevoked
-                      ? "bg-red-50/50 border-red-200"
-                      : "bg-emerald-50/50 border-emerald-200"
-                  )}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className={clsx(
-                          "w-8 h-8 rounded-lg flex items-center justify-center",
-                          isRevoked ? "bg-red-100" : "bg-emerald-100"
-                        )}>
-                          {isRevoked
-                            ? <Ban size={16} className="text-red-600" />
-                            : <CheckCircle size={16} className="text-emerald-600" />
-                          }
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold text-gray-800">Графік на {latest.target_date}</h3>
-                          <span className={clsx(
-                            "text-xs font-semibold",
-                            isRevoked ? "text-red-600" : "text-emerald-600"
-                          )}>
-                            {isRevoked ? 'Відкликано' : 'Активний'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setSelectedReview(latest)}
-                          className="px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-white transition-colors"
-                        >
-                          👁 Переглянути
-                        </button>
-                        {!isRevoked && (
-                          <button
-                            onClick={() => handleRevoke(latest.id)}
-                            className="px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-                          >
-                            Відкликати
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2.5 bg-white/80 rounded-lg px-3.5 py-2.5 border border-gray-100">
-                        <Clock size={14} className="text-blue-500 shrink-0" />
-                        <div>
-                          <p className="text-[10px] text-gray-400 font-semibold uppercase">Отримано системою</p>
-                          <p className="text-sm font-bold text-gray-800">{fmtKyiv(latest.received_at)}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2.5 bg-white/80 rounded-lg px-3.5 py-2.5 border border-gray-100">
-                        <CheckCircle size={14} className="text-emerald-500 shrink-0" />
-                        <div>
-                          <p className="text-[10px] text-gray-400 font-semibold uppercase">Опубліковано в PWA</p>
-                          <p className="text-sm font-bold text-gray-800">{fmtKyiv(latest.published_at) || 'Очікує'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
           )}
 
@@ -651,7 +600,7 @@ const VerificationPanel = ({ result, onClose, onRevoke, GROUPS }: any) => {
           <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
             Закрити
           </button>
-          {result.status !== 'revoked' && (
+          {typeof result.id === 'number' && result.status !== 'revoked' && (
             <button onClick={() => onRevoke(result.id)} className="flex-1 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors">
               🚫 Відкликати графік
             </button>

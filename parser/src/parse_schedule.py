@@ -216,6 +216,7 @@ def process_image_and_text(img_bytes, source_used, raw_path, state, html_content
             "type": "schedule",
             "processed": True,
             "raw_path": raw_path,
+            "source_url": state.get("last_img_url") if state else None,
             "queues": structured.get("queues", {}),
             "queues_raw": structured.get("queues", {}).copy(),
             "announcements": [],

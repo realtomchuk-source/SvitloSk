@@ -1,6 +1,6 @@
 {
   "date": "01.07",
-  "updated_at": "2026-07-01T16:07:45.382303+03:00",
+  "updated_at": "2026-07-01T16:39:40.214541+03:00",
   "mode": "schedule",
   "message": "Графік погодинних відключень на 01.07.2026",
   "queues": {
@@ -18,9 +18,10 @@
     "6.2": "111111111111111111111111"
   },
   "meta": {
-    "generated_at": "01.07.2026 16:07",
+    "generated_at": "01.07.2026 16:39",
     "state": "parser_found",
     "target_date": "01.07",
-    "captured_at": "2026-07-01T15:53:55.460948+03:00"
+    "captured_at": "2026-07-01T15:53:55.460948+03:00",
+    "source_media_url": "https://hoe.com.ua/Content/Uploads/2026/06/file20260630194428959.png"
   }
 }
