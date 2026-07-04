@@ -24,7 +24,7 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
       background: 'transparent',
       border: 'none',
       padding: '0', /* Removed padding to align date/clock with HeroCard edges */
-      margin: '2px 20px 8px 20px',
+      margin: '2px 34px 8px 34px', /* Changed margins from 20px to 34px to align with mini-graph content */
       transition: 'all 0.3s ease',
       fontFamily: 'var(--sans)' /* Uses the exact same font as the news feed */
     }}>
