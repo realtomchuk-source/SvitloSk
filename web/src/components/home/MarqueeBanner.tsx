@@ -319,20 +319,20 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
         left: 0,
         top: 0,
         bottom: 0,
-        width: '32px',
-        background: 'linear-gradient(to right, var(--bg) 0%, rgba(248, 250, 252, 0) 100%)',
+        width: '40px', /* Increased width for a smoother transition */
+        background: 'linear-gradient(to right, #f8fafc 0%, rgba(248, 250, 252, 0) 100%)',
         pointerEvents: 'none',
-        zIndex: 2,
+        zIndex: 10, /* Raised z-index to force overlays on top of the scrolling stack */
       }} />
       <div style={{
         position: 'absolute',
         right: 0,
         top: 0,
         bottom: 0,
-        width: '32px',
-        background: 'linear-gradient(to left, var(--bg) 0%, rgba(248, 250, 252, 0) 100%)',
+        width: '40px', /* Increased width for a smoother transition */
+        background: 'linear-gradient(to left, #f8fafc 0%, rgba(248, 250, 252, 0) 100%)',
         pointerEvents: 'none',
-        zIndex: 2,
+        zIndex: 10, /* Raised z-index to force overlays on top of the scrolling stack */
       }} />
 
       <div
