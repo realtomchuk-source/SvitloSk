@@ -1,16 +1,16 @@
 {
-  "last_sync": "2026-07-01T16:39:40.218019+03:00",
+  "last_sync": "2026-07-04T21:17:00.639954+03:00",
   "today": {
-    "date": "01.07",
-    "state": "parser_found",
-    "updated": "01.07.2026 16:39",
-    "captured_at": "2026-07-01T15:53:55.460948+03:00",
-    "source_media_url": "https://hoe.com.ua/Content/Uploads/2026/06/file20260630194428959.png"
+    "date": "04.07",
+    "state": "no_outages_fallback",
+    "updated": "04.07.2026 21:17",
+    "captured_at": null,
+    "source_media_url": null
   },
   "tomorrow": {
-    "date": "02.07",
+    "date": "05.07",
     "state": "pending",
-    "updated": "01.07.2026 16:39",
+    "updated": "04.07.2026 21:17",
     "captured_at": null,
     "source_media_url": null
   }
