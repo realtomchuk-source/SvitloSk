@@ -302,29 +302,25 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
     <div 
       className={isLoading ? "animate-pulse" : ""}
       style={{
-        background: 'rgba(255, 255, 255, 0.85)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderRadius: '16px',
-        margin: '0 20px',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
-        border: isOn ? '1px solid var(--color-orange-glow-20)' : '1.2px solid rgba(142, 142, 147, 0.3)',
+        background: 'transparent',
+        border: 'none',
         overflow: 'hidden',
-        height: '54px',
+        height: '36px',
         boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'center',
         position: 'relative',
+        margin: '8px 20px 2px 20px',
       }}
     >
-      {/* Edge Fade Masks */}
+      {/* Edge Fade Masks (Seamless blend with page background) */}
       <div style={{
         position: 'absolute',
         left: 0,
         top: 0,
         bottom: 0,
         width: '32px',
-        background: 'linear-gradient(to right, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 100%)',
+        background: 'linear-gradient(to right, var(--bg) 0%, rgba(248, 250, 252, 0) 100%)',
         pointerEvents: 'none',
         zIndex: 2,
       }} />
@@ -334,7 +330,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
         top: 0,
         bottom: 0,
         width: '32px',
-        background: 'linear-gradient(to left, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 100%)',
+        background: 'linear-gradient(to left, var(--bg) 0%, rgba(248, 250, 252, 0) 100%)',
         pointerEvents: 'none',
         zIndex: 2,
       }} />
