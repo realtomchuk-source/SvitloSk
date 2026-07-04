@@ -342,7 +342,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
-          padding: '0 24px',
+          padding: '0', /* Removed padding so text fades out smoothly under 32px masks */
           height: '100%',
           display: 'flex',
           alignItems: 'center',
