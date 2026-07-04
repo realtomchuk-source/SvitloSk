@@ -6,6 +6,7 @@ import { HeroCard } from '@/components/home/HeroCard';
 import { DashboardBar } from '@/components/home/DashboardBar';
 import { SubqueueSelector } from '@/components/home/SubqueueSelector';
 import { InteractiveTimeline } from '@/components/home/InteractiveTimeline';
+import { AlternativeTimeline } from '@/components/home/AlternativeTimeline';
 import { MarqueeBanner } from '@/components/home/MarqueeBanner';
 import { usePWA } from '@/hooks/usePWA';
 import { PWAInstallSheet } from '@/pages/Cabinet/components/PWAInstallSheet';
@@ -200,6 +201,14 @@ export const Home: React.FC = () => {
         />
 
         <SubqueueSelector />
+
+        <AlternativeTimeline 
+          queuesStr={currentQueuesStr} 
+          activeSlot={activeSlot}
+          currentRealSlot={currentRealSlot}
+          onScrub={setScrubPercent}
+          pointerPercent={pointerPercent}
+        />
       </section>
 
       <PWAInstallSheet 

@@ -29,7 +29,8 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
       margin: '0 20px',
       boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
       border: '1px solid rgba(238, 114, 33, 0.15)',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      fontFamily: 'var(--sans)' /* Uses the exact same font as the news feed */
     }}>
       {/* Date Segment */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
@@ -38,7 +39,7 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
       </div>
 
       {/* Clock Segment */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
         <span style={{ 
           fontSize: '16px', 
           fontWeight: 800, 

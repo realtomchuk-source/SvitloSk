@@ -61,3 +61,331 @@
 
 /* REMOVE LEGACY INDICATORS */
 .btn-legend-call { display: none !important; }
+
+/* ==========================================================================
+   ALTERNATIVE TIMELINE (PREMIUM GRAPH & SLIDER)
+   ========================================================================== */
+
+.alt-timeline-container {
+  margin: 15px 0 25px !important;
+  padding: 0 20px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  user-select: none !important;
+}
+
+/* 6-Hour Time Scale Grid */
+.alt-time-scale {
+  position: relative !important;
+  height: 20px !important;
+  width: 100% !important;
+  margin-bottom: 2px !important;
+}
+
+.alt-scale-tick-label {
+  position: absolute !important;
+  transform: translateX(-50%) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #374151 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+/* Edge alignment overrides */
+.alt-scale-tick-label.tick-start {
+  transform: none !important;
+  left: 0 !important;
+  align-items: flex-start !important;
+}
+
+.alt-scale-tick-label.tick-end {
+  transform: none !important;
+  left: auto !important;
+  right: 0 !important;
+  align-items: flex-end !important;
+}
+
+/* Vertical Ruler Tick Marks */
+.alt-scale-ticks-container {
+  position: relative !important;
+  width: 100% !important;
+  height: 10px !important;
+  margin-bottom: 8px !important;
+  margin-top: -2px !important; /* Pull closer to the scale numbers above */
+}
+
+.alt-ruler-tick {
+  position: absolute !important;
+  top: 0 !important; /* Aligned to the top, pointing downwards */
+  width: 1.2px !important;
+  background: #C2C5CA !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Ticks dimensions */
+.alt-ruler-tick.major-tick {
+  height: 9px !important;
+  background: #374151 !important;
+}
+
+.alt-ruler-tick.medium-tick {
+  height: 6px !important;
+  background: #8E8E93 !important;
+}
+
+.alt-ruler-tick.minor-tick {
+  height: 3px !important;
+  background: rgba(194, 197, 202, 0.4) !important;
+}
+
+/* Helper wrapper to sync vertical line position with grid content area */
+.alt-pointer-wrapper {
+  position: absolute !important;
+  left: 20px !important;
+  right: 20px !important;
+  top: 0px !important;
+  height: calc(100% - 58px) !important; /* Stops at the bottom of the capsule grid */
+  pointer-events: none !important;
+  z-index: 100 !important;
+  overflow: visible !important;
+}
+
+/* Vertical neon pointer line (floating over everything) */
+.alt-neon-pointer-line {
+  position: absolute !important;
+  width: 1.5px !important;
+  background: #EE7221 !important;
+  top: 10px !important; /* Starts higher, almost touching the numbers */
+  height: 57px !important; /* Adjusted to end 3px above the grid (10 + 57 = 67px; grid starts at 70px) */
+  pointer-events: none !important;
+  z-index: 100 !important;
+  box-shadow: 0 0 5px rgba(238, 114, 33, 0.4) !important;
+  transform: translateX(-50%) !important;
+  transition: left 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+/* Bottom Pointer Line Continuation (without dot) */
+.alt-neon-pointer-line-bottom {
+  position: absolute !important;
+  width: 1.5px !important;
+  background: #EE7221 !important;
+  top: -39px !important; /* Extended higher to start 3px below the grid bottom */
+  height: 39px !important; /* Reaches down to the slider wrapper */
+  pointer-events: none !important;
+  z-index: 100 !important;
+  box-shadow: 0 0 5px rgba(238, 114, 33, 0.4) !important;
+  transform: translateX(-50%) !important;
+  transition: left 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+/* Dynamic Breakout Switch Labels Container */
+.alt-breakouts-top {
+  position: relative !important;
+  width: 100% !important;
+  height: 28px !important; /* Increased height for ticks and capsules spacing */
+  margin-bottom: 4px !important;
+}
+
+.alt-breakouts-bottom {
+  position: relative !important;
+  width: 100% !important;
+  height: 28px !important; /* Increased height for ticks and capsules spacing */
+  margin-top: 4px !important;
+}
+
+/* Breakout item container (holds badge + tick line) */
+.alt-breakout-item {
+  position: absolute !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  pointer-events: none !important;
+}
+
+.alt-breakout-item.on-item {
+  bottom: -1px !important; /* Adjusted by -1px to compensate for the 4px margin, creating a pixel-perfect 3px gap to match the vertical line */
+  justify-content: flex-end !important;
+}
+
+.alt-breakout-item.off-item {
+  top: -1px !important; /* Adjusted by -1px to compensate for the 4px margin, creating a pixel-perfect 3px gap to match the vertical line */
+  justify-content: flex-start !important;
+}
+
+/* Connecting Tick lines (виноски) */
+.alt-breakout-tick {
+  width: 1px !important;
+  height: 8px !important;
+}
+
+.alt-breakout-tick.on-tick {
+  background: #EE7221 !important;
+}
+
+.alt-breakout-tick.off-tick {
+  background: #374151 !important;
+}
+
+/* Option A: Capsule with soft tint and border */
+.alt-breakout-badge {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important; /* Mathematically balanced border radius for sharp-corner environments */
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+
+.alt-breakout-badge.on-badge {
+  color: #EE7221 !important;
+  background: rgba(238, 114, 33, 0.05) !important; /* Slightly lighter soft tint */
+  border: 1px solid #EE7221 !important; /* Solid matching orange border */
+}
+
+.alt-breakout-badge.off-badge {
+  color: #374151 !important;
+  background: rgba(55, 65, 81, 0.04) !important; /* Slightly lighter soft tint */
+  border: 1px solid #374151 !important; /* Solid matching gray border */
+}
+
+/* 24-Hour Grid and Capsule styling */
+.alt-timeline-grid-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  background: transparent !important; /* Removed gray solid background */
+  border-radius: 0 !important;
+  border: none !important; /* Removed outer gray border completely */
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+.alt-timeline-grid {
+  display: flex !important;
+  width: 100% !important;
+  height: 100% !important;
+  gap: 1.5px !important; /* Clean thin gap between squares instead of borders */
+}
+
+.alt-timeline-hour {
+  flex: 1 !important;
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+}
+
+.alt-timeline-hour:not(:last-child) {
+  border-right: none !important; /* Removed internal border dividers */
+}
+
+.alt-capsule {
+  flex: 1 !important;
+  height: 100% !important;
+  transition: background 0.3s ease !important;
+}
+
+/* Color states */
+.alt-capsule.status-on {
+  background: #EE7221 !important;
+}
+
+.alt-capsule.status-off {
+  background: #374151 !important;
+}
+
+/* Past dimmed state */
+.alt-capsule.is-past.status-on {
+  background: rgba(238, 114, 33, 0.50) !important; /* Increased from 0.25 for higher saturation */
+}
+
+.alt-capsule.is-past.status-off {
+  background: rgba(55, 65, 81, 0.35) !important; /* Increased from 0.12 for higher saturation */
+}
+
+/* Selected Virtual Time Indicator Highlight in grid */
+.alt-capsule.is-active-virtual {
+  filter: brightness(1.15) saturate(1.05) !important;
+}
+
+/* Slider (Range) container & input */
+.alt-slider-wrapper {
+  margin-top: 10px !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  z-index: 101 !important; /* Higher than breakouts to allow bottom line to overlay on top of them */
+}
+
+.alt-range-input {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 100% !important;
+  height: 32px !important; /* Thick touch height */
+  background: transparent !important; /* Transparent track as requested */
+  outline: none !important;
+  cursor: pointer !important;
+  border: none !important;
+}
+
+/* Webkit (Safari, Chrome) Custom Thumb styling mimicking .cardActive */
+.alt-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #EE7221 !important;
+  box-shadow: 0 4px 14px rgba(238, 114, 33, 0.25) !important;
+  cursor: grab !important;
+  position: relative !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+  /* Visual alignment pill at the bottom */
+  background-image: linear-gradient(to right, #EE7221 0%, #EE7221 100%) !important;
+  background-size: 14px 3px !important;
+  background-repeat: no-repeat !important;
+  background-position: center bottom 4px !important;
+}
+
+.alt-range-input::-webkit-slider-thumb:active {
+  cursor: grabbing !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 18px rgba(238, 114, 33, 0.35) !important;
+}
+
+/* Firefox Custom Thumb styling mimicking .cardActive */
+.alt-range-input::-moz-range-thumb {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #EE7221 !important;
+  box-shadow: 0 4px 14px rgba(238, 114, 33, 0.25) !important;
+  cursor: grab !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+  background-image: linear-gradient(to right, #EE7221 0%, #EE7221 100%) !important;
+  background-size: 14px 3px !important;
+  background-repeat: no-repeat !important;
+  background-position: center bottom 4px !important;
+}
+
+.alt-range-input::-moz-range-thumb:active {
+  cursor: grabbing !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 18px rgba(238, 114, 33, 0.35) !important;
+}
+
+

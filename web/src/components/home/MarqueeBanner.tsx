@@ -289,7 +289,7 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
       {announcements.map((a, i) => (
         <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
           {i > 0 && <span style={{ color: isOn ? 'var(--color-orange-glow-35)' : 'rgba(142,142,147,0.4)', padding: '0 14px', fontSize: '8px' }}>●</span>}
-          <span style={{ color: '#3a3a3c', fontSize: '15px', fontWeight: 500, paddingRight: '6px' }}>
+          <span style={{ color: '#3a3a3c', fontSize: '16px', fontWeight: 500, paddingRight: '6px' }}>
             {parseAnnouncementText(a.text)}
           </span>
         </span>

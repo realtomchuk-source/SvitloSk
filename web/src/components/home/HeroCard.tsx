@@ -61,14 +61,24 @@ export const HeroCard: React.FC<HeroCardProps> = ({
       </div>
 
       {/* HORIZONTAL MINI-GRAPH */}
-      <div style={{ gridColumn: '1 / span 3', gridRow: 2, position: 'relative', width: '100%', height: '6px', background: '#E8E8ED', borderRadius: '3px', marginTop: '12px' }}>
+      <div style={{ gridColumn: '1 / span 3', gridRow: 2, position: 'relative', width: '100%', height: '6px', background: 'transparent', borderRadius: '3px', marginTop: '12px' }}>
         <div style={{ position: 'absolute', inset: 0, borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
           {Array.from({ length: 48 }).map((_, i) => {
             const isAvailable = queuesStr[Math.floor(i / 2)] === '1';
+            const currentSlot = Math.floor((currentTimePercent / 100) * 48);
+            const isPast = i < currentSlot;
+
+            let bg = '#374151'; // Future OFF
+            if (isAvailable) {
+              bg = isPast ? 'rgba(238, 114, 33, 0.50)' : '#EE7221'; // ON
+            } else {
+              bg = isPast ? 'rgba(55, 65, 81, 0.35)' : '#374151'; // OFF
+            }
+
             return (
               <div 
                 key={i} 
-                style={{ flex: 1, background: isAvailable ? '#FF7A00' : 'transparent', height: '100%' }}
+                style={{ flex: 1, background: bg, height: '100%', transition: 'background 0.3s ease' }}
               />
             );
           })}
