@@ -9,7 +9,7 @@ interface DashboardBarProps {
 
 export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual, isPast }) => {
   const dayStr = realTime.toLocaleDateString('uk-UA', { weekday: 'short' }).toUpperCase();
-  const dateNum = realTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  const dateNum = realTime.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' }); /* Fully format year to 4-digits (e.g. 2026) */
   const timeStr = realTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
   const secStr = realTime.getSeconds().toString().padStart(2, '0');
 
@@ -28,13 +28,7 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
       transition: 'all 0.3s ease',
       fontFamily: 'var(--sans)' /* Uses the exact same font as the news feed */
     }}>
-      {/* Date Segment */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-        <span style={{ fontSize: '16px', fontWeight: 800, color: '#FF7A00', letterSpacing: '0.02em' }}>{dayStr}</span>
-        <span style={{ fontSize: '16px', fontWeight: 700, color: '#1C1C1E', letterSpacing: '0.2px' }}>{dateNum}</span>
-      </div>
-
-      {/* Clock Segment */}
+      {/* Clock Segment (Left side) */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
         <span style={{ 
           fontSize: '16px', 
@@ -63,6 +57,12 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
             {secStr}
           </span>
         )}
+      </div>
+
+      {/* Date Segment (Right side) */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+        <span style={{ fontSize: '16px', fontWeight: 800, color: '#FF7A00', letterSpacing: '0.02em' }}>{dayStr}</span>
+        <span style={{ fontSize: '16px', fontWeight: 700, color: '#1C1C1E', letterSpacing: '0.2px' }}>{dateNum}</span>
       </div>
     </div>
   );
