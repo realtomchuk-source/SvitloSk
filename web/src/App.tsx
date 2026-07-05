@@ -9,12 +9,13 @@ const Archive = lazy(() => import('@/pages/Archive/Archive').then(m => ({ defaul
 const AddressSearch = lazy(() => import('@/pages/AddressSearch/AddressSearch').then(m => ({ default: m.AddressSearch })));
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { saveScheduleToArchive } from '@/pages/Archive/services/archiveSyncService';
+import { Tomorrow } from '@/pages/Tomorrow';
 
 import { Login } from '@/pages/Admin/Login';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 function AppContent() {
-  const { setScheduleData, setLoading, setError, loadUserData, initAuth, isAuthLoading } = useStore();
+  const { setScheduleData, setTomorrowScheduleData, setLoading, setError, loadUserData, initAuth, isAuthLoading } = useStore();
   const location = useLocation();
 
   useEffect(() => {
@@ -27,6 +28,15 @@ function AppContent() {
         setScheduleData(data);
         setError(null);
         saveScheduleToArchive(data);
+
+        // Silent load for tomorrow
+        try {
+          const tomData = await fetchSchedule('tomorrow');
+          setTomorrowScheduleData(tomData);
+        } catch (tErr) {
+          console.warn('Tomorrow schedule pending or not found:', tErr);
+          setTomorrowScheduleData(null);
+        }
       } catch (err) {
         console.error(err);
         setError('Помилка завантаження даних');
@@ -35,7 +45,7 @@ function AppContent() {
       }
     };
     loadData();
-  }, [setScheduleData, setLoading, setError, loadUserData]);
+  }, [setScheduleData, setTomorrowScheduleData, setLoading, setError, loadUserData]);
 
   if (isAuthLoading) {
     return (
@@ -84,6 +94,7 @@ function AppContent() {
             } 
           />
           <Route path="/cabinet" element={<Cabinet />} />
+          <Route path="/tomorrow" element={<Tomorrow />} />
           
           {/* Admin Routes */}
           <Route path="/admin/login" element={<Login />} />

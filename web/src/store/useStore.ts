@@ -10,6 +10,7 @@ interface AppState {
   // Data State
   selectedGroup: string;
   scheduleData: Schedule | null;
+  tomorrowScheduleData: Schedule | null;
   isLoading: boolean;
   error: string | null;
   
@@ -22,6 +23,7 @@ interface AppState {
   // Actions
   setSelectedGroup: (group: string) => void;
   setScheduleData: (data: Schedule | null) => void;
+  setTomorrowScheduleData: (data: Schedule | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 
@@ -52,6 +54,7 @@ export const useStore = create<AppState>()(
     (set, get) => ({
       selectedGroup: '1.1',
       scheduleData: null,
+      tomorrowScheduleData: null,
       isLoading: false,
       error: null,
       user: null,
@@ -61,6 +64,7 @@ export const useStore = create<AppState>()(
 
       setSelectedGroup: (group) => set({ selectedGroup: group }),
       setScheduleData: (data) => set({ scheduleData: data }),
+      setTomorrowScheduleData: (data) => set({ tomorrowScheduleData: data }),
       setLoading: (loading) => set({ isLoading: loading }),
       setError: (error) => set({ error: error }),
 

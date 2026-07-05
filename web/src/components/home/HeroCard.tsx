@@ -1,5 +1,7 @@
 import React from "react";
 import { clsx } from 'clsx';
+import { useNavigate } from 'react-router-dom';
+import { useStore } from '@/store/useStore';
 import powerOffIcon from '@/assets/power_off.png';
 import powerOnIcon from '@/assets/power_on.png';
 
@@ -22,8 +24,31 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   currentTimePercent,
   isVirtual,
 }) => {
+  const navigate = useNavigate();
+  const { tomorrowScheduleData, selectedGroup } = useStore();
   const statusClass = isOn ? 'status-on' : 'status-off';
   const iconSrc = isOn ? powerOffIcon : powerOnIcon;
+
+  // Tomorrow schedule check
+  const hasTomorrowData = tomorrowScheduleData !== null;
+  const tomorrowQueueStr = tomorrowScheduleData?.queues[selectedGroup];
+  const hasTomorrowOutages = tomorrowQueueStr ? tomorrowQueueStr.includes('0') : false;
+
+  // Button Action & Styling
+  const isClickable = hasTomorrowData;
+  const buttonText = !hasTomorrowData 
+    ? 'НА ЗАВТРА' 
+    : (hasTomorrowOutages ? 'ГРАФІК НА ЗАВТРА' : 'ЗАВТРА ЗІ СВІТЛОМ');
+  
+  const buttonClass = (!hasTomorrowData || !hasTomorrowOutages) 
+    ? 'btn-pending' 
+    : 'btn-active';
+
+  const handleTomorrowClick = () => {
+    if (isClickable) {
+      navigate('/tomorrow');
+    }
+  };
 
   return (
     <div id="smart-hero" className={clsx('hero-card', statusClass)} style={{ margin: '0 20px', position: 'relative' }}>
@@ -45,19 +70,15 @@ export const HeroCard: React.FC<HeroCardProps> = ({
         </div>
       </div>
 
-      {/* PROGRESS CAPSULE */}
-      <div className="hero-phase" id="hero-phase-capsule">
-        <div className="phase-track"></div>
-        <div 
-          className="phase-fill" 
-          style={{ height: `${((24 - nextChangeHour) / 24) * 100}%` }}
-        ></div>
-        <div className="phase-dot phase-start"></div>
-        <div className="phase-dot phase-end"></div>
-        <div 
-          className="phase-dot phase-current" 
-          style={{ bottom: `${((24 - nextChangeHour) / 24) * 100}%` }}
-        ></div>
+      {/* TOMORROW SCHEDULE BUTTON */}
+      <div className="hero-phase-btn-container">
+        <button 
+          className={clsx("hero-tomorrow-btn", buttonClass)}
+          onClick={handleTomorrowClick}
+          disabled={!isClickable}
+        >
+          {buttonText}
+        </button>
       </div>
 
       {/* HORIZONTAL MINI-GRAPH */}
