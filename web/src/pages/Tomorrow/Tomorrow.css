@@ -12,8 +12,17 @@
   --color-on-glow-35: rgba(168, 85, 247, 0.25) !important;
   --color-on-past: rgba(168, 85, 247, 0.5) !important;
 
+  /* Lighter steel gray for OFF slots instead of standard dark charcoal #374151 */
+  --color-off: #5C667B !important;
+  --color-off-past: rgba(92, 102, 123, 0.5) !important;
+
   /* Overrides for dashboard bar elements */
   --dash-accent: #A855F7 !important;
+
+  /* Overrides for HeroCard text to be pure black for maximum contrast */
+  --hero-text-primary: #000000 !important;
+  --hero-text-secondary: #000000 !important;
+  --hero-text-dim: #000000 !important;
   
   /* Inherits standard dark background of the app body (#050505) */
   background: transparent !important;
@@ -35,14 +44,36 @@
   font-family: var(--sans) !important;
 }
 
-/* ── HeroCard Neon Purple Accents ───────────────────────────────────────────── */
+/* ── HeroCard Neon Purple Accents & Contrast ────────────────────────────────── */
 .page-tomorrow .hero-card {
   border-color: rgba(168, 85, 247, 0.25) !important;
   box-shadow: 0 10px 40px rgba(168, 85, 247, 0.06) !important;
   background: linear-gradient(135deg, rgba(168, 85, 247, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
 }
 
+/* ── Force Black Card Text for Readability ───────────────────────────────────── */
+.page-tomorrow .hero-status,
+.page-tomorrow .hero-timer,
+.page-tomorrow .hero-context,
+.page-tomorrow .hero-context--active,
+.page-tomorrow .hero-context--passive {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
 /* ── Magic CSS filter to shift orange bulb icon to custom purple ───────────── */
 .page-tomorrow .hero-icon img {
   filter: hue-rotate(235deg) saturate(1.5) brightness(1.1) !important;
+}
+
+/* ── Subqueue Inactive Cards Text Color Force Black ────────────────────────── */
+.page-tomorrow .selector-card .selector-num {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+/* Make inactive cards outline slightly more visible */
+.page-tomorrow .selector-card {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  background: #F9FAFB !important;
 }
