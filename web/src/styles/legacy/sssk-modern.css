@@ -163,12 +163,12 @@
 .alt-neon-pointer-line {
   position: absolute !important;
   width: 1.5px !important;
-  background: #EE7221 !important;
+  background: var(--color-on, #EE7221) !important;
   top: 10px !important; /* Starts higher, almost touching the numbers */
   height: 57px !important; /* Adjusted to end 3px above the grid (10 + 57 = 67px; grid starts at 70px) */
   pointer-events: none !important;
   z-index: 100 !important;
-  box-shadow: 0 0 5px rgba(238, 114, 33, 0.4) !important;
+  box-shadow: 0 0 5px var(--color-on-glow, rgba(238, 114, 33, 0.4)) !important;
   transform: translateX(-50%) !important;
   transition: left 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
@@ -177,12 +177,12 @@
 .alt-neon-pointer-line-bottom {
   position: absolute !important;
   width: 1.5px !important;
-  background: #EE7221 !important;
+  background: var(--color-on, #EE7221) !important;
   top: -39px !important; /* Extended higher to start 3px below the grid bottom */
   height: 39px !important; /* Reaches down to the slider wrapper */
   pointer-events: none !important;
   z-index: 100 !important;
-  box-shadow: 0 0 5px rgba(238, 114, 33, 0.4) !important;
+  box-shadow: 0 0 5px var(--color-on-glow, rgba(238, 114, 33, 0.4)) !important;
   transform: translateX(-50%) !important;
   transition: left 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
@@ -229,7 +229,7 @@
 }
 
 .alt-breakout-tick.on-tick {
-  background: #EE7221 !important;
+  background: var(--color-on, #EE7221) !important;
 }
 
 .alt-breakout-tick.off-tick {
@@ -248,9 +248,9 @@
 }
 
 .alt-breakout-badge.on-badge {
-  color: #EE7221 !important;
-  background: rgba(238, 114, 33, 0.05) !important; /* Slightly lighter soft tint */
-  border: 1px solid #EE7221 !important; /* Solid matching orange border */
+  color: var(--color-on, #EE7221) !important;
+  background: var(--color-on-glow-20, rgba(238, 114, 33, 0.05)) !important;
+  border: 1px solid var(--color-on, #EE7221) !important; /* Solid matching orange border */
 }
 
 .alt-breakout-badge.off-badge {
@@ -348,13 +348,13 @@
   height: 32px !important;
   border-radius: 8px !important;
   background: #ffffff !important;
-  border: 1.5px solid #EE7221 !important;
-  box-shadow: 0 4px 14px rgba(238, 114, 33, 0.25) !important;
+  border: 1.5px solid var(--color-on, #EE7221) !important;
+  box-shadow: 0 4px 14px var(--color-on-glow-35, rgba(238, 114, 33, 0.25)) !important;
   cursor: grab !important;
   position: relative !important;
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
   /* Visual alignment pill at the bottom */
-  background-image: linear-gradient(to right, #EE7221 0%, #EE7221 100%) !important;
+  background-image: linear-gradient(to right, var(--color-on, #EE7221) 0%, var(--color-on, #EE7221) 100%) !important;
   background-size: 14px 3px !important;
   background-repeat: no-repeat !important;
   background-position: center bottom 4px !important;
@@ -363,7 +363,7 @@
 .alt-range-input::-webkit-slider-thumb:active {
   cursor: grabbing !important;
   transform: scale(1.1) !important;
-  box-shadow: 0 6px 18px rgba(238, 114, 33, 0.35) !important;
+  box-shadow: 0 6px 18px var(--color-on-glow, rgba(238, 114, 33, 0.35)) !important;
 }
 
 /* Firefox Custom Thumb styling mimicking .cardActive */
@@ -372,11 +372,11 @@
   height: 32px !important;
   border-radius: 8px !important;
   background: #ffffff !important;
-  border: 1.5px solid #EE7221 !important;
-  box-shadow: 0 4px 14px rgba(238, 114, 33, 0.25) !important;
+  border: 1.5px solid var(--color-on, #EE7221) !important;
+  box-shadow: 0 4px 14px var(--color-on-glow-35, rgba(238, 114, 33, 0.25)) !important;
   cursor: grab !important;
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
-  background-image: linear-gradient(to right, #EE7221 0%, #EE7221 100%) !important;
+  background-image: linear-gradient(to right, var(--color-on, #EE7221) 0%, var(--color-on, #EE7221) 100%) !important;
   background-size: 14px 3px !important;
   background-repeat: no-repeat !important;
   background-position: center bottom 4px !important;
@@ -385,7 +385,7 @@
 .alt-range-input::-moz-range-thumb:active {
   cursor: grabbing !important;
   transform: scale(1.1) !important;
-  box-shadow: 0 6px 18px rgba(238, 114, 33, 0.35) !important;
+  box-shadow: 0 6px 18px var(--color-on-glow, rgba(238, 114, 33, 0.35)) !important;
 }
 
 

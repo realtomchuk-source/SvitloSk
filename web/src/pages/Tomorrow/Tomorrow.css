@@ -7,8 +7,9 @@
   --color-orange-glow-35: rgba(168, 85, 247, 0.35) !important;
   
   --color-on: #A855F7 !important;
-  --color-on-glow: rgba(168, 85, 247, 0.6) !important;
-  --color-on-glow-20: rgba(168, 85, 247, 0.2) !important;
+  --color-on-glow: rgba(168, 85, 247, 0.4) !important;
+  --color-on-glow-20: rgba(168, 85, 247, 0.05) !important;
+  --color-on-glow-35: rgba(168, 85, 247, 0.25) !important;
   --color-on-past: rgba(168, 85, 247, 0.5) !important;
 
   /* Overrides for dashboard bar elements */
