@@ -238,7 +238,7 @@ export function MarqueeBanner({ isOn = true, customMessage }: { isOn?: boolean; 
   const isLoading = announcements.length === 0;
 
   const parseAnnouncementText = (text: string) => {
-    const regex = /([Оо]новлено\s+[оо0]\s+\d{1,2}:\d{2})|([Зз]неструмлення:\s*)([а-яА-ЯёЁіІїЇєЄґҐ\s'-]+?)(\s*\()|([Сс]тарокостянтинів[а-яА-ЯёЁіІїЇєЄґҐ]*)|(\|)/g;
+    const regex = /([Оо]новлено\s+[оо0]\s+\d{1,2}:\d{2})|([Зз]неструмлення:\s*)([а-яА-ЯёЁіІїЇєЄґҐ\s'-]+?)(\s*\()|([Сс]тарокостянтинів[а-яА-ЯёЁіІїЇєЄґҐ]*)|(\|)|(\d{1,2}\s+[а-яА-ЯіІїЇєЄґҐ]+\s+\d{4}\s+року)/g;
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
     let match;
@@ -274,6 +274,12 @@ export function MarqueeBanner({ isOn = true, customMessage }: { isOn?: boolean; 
         parts.push(
           <span key={`sep-${matchIndex}`} style={{ color: 'var(--color-orange)', fontWeight: 700, padding: '0 4px' }}>
             {match[6]}
+          </span>
+        );
+      } else if (match[7]) {
+        parts.push(
+          <span key={`date-${matchIndex}`} style={{ color: 'var(--color-orange)', fontWeight: 700 }}>
+            {match[7]}
           </span>
         );
       }
