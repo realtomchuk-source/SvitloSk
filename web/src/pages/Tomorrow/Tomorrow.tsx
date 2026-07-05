@@ -93,7 +93,7 @@ export const Tomorrow: React.FC = () => {
   const activeSlot = Math.max(0, Math.min(47, Math.floor((scrubPercent !== null ? scrubPercent : 0) * 48)));
 
   // Message in news feed
-  const bannerMessage = "Ви перебуваєте на сторінці планування і бачите графік на 6 липня 2026 року, який може змінитись.";
+  const bannerMessage = "Ви бачите графік на 6 липня 2026 року, який може змінитись.";
 
   return (
     <div className={clsx("page-home page-tomorrow", !displayContext.isOn && "status-off")}>
