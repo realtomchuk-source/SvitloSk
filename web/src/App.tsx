@@ -9,7 +9,7 @@ const Archive = lazy(() => import('@/pages/Archive/Archive').then(m => ({ defaul
 const AddressSearch = lazy(() => import('@/pages/AddressSearch/AddressSearch').then(m => ({ default: m.AddressSearch })));
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { saveScheduleToArchive } from '@/pages/Archive/services/archiveSyncService';
-import { Tomorrow } from '@/pages/Tomorrow';
+import { Tomorrow } from '@/pages/Tomorrow/Tomorrow';
 
 import { Login } from '@/pages/Admin/Login';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';

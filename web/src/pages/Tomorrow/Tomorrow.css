@@ -1,0 +1,63 @@
+/* ── Tomorrow Page Theme Variables & Base ───────────────────────────────────── */
+.page-tomorrow {
+  /* Slate/steel blue tint for active plan state instead of today's bright orange */
+  --color-orange: #708090 !important; 
+  --color-orange-rgb: 112, 128, 144 !important;
+  --color-orange-glow-20: rgba(112, 128, 144, 0.2) !important;
+  --color-orange-glow-35: rgba(112, 128, 144, 0.35) !important;
+  
+  background: radial-gradient(circle at top, rgba(112, 128, 144, 0.06) 0%, #050505 100%) !important;
+}
+
+/* ── Blueprint Watermark ─────────────────────────────────────────────────────── */
+.page-tomorrow::before {
+  content: "ПЛАН НА ЗАВТРА" !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) rotate(-15deg) !important;
+  font-size: 8vw !important;
+  font-weight: 900 !important;
+  color: rgba(112, 128, 144, 0.025) !important;
+  letter-spacing: 0.25em !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  font-family: var(--sans) !important;
+}
+
+/* ── HeroCard Plan Accents ──────────────────────────────────────────────────── */
+.page-tomorrow .hero-card {
+  border-color: rgba(112, 128, 144, 0.22) !important;
+  box-shadow: 0 10px 40px rgba(112, 128, 144, 0.04) !important;
+  background: linear-gradient(135deg, rgba(112, 128, 144, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* ── Back Navigation Button ─────────────────────────────────────────────────── */
+.tomorrow-back-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  padding: 6px 12px 6px 8px !important;
+  color: #a1a1aa !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+}
+
+.tomorrow-back-btn:active {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  transform: scale(0.97) !important;
+}
+
+.tomorrow-back-btn span {
+  font-family: var(--sans) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+}

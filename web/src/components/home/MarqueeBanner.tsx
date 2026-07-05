@@ -41,7 +41,7 @@ const getKyivTomorrowDateISO = () => {
   return getKyivDateTime(tomorrow).dateISO;
 };
 
-export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
+export function MarqueeBanner({ isOn = true, customMessage }: { isOn?: boolean; customMessage?: string }) {
   const [announcements, setAnnouncements] = useState<BannerAnnouncement[]>([]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
@@ -52,6 +52,10 @@ export function MarqueeBanner({ isOn = true }: { isOn?: boolean }) {
   const currentFeedTextRef = useRef<string>('');
 
   useEffect(() => {
+    if (customMessage) {
+      setAnnouncements([{ id: 'custom', text: customMessage, sort_order: 1 }]);
+      return;
+    }
     const kyivInfo = getKyivDateTime();
     currentLoadedDateRef.current = kyivInfo.dateISO;
 
