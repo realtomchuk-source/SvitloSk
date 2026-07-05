@@ -25,15 +25,57 @@ export interface RegistryData {
   [okrugName: string]: any; // Okrugs
 }
 
+const normalizeStreetName = (name: string): string => {
+  // Correct common grammatical errors in street number suffixes
+  // 3-а -> 3-я (третя)
+  return name.replace(/\b(3)-а\b/g, '$1-я');
+};
+
+const normalizeRegistry = (data: RegistryData): RegistryData => {
+  // Normalize City Streets
+  if (data.Місто) {
+    for (const cityName of Object.keys(data.Місто)) {
+      const streets = data.Місто[cityName];
+      if (streets) {
+        const normalized: StreetData = {};
+        for (const [streetName, houseData] of Object.entries(streets)) {
+          normalized[normalizeStreetName(streetName)] = houseData;
+        }
+        data.Місто[cityName] = normalized;
+      }
+    }
+  }
+
+  // Normalize Okrug/Village Streets
+  for (const okrugName of Object.keys(data)) {
+    if (okrugName === 'Місто') continue;
+    const okrug = data[okrugName];
+    if (okrug) {
+      for (const villageName of Object.keys(okrug)) {
+        const villageStreets = okrug[villageName];
+        if (villageStreets) {
+          const normalized: StreetData = {};
+          for (const [streetName, houseData] of Object.entries(villageStreets)) {
+            normalized[normalizeStreetName(streetName)] = houseData as HouseData;
+          }
+          okrug[villageName] = normalized;
+        }
+      }
+    }
+  }
+
+  return data;
+};
+
 // Dynamic address loader
 export const loadAddressRegistry = async (): Promise<RegistryData> => {
-  // Uses Vite dynamic import or simple fetch
   const base = import.meta.env.BASE_URL;
   const response = await fetch(`${base}data/starokost_addresses.json?t=${Date.now()}`);
   if (!response.ok) {
     throw new Error("Не вдалося завантажити базу адрес");
   }
-  return response.json();
+  const rawData = await response.json();
+  return normalizeRegistry(rawData);
 };
 
 // Natural sorting algorithm for house numbers (e.g., "1", "2/1", "2-А", "10")
