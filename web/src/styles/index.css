@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-family: var(--sans);
   
   /* SvitloSk Design Tokens */
   --radius-main: 16px;
