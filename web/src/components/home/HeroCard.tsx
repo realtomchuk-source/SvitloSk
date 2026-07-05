@@ -100,7 +100,8 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           {Array.from({ length: 48 }).map((_, i) => {
             const isAvailable = queuesStr[Math.floor(i / 2)] === '1';
             const currentSlot = Math.floor((currentTimePercent / 100) * 48);
-            const isPast = i < currentSlot;
+            const isTomorrowPage = location.pathname === '/tomorrow';
+            const isPast = isTomorrowPage ? false : (i < currentSlot);
 
             let bg = 'var(--color-off, #374151)'; // Future OFF
             if (isAvailable) {
