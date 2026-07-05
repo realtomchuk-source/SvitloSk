@@ -5,7 +5,6 @@ import { getStatusInfo } from '@/services/scheduleService';
 import { HeroCard } from '@/components/home/HeroCard';
 import { DashboardBar } from '@/components/home/DashboardBar';
 import { SubqueueSelector } from '@/components/home/SubqueueSelector';
-import { InteractiveTimeline } from '@/components/home/InteractiveTimeline';
 import { AlternativeTimeline } from '@/components/home/AlternativeTimeline';
 import { MarqueeBanner } from '@/components/home/MarqueeBanner';
 import { usePWA } from '@/hooks/usePWA';
@@ -190,14 +189,6 @@ export const Home: React.FC = () => {
           realTime={displayContext.referenceDate} 
           isVirtual={displayContext.isVirtual}
           isPast={displayContext.isPast}
-        />
-        
-        <InteractiveTimeline 
-          queuesStr={currentQueuesStr} 
-          activeSlot={activeSlot}
-          currentRealSlot={currentRealSlot}
-          onScrub={setScrubPercent}
-          pointerPercent={pointerPercent}
         />
 
         <SubqueueSelector />
