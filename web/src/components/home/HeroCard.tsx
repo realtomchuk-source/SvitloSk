@@ -86,7 +86,8 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           onClick={handleTomorrowClick}
           disabled={!isClickable}
         >
-          {line1}<br />{line2}
+          <span style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.07em' }}>{line1}</span>
+          <span style={{ fontSize: '8px', fontWeight: 600, opacity: 0.8, marginTop: '2px', letterSpacing: '0.02em' }}>{line2}</span>
         </button>
       </div>
 

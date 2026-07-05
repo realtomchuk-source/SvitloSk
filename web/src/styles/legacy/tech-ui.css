@@ -383,14 +383,11 @@
 
 .hero-tomorrow-btn {
   font-family: var(--sans) !important;
-  font-size: 11px !important;
-  font-weight: 750 !important;
-  letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
-  padding: 8px 14px !important;
-  border-radius: 10px !important;
+  padding: 6px 12px !important;
+  border-radius: 12px !important;
   transition: all 0.25s ease !important;
-  border: 1.5px solid transparent !important;
+  border: 1px solid transparent !important;
   cursor: pointer !important;
   outline: none !important;
   text-align: center !important;
@@ -398,23 +395,26 @@
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  line-height: 1.25 !important;
+  line-height: 1.2 !important;
+  min-width: 96px !important;
+  box-sizing: border-box !important;
 }
 
 .hero-tomorrow-btn.btn-active {
-  background: rgba(238, 114, 33, 0.08) !important;
-  border-color: rgba(238, 114, 33, 0.25) !important;
+  background: rgba(238, 114, 33, 0.06) !important;
+  border-color: rgba(238, 114, 33, 0.2) !important;
   color: #EE7221 !important;
+  box-shadow: 0 2px 8px rgba(238, 114, 33, 0.04) !important;
 }
 
 .hero-tomorrow-btn.btn-active:active {
-  background: rgba(238, 114, 33, 0.16) !important;
+  background: rgba(238, 114, 33, 0.12) !important;
 }
 
 .hero-tomorrow-btn.btn-pending {
-  background: rgba(113, 113, 122, 0.08) !important;
-  border-color: rgba(113, 113, 122, 0.25) !important;
-  color: #71717a !important;
+  background: rgba(113, 113, 122, 0.04) !important;
+  border-color: rgba(113, 113, 122, 0.15) !important;
+  color: #8E8E93 !important;
 }
 
 
