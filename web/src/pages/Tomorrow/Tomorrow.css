@@ -10,6 +10,9 @@
   --color-on-glow: rgba(168, 85, 247, 0.6) !important;
   --color-on-glow-20: rgba(168, 85, 247, 0.2) !important;
   --color-on-past: rgba(168, 85, 247, 0.5) !important;
+
+  /* Overrides for dashboard bar elements */
+  --dash-accent: #A855F7 !important;
   
   /* Inherits standard dark background of the app body (#050505) */
   background: transparent !important;
@@ -38,34 +41,7 @@
   background: linear-gradient(135deg, rgba(168, 85, 247, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
 }
 
-/* ── Magic CSS filter to shift orange bulb icon to purple ───────────────────── */
+/* ── Magic CSS filter to shift orange bulb icon to custom purple ───────────── */
 .page-tomorrow .hero-icon img {
-  filter: hue-rotate(250deg) saturate(1.8) brightness(1.1) !important;
-}
-
-/* ── Back Navigation Button ─────────────────────────────────────────────────── */
-.tomorrow-back-btn {
-  background: rgba(168, 85, 247, 0.05) !important;
-  border: 1px solid rgba(168, 85, 247, 0.2) !important;
-  border-radius: 20px !important;
-  padding: 6px 12px 6px 8px !important;
-  color: #A855F7 !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  transition: all 0.2s ease !important;
-  outline: none !important;
-}
-
-.tomorrow-back-btn:active {
-  background: rgba(168, 85, 247, 0.12) !important;
-  transform: scale(0.97) !important;
-}
-
-.tomorrow-back-btn span {
-  font-family: var(--sans) !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.02em !important;
+  filter: hue-rotate(235deg) saturate(1.5) brightness(1.1) !important;
 }

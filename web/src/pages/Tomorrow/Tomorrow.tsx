@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { clsx } from 'clsx';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { getStatusInfo } from '@/services/scheduleService';
 import { HeroCard } from '@/components/home/HeroCard';
@@ -17,7 +15,6 @@ import '@/styles/legacy/sssk-modern.css';
 import './Tomorrow.css'; // Custom theme styling for Tomorrow page
 
 export const Tomorrow: React.FC = () => {
-  const navigate = useNavigate();
   const { selectedGroup, tomorrowScheduleData } = useStore();
   const fallbackSchedule = "1".repeat(24);
   const tomorrowQueueStr = tomorrowScheduleData?.queues[selectedGroup] || fallbackSchedule;
@@ -102,16 +99,6 @@ export const Tomorrow: React.FC = () => {
     <div className={clsx("page-home page-tomorrow", !displayContext.isOn && "status-off")}>
       <section id="tomorrow-section" className="animate-in fade-in duration-700">
         
-        {/* Navigation Header */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '12px 20px 0px 20px', justifySelf: 'start', zIndex: 10 }}>
-          <button 
-            onClick={() => navigate('/')} 
-            className="tomorrow-back-btn"
-          >
-            <ChevronLeft size={20} />
-            <span>Головна</span>
-          </button>
-        </div>
 
         {/* Hero Card for Tomorrow */}
         <HeroCard 

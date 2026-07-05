@@ -102,11 +102,11 @@ export const HeroCard: React.FC<HeroCardProps> = ({
             const currentSlot = Math.floor((currentTimePercent / 100) * 48);
             const isPast = i < currentSlot;
 
-            let bg = '#374151'; // Future OFF
+            let bg = 'var(--color-off, #374151)'; // Future OFF
             if (isAvailable) {
-              bg = isPast ? 'rgba(238, 114, 33, 0.50)' : '#EE7221'; // ON
+              bg = isPast ? 'var(--color-on-past, rgba(238, 114, 33, 0.50))' : 'var(--color-on, #EE7221)'; // ON
             } else {
-              bg = isPast ? 'rgba(55, 65, 81, 0.35)' : '#374151'; // OFF
+              bg = isPast ? 'var(--color-off-past, rgba(55, 65, 81, 0.35))' : 'var(--color-off, #374151)'; // OFF
             }
 
             return (
