@@ -97,7 +97,7 @@ export const Tomorrow: React.FC = () => {
 
   return (
     <div className={clsx("page-home page-tomorrow", !displayContext.isOn && "status-off")}>
-      <section id="tomorrow-section" className="animate-in fade-in duration-700">
+      <section id="home-section" className="animate-in fade-in duration-700">
         
 
         {/* Hero Card for Tomorrow */}

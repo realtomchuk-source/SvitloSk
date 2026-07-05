@@ -61,7 +61,7 @@ export const DashboardBar: React.FC<DashboardBarProps> = ({ realTime, isVirtual,
 
       {/* Date Segment (Right side) */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-        <span style={{ fontSize: '16px', fontWeight: 800, color: '#FF7A00', letterSpacing: '0.02em' }}>{dayStr}</span>
+        <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-orange, #FF7A00)', letterSpacing: '0.02em' }}>{dayStr}</span>
         <span style={{ fontSize: '16px', fontWeight: 700, color: '#1C1C1E', letterSpacing: '0.2px' }}>{dateNum}</span>
       </div>
     </div>
