@@ -92,8 +92,23 @@ export const Tomorrow: React.FC = () => {
   // Active slot index (0 - 47) for styling AlternativeTimeline capsules
   const activeSlot = Math.max(0, Math.min(47, Math.floor((scrubPercent !== null ? scrubPercent : 0) * 48)));
 
-  // Message in news feed
-  const bannerMessage = "Ви бачите графік на 6 липня 2026 року, який може змінитись.";
+  // Dynamically calculate tomorrow's date in Ukrainian format
+  const tomorrowDateStr = useMemo(() => {
+    const now = new Date();
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const day = tomorrow.getDate();
+    const monthNames = [
+      "січня", "лютого", "березня", "квітня", "травня", "червня",
+      "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
+    ];
+    const month = monthNames[tomorrow.getMonth()];
+    const year = tomorrow.getFullYear();
+    return `${day} ${month} ${year} року`;
+  }, []);
+
+  const bannerMessage = tomorrowScheduleData 
+    ? `Ви бачите графік на ${tomorrowDateStr}, який може змінитись.`
+    : `Дані про графік на ${tomorrowDateStr} ще не надходили.`;
 
   return (
     <div className={clsx("page-home page-tomorrow", !displayContext.isOn && "status-off")}>
