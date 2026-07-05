@@ -1,12 +1,18 @@
 /* ── Tomorrow Page Theme Variables & Base ───────────────────────────────────── */
 .page-tomorrow {
-  /* Slate/steel blue tint for active plan state instead of today's bright orange */
-  --color-orange: #708090 !important; 
-  --color-orange-rgb: 112, 128, 144 !important;
-  --color-orange-glow-20: rgba(112, 128, 144, 0.2) !important;
-  --color-orange-glow-35: rgba(112, 128, 144, 0.35) !important;
+  /* Neon Purple accents for all plan elements instead of today's bright orange */
+  --color-orange: #A855F7 !important; 
+  --color-orange-rgb: 168, 85, 247 !important;
+  --color-orange-glow-20: rgba(168, 85, 247, 0.2) !important;
+  --color-orange-glow-35: rgba(168, 85, 247, 0.35) !important;
   
-  background: radial-gradient(circle at top, rgba(112, 128, 144, 0.06) 0%, #050505 100%) !important;
+  --color-on: #A855F7 !important;
+  --color-on-glow: rgba(168, 85, 247, 0.6) !important;
+  --color-on-glow-20: rgba(168, 85, 247, 0.2) !important;
+  --color-on-past: rgba(168, 85, 247, 0.5) !important;
+  
+  /* Inherits standard dark background of the app body (#050505) */
+  background: transparent !important;
 }
 
 /* ── Blueprint Watermark ─────────────────────────────────────────────────────── */
@@ -18,29 +24,32 @@
   transform: translate(-50%, -50%) rotate(-15deg) !important;
   font-size: 8vw !important;
   font-weight: 900 !important;
-  color: rgba(112, 128, 144, 0.025) !important;
+  color: rgba(168, 85, 247, 0.02) !important; /* Extremely soft purple watermark */
   letter-spacing: 0.25em !important;
   pointer-events: none !important;
   z-index: 0 !important;
   font-family: var(--sans) !important;
 }
 
-/* ── HeroCard Plan Accents ──────────────────────────────────────────────────── */
+/* ── HeroCard Neon Purple Accents ───────────────────────────────────────────── */
 .page-tomorrow .hero-card {
-  border-color: rgba(112, 128, 144, 0.22) !important;
-  box-shadow: 0 10px 40px rgba(112, 128, 144, 0.04) !important;
-  background: linear-gradient(135deg, rgba(112, 128, 144, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(168, 85, 247, 0.25) !important;
+  box-shadow: 0 10px 40px rgba(168, 85, 247, 0.06) !important;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+}
+
+/* ── Magic CSS filter to shift orange bulb icon to purple ───────────────────── */
+.page-tomorrow .hero-icon img {
+  filter: hue-rotate(250deg) saturate(1.8) brightness(1.1) !important;
 }
 
 /* ── Back Navigation Button ─────────────────────────────────────────────────── */
 .tomorrow-back-btn {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(168, 85, 247, 0.05) !important;
+  border: 1px solid rgba(168, 85, 247, 0.2) !important;
   border-radius: 20px !important;
   padding: 6px 12px 6px 8px !important;
-  color: #a1a1aa !important;
+  color: #A855F7 !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
@@ -50,8 +59,7 @@
 }
 
 .tomorrow-back-btn:active {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
+  background: rgba(168, 85, 247, 0.12) !important;
   transform: scale(0.97) !important;
 }
 

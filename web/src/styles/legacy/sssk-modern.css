@@ -297,20 +297,20 @@
 
 /* Color states */
 .alt-capsule.status-on {
-  background: #EE7221 !important;
+  background: var(--color-on, #EE7221) !important;
 }
 
 .alt-capsule.status-off {
-  background: #374151 !important;
+  background: var(--color-off, #374151) !important;
 }
 
 /* Past dimmed state */
 .alt-capsule.is-past.status-on {
-  background: rgba(238, 114, 33, 0.50) !important; /* Increased from 0.25 for higher saturation */
+  background: var(--color-on-past, rgba(238, 114, 33, 0.50)) !important;
 }
 
 .alt-capsule.is-past.status-off {
-  background: rgba(55, 65, 81, 0.35) !important; /* Increased from 0.12 for higher saturation */
+  background: var(--color-off-past, rgba(55, 65, 81, 0.35)) !important;
 }
 
 /* Selected Virtual Time Indicator Highlight in grid */

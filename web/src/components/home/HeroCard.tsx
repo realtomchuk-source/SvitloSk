@@ -41,13 +41,13 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   let line2 = '';
   if (!hasTomorrowData) {
     line1 = 'ГРАФІК';
-    line2 = 'НА ЗАВТРА';
+    line2 = 'ЗАВТРА';
   } else if (hasTomorrowOutages) {
     line1 = 'ГРАФІК';
-    line2 = 'НА ЗАВТРА';
+    line2 = 'ЗАВТРА';
   } else {
     line1 = 'ЗАВТРА';
-    line2 = 'ЗІ СВІТЛОМ';
+    line2 = 'СВІТЛО';
   }
   
   const buttonClass = (!hasTomorrowData || !hasTomorrowOutages) 
@@ -88,8 +88,8 @@ export const HeroCard: React.FC<HeroCardProps> = ({
             onClick={handleTomorrowClick}
             disabled={!isClickable}
           >
-            <span style={{ fontSize: '10.5px', fontWeight: 800, letterSpacing: '0.07em' }}>{line1}</span>
-            <span style={{ fontSize: '8px', fontWeight: 600, opacity: 0.8, marginTop: '2px', letterSpacing: '0.02em' }}>{line2}</span>
+            <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.04em' }}>{line1}</span>
+            <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.04em', marginTop: '1px' }}>{line2}</span>
           </button>
         </div>
       )}
