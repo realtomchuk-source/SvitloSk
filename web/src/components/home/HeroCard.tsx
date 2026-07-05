@@ -36,9 +36,18 @@ export const HeroCard: React.FC<HeroCardProps> = ({
 
   // Button Action & Styling
   const isClickable = hasTomorrowData;
-  const buttonText = !hasTomorrowData 
-    ? 'НА ЗАВТРА' 
-    : (hasTomorrowOutages ? 'ГРАФІК НА ЗАВТРА' : 'ЗАВТРА ЗІ СВІТЛОМ');
+  let line1 = '';
+  let line2 = '';
+  if (!hasTomorrowData) {
+    line1 = 'ГРАФІК';
+    line2 = 'НА ЗАВТРА';
+  } else if (hasTomorrowOutages) {
+    line1 = 'ГРАФІК';
+    line2 = 'НА ЗАВТРА';
+  } else {
+    line1 = 'ЗАВТРА';
+    line2 = 'ЗІ СВІТЛОМ';
+  }
   
   const buttonClass = (!hasTomorrowData || !hasTomorrowOutages) 
     ? 'btn-pending' 
@@ -77,7 +86,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           onClick={handleTomorrowClick}
           disabled={!isClickable}
         >
-          {buttonText}
+          {line1}<br />{line2}
         </button>
       </div>
 
