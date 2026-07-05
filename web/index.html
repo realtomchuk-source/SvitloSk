@@ -13,7 +13,96 @@
     <title>SvitloSk — Світло Старокостянтинів</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="splash-screen">
+        <div class="splash-logo-container">
+          <svg id="splash-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <!-- Нижня темно-сіра частина лампочки -->
+            <path class="bulb-base" d="M312.42,364.01c-.83,69.98-124.26,60.57-112.84-9.4h112.84v9.4Z"/>
+            <!-- Базовий тьмяний помаранчевий контур -->
+            <path class="bulb-outline-bg" pathLength="100" d="M196.69,326.39 C192.46,313.29,183.82,301.41,174.13,291.19 C106.17,224.41,159.16,97.35,256,100.7 C352.84,104.05,405.83,231.11,337.86,291.18 C328.17,301.39,319.54,313.28,315.29,326.39 H196.69 Z"/>
+            <!-- Анімована змійка-вогник -->
+            <path class="bulb-outline-active" pathLength="100" d="M196.69,326.39 C192.46,313.29,183.82,301.41,174.13,291.19 C106.17,224.41,159.16,97.35,256,100.7 C352.84,104.05,405.83,231.11,337.86,291.18 C328.17,301.39,319.54,313.28,315.29,326.39 H196.69 Z"/>
+          </svg>
+        </div>
+      </div>
+      
+      <style>
+        .splash-screen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #f4f4f5;
+          z-index: 9999;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+          .splash-screen {
+            background-color: #09090b;
+          }
+          .bulb-base {
+            fill: #e4e4e7 !important;
+          }
+        }
+
+        .splash-logo-container {
+          width: 160px;
+          height: 160px;
+          animation: splash-fade-in 0.6s ease-out forwards;
+        }
+
+        .bulb-base {
+          fill: #374151;
+          opacity: 0;
+          transform-origin: center;
+          animation: base-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+        }
+
+        .bulb-outline-bg {
+          fill: none;
+          stroke: #ee7221;
+          stroke-miterlimit: 10;
+          stroke-width: 8px;
+          opacity: 0.15;
+        }
+
+        .bulb-outline-active {
+          fill: none;
+          stroke: #ee7221;
+          stroke-miterlimit: 10;
+          stroke-width: 8px;
+          stroke-linecap: round;
+          stroke-dasharray: 30 70;
+          stroke-dashoffset: 100;
+          animation: snake-run 2s linear infinite 0.6s;
+          filter: drop-shadow(0 0 4px rgba(238, 114, 33, 0.6));
+        }
+
+        @keyframes splash-fade-in {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes base-appear {
+          from { opacity: 0; transform: translateY(15px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes snake-run {
+          from {
+            stroke-dashoffset: 100;
+          }
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+      </style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

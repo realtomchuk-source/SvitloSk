@@ -104,6 +104,38 @@
   color: #71717a;
 }
 
+.labelWithBack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.backBtn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #71717a;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  margin-left: -4px;
+  outline: none;
+}
+
+.backBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1a1c;
+}
+
+.backBtn:active {
+  transform: scale(0.95);
+}
+
+
 .inputWrapper {
   position: relative;
   width: 100%;

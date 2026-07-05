@@ -13,7 +13,7 @@ import {
 } from './services/addressService';
 import { AutoCompleteInput } from './components/AutoCompleteInput';
 import { MissingAddressForm } from './components/MissingAddressForm';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, ChevronLeft } from 'lucide-react';
 import { MainLogoIcon } from '@/assets/brand/MainLogoIcon';
 import styles from './AddressSearch.module.css';
 
@@ -197,6 +197,38 @@ export const AddressSearch: React.FC = () => {
     setSelectedVillage('');
   };
 
+  const handleBackStep = () => {
+    clearTransitionTimeout();
+    if (isCity) {
+      if (currentStep === 2) {
+        setSelectedStreet('');
+        setSelectedHouse('');
+        setHouseSearchQuery('');
+        setCurrentStep(1);
+      }
+    } else {
+      if (currentStep === 2) {
+        setSelectedOkrug('');
+        setSelectedVillage('');
+        setSelectedStreet('');
+        setSelectedHouse('');
+        setHouseSearchQuery('');
+        setCurrentStep(1);
+      } else if (currentStep === 3) {
+        setSelectedVillage('');
+        setSelectedStreet('');
+        setSelectedHouse('');
+        setHouseSearchQuery('');
+        setCurrentStep(2);
+      } else if (currentStep === 4) {
+        setSelectedStreet('');
+        setSelectedHouse('');
+        setHouseSearchQuery('');
+        setCurrentStep(3);
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={styles.root}>
@@ -225,7 +257,20 @@ export const AddressSearch: React.FC = () => {
       {/* Territory Selection (Vertically stacked full-width capsule buttons) — Visible only during active search */}
       {!isSelectionComplete && (
         <div className={styles.inputGroup}>
-          <span className={styles.inputLabel}>Оберіть адресу</span>
+          <div className={styles.labelWithBack}>
+            {currentStep > 1 && (
+              <button
+                type="button"
+                onClick={handleBackStep}
+                className={styles.backBtn}
+                title="Назад"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <ChevronLeft size={18} />
+              </button>
+            )}
+            <span className={styles.inputLabel} style={{ margin: 0 }}>Оберіть адресу</span>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}>
             {isCity ? (
               <>
@@ -648,7 +693,7 @@ export const AddressSearch: React.FC = () => {
                 onClick={handleResetSearch}
                 className={`${styles.capsuleBtn} ${styles.capsuleNeutral}`}
               >
-                Почати новий пошук з самого початку
+                Новий пошук
               </button>
             </div>
           )}
@@ -719,7 +764,7 @@ export const AddressSearch: React.FC = () => {
             onClick={handleResetSearch}
             className={`${styles.capsuleBtn} ${styles.capsuleNeutral}`}
           >
-            Почати новий пошук з самого початку
+            Новий пошук
           </button>
         </div>
       )}

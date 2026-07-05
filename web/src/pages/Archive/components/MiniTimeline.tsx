@@ -60,6 +60,22 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
   const isStartLit = normalizedBitstring[0] === '1';
   const isEndLit = normalizedBitstring[47] === '1';
 
+  // Prevent boundary label overlap with transition labels
+  // Threshold: 4 slots (2 hours, i.e., 02:00 or 22:00)
+  const hideStartLabel = useMemo(() => {
+    return transitions.some(tr => {
+      const isStartSameType = isStartLit ? tr.type === 'on' : tr.type === 'off';
+      return isStartSameType && tr.slot <= 4;
+    });
+  }, [transitions, isStartLit]);
+
+  const hideEndLabel = useMemo(() => {
+    return transitions.some(tr => {
+      const isEndSameType = isEndLit ? tr.type === 'on' : tr.type === 'off';
+      return isEndSameType && tr.slot >= 44;
+    });
+  }, [transitions, isEndLit]);
+
   return (
     <div className="mini-slider-row" style={{ padding: '0px', display: 'flex', flexDirection: 'column' }}>
       
@@ -121,7 +137,7 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
         {/* ABOVE TRACK: ON labels & ticks (height 16px) */}
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '16px', pointerEvents: 'none' }}>
           {/* Start label at 00:00 (if light) */}
-          {isStartLit && (
+          {isStartLit && !hideStartLabel && (
             <span style={{ position: 'absolute', left: 0, top: 0, color: '#EE7221', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
               00:00
             </span>
@@ -167,7 +183,7 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
           })}
 
           {/* End label at 24:00 (if light) */}
-          {isEndLit && (
+          {isEndLit && !hideEndLabel && (
             <span style={{ position: 'absolute', right: 0, top: 0, color: '#EE7221', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
               24:00
             </span>
@@ -198,7 +214,7 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
         {/* BELOW TRACK: OFF labels & ticks (height 16px) */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '16px', pointerEvents: 'none' }}>
           {/* Start label at 00:00 (if outage) */}
-          {!isStartLit && (
+          {!isStartLit && !hideStartLabel && (
             <span style={{ position: 'absolute', left: 0, bottom: 0, color: '#374151', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
               00:00
             </span>
@@ -244,7 +260,7 @@ export const MiniTimeline: React.FC<MiniTimelineProps> = ({
           })}
 
           {/* End label at 24:00 (if outage) */}
-          {!isEndLit && (
+          {!isEndLit && !hideEndLabel && (
             <span style={{ position: 'absolute', right: 0, bottom: 0, color: '#374151', fontSize: '10px', fontWeight: 900, letterSpacing: '0.05em', lineHeight: 1 }}>
               24:00
             </span>

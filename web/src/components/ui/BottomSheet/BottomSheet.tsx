@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import styles from './BottomSheet.module.css';
 
 interface BottomSheetProps {
@@ -40,7 +40,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose, title
                 
                 <div className={styles.header}>
                     <button className={styles.backBtn} onClick={onClose} aria-label="Go back">
-                        <ArrowLeft size={18} />
+                        <ChevronLeft size={18} />
                     </button>
                     <div className={styles.title}>{title}</div>
                 </div>
