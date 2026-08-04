@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 # Ensure we can import from the same directory
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from modules.utils import load_json, save_json, get_now
-from config import UNIFIED_DB, DATA_DIR, TODAY_JSON_FILE, TOMORROW_JSON_FILE, DEADLINE_HOUR, DEADLINE_MINUTE, HEALTH_FILE
+from config import UNIFIED_DB, DATA_DIR, TODAY_JSON_FILE, TOMORROW_JSON_FILE, DEADLINE_HOUR, DEADLINE_MINUTE, HEALTH_FILE, TG_POSTS_DIR
 
 logger = logging.getLogger("SSSK-GenerateToday")
 
@@ -130,6 +130,49 @@ def archive_day(today_data):
     except Exception as e:
         logger.error(f"Failed to archive today's schedule: {e}")
 
+def save_daily_schedule_to_tg_posts(schedule_data):
+    """Saves the schedule to parser/tg_posts/YYYY-MM-DD.json."""
+    try:
+        date_str = schedule_data.get("date") # e.g. "30.05"
+        if not date_str or "." not in date_str:
+            return
+            
+        day_part, month_part = date_str.split('.')
+        day = int(day_part)
+        month = int(month_part)
+        
+        now_kyiv = get_now()
+        current_year = now_kyiv.year
+        current_month = now_kyiv.month
+        
+        if month == 12 and current_month == 1:
+            schedule_year = current_year - 1
+        elif month == 1 and current_month == 12:
+            schedule_year = current_year + 1
+        else:
+            schedule_year = current_year
+            
+        iso_date = f"{schedule_year}-{month:02d}-{day:02d}"
+        
+        # Prepare content in the same format
+        output_data = {
+            "date": iso_date,
+            "updated_at": schedule_data.get("updated_at") or now_kyiv.isoformat(),
+            "mode": schedule_data.get("mode", "schedule"),
+            "message": schedule_data.get("message", ""),
+            "queues": ensure_full_queues(schedule_data.get("queues")),
+            "meta": schedule_data.get("meta", {})
+        }
+        
+        os.makedirs(TG_POSTS_DIR, exist_ok=True)
+        file_path = os.path.join(TG_POSTS_DIR, f"{iso_date}.json")
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(output_data, f, ensure_ascii=False, indent=2)
+            
+        logger.info(f"✅ Daily schedule saved to tg_posts: {file_path}")
+    except Exception as e:
+        logger.error(f"Failed to save daily schedule to tg_posts: {e}")
+
 def generate_files():
     db = load_json(UNIFIED_DB, default=[])
     
@@ -179,7 +222,8 @@ def generate_files():
     if best_today:
         update_published_at(today_str)
     archive_day(today_data)
-
+    save_daily_schedule_to_tg_posts(today_data)
+ 
     # 2. G2: TOMORROW
     best_tomorrow = None
     for entry in reversed(db):
@@ -201,6 +245,9 @@ def generate_files():
                 "source_media_url": best_tomorrow.get("source_url") or best_tomorrow.get("img_url")
             }
         }
+        save_json(TOMORROW_JSON_FILE, tomorrow_data)
+        logger.info(f"G2 (Tomorrow) saved to {TOMORROW_JSON_FILE}")
+        save_daily_schedule_to_tg_posts(tomorrow_data)
     else:
         # Check if it's "Late evening" (23:50+)
         is_late_evening = (now.hour == DEADLINE_HOUR and now.minute >= DEADLINE_MINUTE) or (now.hour > DEADLINE_HOUR)
@@ -219,6 +266,9 @@ def generate_files():
                     "target_date": tomorrow_str
                 }
             }
+            save_json(TOMORROW_JSON_FILE, tomorrow_data)
+            logger.info(f"G2 (Tomorrow) saved to {TOMORROW_JSON_FILE}")
+            save_daily_schedule_to_tg_posts(tomorrow_data)
         else:
             # Still waiting for announcements
             tomorrow_data = {
@@ -231,10 +281,9 @@ def generate_files():
                     "target_date": tomorrow_str
                 }
             }
+            save_json(TOMORROW_JSON_FILE, tomorrow_data)
+            logger.info(f"G2 (Tomorrow) saved to {TOMORROW_JSON_FILE}")
             
-    save_json(TOMORROW_JSON_FILE, tomorrow_data)
-    logger.info(f"G2 (Tomorrow) saved to {TOMORROW_JSON_FILE}")
-    
     write_status("ok", today_data, tomorrow_data)
     return True
 

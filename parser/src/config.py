@@ -11,6 +11,7 @@ SCHEDULE_API_FILE = os.path.join(DATA_DIR, "schedule_api.json")
 RAW_SITE_DIR = os.path.join(DATA_DIR, "raw_site")
 ARCHIVE_DIR = os.path.join(DATA_DIR, "archive")
 PWA_DATA_DIR = os.path.join(os.path.dirname(BASE_DIR), "web", "public", "data")
+TG_POSTS_DIR = os.path.join(BASE_DIR, "tg_posts")
 
 HISTORY_API_FILE = os.path.join(PWA_DATA_DIR, "history_api.json")
 HEALTH_FILE = os.path.join(PWA_DATA_DIR, "health.json")
