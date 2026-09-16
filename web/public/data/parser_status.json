@@ -1,16 +1,16 @@
 {
-  "last_sync": "2026-09-17T01:26:56.167307+03:00",
+  "last_sync": "2026-09-17T02:28:38.219703+03:00",
   "today": {
     "date": "17.09",
     "state": "no_outages_fallback",
-    "updated": "17.09.2026 01:26",
+    "updated": "17.09.2026 02:28",
     "captured_at": null,
     "source_media_url": null
   },
   "tomorrow": {
     "date": "18.09",
     "state": "pending",
-    "updated": "17.09.2026 01:26",
+    "updated": "17.09.2026 02:28",
     "captured_at": null,
     "source_media_url": null
   }
