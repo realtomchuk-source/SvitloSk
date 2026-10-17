@@ -1,16 +1,16 @@
 {
-  "last_sync": "2026-10-17T23:52:19.820747+03:00",
+  "last_sync": "2026-10-18T00:49:17.101857+03:00",
   "today": {
-    "date": "17.10",
-    "state": "parser_found",
-    "updated": "17.10.2026 23:52",
-    "captured_at": "2026-10-17T11:56:00.682293+03:00",
-    "source_media_url": "https://hoe.com.ua/post/pogodinni-vidkljuchennja-na-17-zhovtnja.html"
-  },
-  "tomorrow": {
     "date": "18.10",
     "state": "no_outages_fallback",
-    "updated": "17.10.2026 23:52",
+    "updated": "18.10.2026 00:49",
+    "captured_at": null,
+    "source_media_url": null
+  },
+  "tomorrow": {
+    "date": "19.10",
+    "state": "pending",
+    "updated": "18.10.2026 00:49",
     "captured_at": null,
     "source_media_url": null
   }
