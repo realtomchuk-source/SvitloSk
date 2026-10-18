@@ -213,8 +213,10 @@ def process_history(limit_days=7):
         try:
             logger.info(f"Processing {item['date']} from '{item['title']}'...")
 
-            # NEW: Extract body text to check for podcherga cancellations
+            # Extract body text and post images to check for both image updates and text overrides
             news_text = extract_text_from_post(item["link"])
+            img_urls = extract_images_from_post(item["link"])
+            top_img_url = img_urls[0] if img_urls else None
             
             # Find existing entry in DB to see if we need to update it
             # CRITICAL: Find the LATEST (most recent) entry, not the first one.
@@ -223,15 +225,22 @@ def process_history(limit_days=7):
             if existing_entry and news_text:
                 # REPAIR LOGIC: If entry is missing queues_raw, it's from the old format.
                 # To fix the "dirty" queues, we MUST re-process from image.
-                # We also check if it's the current/tomorrow date to focus on active ones.
                 is_stale_format = "queues_raw" not in existing_entry and existing_entry.get("source") == "site"
                 
+                # Check if a newer image appeared at the top of the post
+                prev_img_url = existing_entry.get("img_url") or (
+                    existing_entry.get("source_url") if str(existing_entry.get("source_url", "")).lower().endswith(('.png', '.jpg', '.jpeg')) else None
+                )
+                has_new_image = bool(top_img_url and prev_img_url != top_img_url)
+
                 if is_stale_format:
                     logger.info(f"  🔔 Entry for {item['date']} is OLD FORMAT (dirty). Removing to re-process cleanly.")
                     db.remove(existing_entry)
                     if item["date"] in existing_dates:
                         existing_dates.remove(item["date"])
                     existing_entry = None  # Force full re-processing below
+                elif has_new_image:
+                    logger.info(f"  🔔 New schedule image detected for {item['date']}: {top_img_url} (prev: {prev_img_url}). Re-processing image...")
                 else:
                     # Apply text updates to EXISTING entry as usual
                     logger.info(f"  Checking text updates for existing entry {item['date']}...")
@@ -252,12 +261,9 @@ def process_history(limit_days=7):
                         existing_entry["updated_by"] = "text_digest"
                         processed_count += 1
                     
-                    # If date is already processed, we skip full image check unless it's a new image
+                    # If date is already processed and top image hasn't changed, skip image check
                     if item["date"] in existing_dates:
                         continue
-
-            # Original Image Logic
-            img_urls = extract_images_from_post(item["link"])
 
             if not img_urls:
                 logger.warning(f"No images found for {item['date']}")
@@ -301,6 +307,7 @@ def process_history(limit_days=7):
                             "processed": True,
                             "timestamp": get_now().isoformat(),
                             "source_url": item["link"],
+                            "img_url": img_url,
                             "raw_path": raw_path,
                             "queues": queues,
                             "queues_raw": queues_raw,

@@ -153,7 +153,7 @@ def save_to_sqlite(entry):
     conn.commit()
     conn.close()
 
-def process_image_and_text(img_bytes, source_used, raw_path, state, html_content=None):
+def process_image_and_text(img_bytes, source_used, raw_path, state, html_content=None, news_text=None):
     """
     The NEW core logic: Vision (24bit) -> Expand (48bit) -> Gemini (Overrides) -> SQLite.
     """
@@ -165,6 +165,31 @@ def process_image_and_text(img_bytes, source_used, raw_path, state, html_content
     if not structured:
         logger.error(f"FAILED to parse structure from {source_used}")
         return False
+
+    # Fallback date extraction if OCR failed to read date from image
+    if not structured.get("date"):
+        from modules.table_parser import extract_date
+        fallback_short, fallback_full = None, None
+        
+        if news_text:
+            fallback_short, fallback_full = extract_date(news_text)
+        if not fallback_short and html_content:
+            from bs4 import BeautifulSoup
+            plain_html_text = BeautifulSoup(html_content, "html.parser").get_text(separator="\n")
+            fallback_short, fallback_full = extract_date(plain_html_text)
+        if not fallback_short and state and state.get("last_img_url"):
+            # Try filename pattern: file20261017164437203.png -> 2026-10-17 -> 17.10
+            m_url = re.search(r"file(202\d)(\d{2})(\d{2})\d+", state.get("last_img_url", ""))
+            if m_url:
+                yyyy, mm, dd = m_url.group(1), m_url.group(2), m_url.group(3)
+                fallback_short = f"{dd}.{mm}"
+                fallback_full = f"{dd}.{mm}.{yyyy}"
+
+        if fallback_short:
+            logger.info(f"Recovered schedule date via fallback: {fallback_short} ({fallback_full})")
+            structured["date"] = fallback_short
+            structured["date_full"] = fallback_full or f"{fallback_short}.2026"
+            structured["message"] = f"Графік погодинних відключень на {structured['date_full']}"
 
     # 2. Expansion Stage (24 -> 48 bits)
     queues_24 = structured.get("queues", {})
@@ -282,7 +307,8 @@ def main():
                     "site", 
                     site_res["raw_path"], 
                     state, 
-                    site_res.get("html")
+                    site_res.get("html"),
+                    site_res.get("news_text")
                 )
     else:
         logger.info("No changes detected. Skipping heavy scan.")

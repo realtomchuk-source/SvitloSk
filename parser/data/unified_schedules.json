@@ -2455,7 +2455,7 @@
   },
   {
     "timestamp": "2026-07-01T20:05:06.565854+03:00",
-    "target_date": "",
+    "target_date": "30.06",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2491,13 +2491,13 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "30.06",
+    "date_full": "30.06.2026",
+    "message": "Графік погодинних відключень на 30.06.2026"
   },
   {
     "timestamp": "2026-07-02T00:15:25.357374+03:00",
-    "target_date": "",
+    "target_date": "30.06",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2533,13 +2533,13 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "30.06",
+    "date_full": "30.06.2026",
+    "message": "Графік погодинних відключень на 30.06.2026"
   },
   {
     "timestamp": "2026-07-02T01:15:37.882866+03:00",
-    "target_date": "",
+    "target_date": "30.06",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2575,13 +2575,13 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "30.06",
+    "date_full": "30.06.2026",
+    "message": "Графік погодинних відключень на 30.06.2026"
   },
   {
     "timestamp": "2026-07-02T02:13:07.427313+03:00",
-    "target_date": "",
+    "target_date": "30.06",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2617,9 +2617,9 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "30.06",
+    "date_full": "30.06.2026",
+    "message": "Графік погодинних відключень на 30.06.2026"
   },
   {
     "date": "17.10",
@@ -2662,7 +2662,7 @@
   },
   {
     "timestamp": "2026-10-17T16:19:58.104849+03:00",
-    "target_date": "",
+    "target_date": "17.10",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2698,13 +2698,13 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "17.10",
+    "date_full": "17.10.2026",
+    "message": "Графік погодинних відключень на 17.10.2026"
   },
   {
     "timestamp": "2026-10-17T20:35:14.263927+03:00",
-    "target_date": "",
+    "target_date": "17.10",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2740,13 +2740,13 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "17.10",
+    "date_full": "17.10.2026",
+    "message": "Графік погодинних відключень на 17.10.2026"
   },
   {
     "timestamp": "2026-10-17T21:21:09.081088+03:00",
-    "target_date": "",
+    "target_date": "17.10",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2782,13 +2782,13 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "17.10",
+    "date_full": "17.10.2026",
+    "message": "Графік погодинних відключень на 17.10.2026"
   },
   {
     "timestamp": "2026-10-18T04:47:29.806566+03:00",
-    "target_date": "",
+    "target_date": "17.10",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2824,13 +2824,13 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "17.10",
+    "date_full": "17.10.2026",
+    "message": "Графік погодинних відключень на 17.10.2026"
   },
   {
     "timestamp": "2026-10-18T16:39:06.171882+03:00",
-    "target_date": "",
+    "target_date": "17.10",
     "source": "site",
     "type": "schedule",
     "processed": true,
@@ -2866,8 +2866,8 @@
     },
     "announcements": [],
     "mode": "schedule",
-    "date": "",
-    "date_full": "",
-    "message": "Графік погодинних відключень"
+    "date": "17.10",
+    "date_full": "17.10.2026",
+    "message": "Графік погодинних відключень на 17.10.2026"
   }
 ]

@@ -34,7 +34,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y tesseract-ocr sqlite3
+          sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ukr sqlite3
           cd parser
           pip install -r requirements.txt
           playwright install --with-deps chromium
@@ -69,7 +69,7 @@ jobs:
       # ===== Debug: Check what was generated =====
       - name: Debug Workspace
         run: |
-          ls -R parser/data
+          ls -R parser/data parser/tg_posts
           if [ -f parser/data/schedules.db ]; then
             sqlite3 parser/data/schedules.db "SELECT 'SQLite Rows: ' || count(*) FROM schedules;"
           else
@@ -91,7 +91,7 @@ jobs:
         run: |
           git config --global user.name "SSSK-Bot"
           git config --global user.email "bot@svitlo-starkon.com"
-          git add parser/data/*.json web/public/data/*.json web/public/data/archive/*.json || true
+          git add parser/data/*.json parser/tg_posts/*.json web/public/data/*.json web/public/data/archive/*.json || true
           if git commit -m "Auto-update schedules"; then
             git push
             echo "committed=true" >> $GITHUB_OUTPUT

@@ -12,17 +12,39 @@ def normalize_group_id(gid):
         return f"{gid[0]}.{gid[1]}"
     return gid
 
+MONTH_MAP_UKR = {
+    "січня": "01", "лютого": "02", "березня": "03", "квітня": "04",
+    "травня": "05", "червня": "06", "липня": "07", "серпня": "08",
+    "вересня": "09", "жовтня": "10", "листопада": "11", "грудня": "12"
+}
+
 def extract_date(text):
-    # Try long format first: 08.04.2024
-    match = re.search(r"на\s+(\d{2}\.\d{2}\.\d{4})", text)
+    if not text:
+        return None, None
+    # 1. Try long format first: на 08.04.2026 or Опубліковано 17.10.2026
+    match = re.search(r"на\s+(\d{2}\.\d{2}\.\d{4})", text, re.IGNORECASE)
     if match:
         full = match.group(1)
         return full[:5], full
-    # Try short format: 08.04
-    match = re.search(r"на\s+(\d{2}\.\d{2})", text)
+    # 2. Try any DD.MM.202X in text (e.g. when OCR misses 'на')
+    match = re.search(r"\b(\d{2}\.\d{2}\.202\d)\b", text)
+    if match:
+        full = match.group(1)
+        return full[:5], full
+    # 3. Try short format: на 08.04
+    match = re.search(r"на\s+(\d{2}\.\d{2})\b", text, re.IGNORECASE)
     if match:
         short = match.group(1)
-        return short, f"{short}.2026" # Assume current year if missing
+        return short, f"{short}.2026"
+    # 4. Try Ukrainian month name format: на 17 жовтня or 17 жовтня
+    month_pattern = "|".join(MONTH_MAP_UKR.keys())
+    match = re.search(rf"\b(\d{{1,2}})\s+({month_pattern})\b", text.lower())
+    if match:
+        day = match.group(1).zfill(2)
+        month = MONTH_MAP_UKR.get(match.group(2))
+        if month:
+            short = f"{day}.{month}"
+            return short, f"{short}.2026"
     return None, None
 
 def detect_mode(text):
