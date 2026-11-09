@@ -107,7 +107,15 @@ def check_for_changes(state):
         img_url = extract_image_url(resp.text)
         
         if not img_url:
-            # Check for "no outages" text if image is missing
+            # 1) Check for new textual GPV schedule format ("Підчерга 1.1 – 10:00-14:00...")
+            from modules.gpv_text_parser import parse_gpv_html_schedules
+            from modules.utils import get_now
+            text_schedules = parse_gpv_html_schedules(resp.text, get_now())
+            if text_schedules:
+                logger.info(f"Stage 2: Textual GPV schedule detected for dates {list(text_schedules.keys())}.")
+                return True, "TEXT_SCHEDULE", current_html_hash, None
+
+            # 2) Check for "no outages" text if image is missing
             text = soup.get_text().lower()
             if "не прогнозує відключень" in text or "графік не застосовується" in text:
                 logger.info("Stage 2: Site says 'No Outages'. Triggering empty update.")
@@ -139,23 +147,60 @@ def run_site_parser(state):
     """
     logger.info("Executing heavy scan...")
     
-    # 1. Fetch the page with Playwright (dynamic rendering)
-    html = fetch_page_dynamic(OBL_URL)
+    # 1. Try lightweight HTTP fetch first (fast path for textual GPV or static HTML)
+    from modules.gpv_text_parser import fetch_gpv_html, parse_gpv_html_schedules
+    from modules.utils import get_now
+    html = fetch_gpv_html(OBL_URL)
+    img_url = extract_image_url(html) if html else None
+
+    # If no image and no textual schedule found in lightweight HTML, fallback to Playwright dynamic rendering
+    if not html or (not img_url and not parse_gpv_html_schedules(html, get_now())):
+        dynamic_html = fetch_page_dynamic(OBL_URL)
+        if dynamic_html:
+            html = dynamic_html
+            img_url = extract_image_url(html)
+
     if not html:
-        logger.error("Failed to fetch page via Playwright.")
+        logger.error("Failed to fetch page via HTTP and Playwright.")
         return None
 
     # 2. Extract specific image URL
     soup = BeautifulSoup(html, 'html.parser')
-    img_url = extract_image_url(html)
+    if not img_url:
+        img_url = extract_image_url(html)
     
     # 3. Extract news text for announcements (preserve structure)
     news_text = soup.get_text(separator='\n')
     news_text = '\n'.join([line.strip() for line in news_text.splitlines() if line.strip()])
     
-    # 4. Check for "no outages" text
+    # 4. Check for textual GPV schedule or "no outages" text when image is absent
     is_empty = False
     if not img_url:
+        text_schedules = parse_gpv_html_schedules(html, get_now())
+        if text_schedules:
+            html_hash = get_hash(html)
+            last_html_hash = state.get("last_html_hash")
+            # Combined hash of all parsed schedule blocks on page
+            combined_hash = get_hash(
+                "|".join(f"{d}:{ item['queues_hash'] }" for d, item in sorted(text_schedules.items()))
+            )
+            last_hash = state.get("last_site_hash")
+            changed = (combined_hash != last_hash) or (html_hash != last_html_hash)
+            logger.info(f"Parsed textual GPV schedules for dates: {list(text_schedules.keys())} (changed={changed})")
+            return {
+                "changed": changed,
+                "is_text_schedule": True,
+                "text_schedules": text_schedules,
+                "raw_path": "site_text",
+                "hash": combined_hash,
+                "html_hash": html_hash,
+                "img_bytes": None,
+                "img_url": OBL_URL,
+                "html": html,
+                "news_text": news_text,
+                "caption": "Textual GPV schedule updated" if changed else "No changes"
+            }
+
         soup = BeautifulSoup(html, 'html.parser')
         text = soup.get_text().lower()
         if "не прогнозує відключень" in text or "графік не застосовується" in text:

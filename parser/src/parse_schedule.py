@@ -259,6 +259,86 @@ def process_image_and_text(img_bytes, source_used, raw_path, state, html_content
     logger.info(f"SUCCESS: Processed {source_used} schedule. Status: {status}")
     return True
 
+def process_text_schedules(text_schedules, source_used, raw_path, state):
+    """
+    Processes textual GPV schedules (new HOE format without images) into SQLite and unified_schedules.json.
+    """
+    if not text_schedules:
+        return False
+
+    db = load_json(UNIFIED_DB, default=[])
+    now_iso = get_now().isoformat()
+    updated_any = False
+
+    for short_date, item in sorted(text_schedules.items()):
+        queues_24 = item.get("queues", {})
+        queues_48 = item.get("queues_48", {})
+        queues_hash = item.get("queues_hash", "")
+        mode = item.get("mode", "schedule")
+        message = item.get("message", f"Графік погодинних відключень на {short_date}")
+        date_full = item.get("date_full", f"{short_date}.{get_now().year}")
+        status_label = "TEXT_UPDATED" if item.get("status") == "updated" else (
+            "TEXT_CANCELED" if item.get("status") == "canceled" else "TEXT_INITIAL"
+        )
+
+        # Check if latest entry for this target_date in unified_schedules.json already has the exact same queues & message
+        existing_latest = next((e for e in reversed(db) if e.get("target_date") == short_date and e.get("processed")), None)
+        if existing_latest:
+            if existing_latest.get("queues") == queues_24 and existing_latest.get("message") == message:
+                logger.info(f"Text schedule for {short_date} is already up-to-date in unified_schedules.json.")
+                continue
+
+        # 1. Save to SQLite / Turso (48-bit grid)
+        entry_sqlite = {
+            "timestamp": now_iso,
+            "target_date": short_date,
+            "source": source_used,
+            "raw_path": raw_path,
+            "mode": mode,
+            "date": short_date,
+            "date_full": date_full,
+            "message": message,
+            "queues": queues_48,
+            "status": status_label,
+            "admin_log": f"Parsed from GPV text blocks (revisions={item.get('revisions_count', 1)}, hash={queues_hash})",
+            "user_announcement": message if item.get("status") in ("updated", "canceled") else "",
+            "processed": True
+        }
+        try:
+            save_to_sqlite(entry_sqlite)
+        except Exception as e:
+            logger.error(f"Failed to save text schedule for {short_date} to SQLite: {e}")
+
+        # 2. Append to unified_schedules.json (24-bit grid for PWA compatibility)
+        new_json_entry = {
+            "timestamp": now_iso,
+            "target_date": short_date,
+            "source": source_used,
+            "type": "schedule",
+            "processed": True,
+            "raw_path": raw_path,
+            "source_url": state.get("last_img_url") if state else None,
+            "queues": queues_24,
+            "queues_raw": queues_24.copy(),
+            "queues_48": queues_48,
+            "queues_hash": queues_hash,
+            "announcements": [],
+            "mode": mode,
+            "status": item.get("status", "initial"),
+            "date": short_date,
+            "date_full": date_full,
+            "message": message,
+            "user_announcement": message if item.get("status") in ("updated", "canceled") else ""
+        }
+        db.append(new_json_entry)
+        updated_any = True
+        logger.info(f"SUCCESS: Exported textual GPV schedule for {short_date} (status={item.get('status')}) to unified_schedules.json")
+
+    if updated_any:
+        save_json(UNIFIED_DB, db)
+
+    return updated_any
+
 def main():
     logger.info("Starting SSSK Parser (Gemini + Turso/SQLite Edition)")
 
@@ -301,7 +381,32 @@ def main():
             state["last_html_hash"] = site_res.get("html_hash")
             state["last_img_url"] = site_res.get("img_url", "")
             
-            if site_res.get("changed"):
+            if site_res.get("is_text_schedule"):
+                process_text_schedules(
+                    site_res.get("text_schedules"),
+                    "site_text",
+                    site_res.get("raw_path", "site_text"),
+                    state
+                )
+            elif site_res.get("is_empty"):
+                today_short = now.strftime("%d.%m")
+                today_full = now.strftime("%d.%m.%Y")
+                empty_24 = {q: "1" * 24 for q in ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2", "5.1", "5.2", "6.1", "6.2"]}
+                empty_48 = {q: "1" * 48 for q in empty_24}
+                process_text_schedules({
+                    today_short: {
+                        "date": today_short,
+                        "date_full": today_full,
+                        "mode": "all_clear",
+                        "status": "canceled",
+                        "message": f"Погодинні відключення на {today_short} не застосовуватимуться.",
+                        "queues": empty_24,
+                        "queues_48": empty_48,
+                        "queues_hash": "all_clear",
+                        "revisions_count": 1
+                    }
+                }, "site", site_res.get("raw_path", "site_empty"), state)
+            elif site_res.get("changed") and site_res.get("img_bytes"):
                 process_image_and_text(
                     site_res["img_bytes"], 
                     "site", 

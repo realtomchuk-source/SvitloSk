@@ -16,7 +16,8 @@ from modules.utils import load_json, save_json, get_now
 from modules.table_parser import validate_queues
 from modules.grid_vision import parse_grid_from_image
 from modules.text_parser import apply_text_overrides
-from config import UNIFIED_DB, HEADERS, RAW_SITE_DIR
+from modules.gpv_text_parser import fetch_gpv_html, parse_gpv_html_schedules
+from config import UNIFIED_DB, HEADERS, RAW_SITE_DIR, OBL_URL
 
 # Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -193,18 +194,64 @@ def extract_images_from_post(post_url):
 def process_history(limit_days=7):
     logger.info(f"=== Starting history crawler (target: last {limit_days} days) ===")
 
+    db = load_json(UNIFIED_DB, default=[])
+    now_dt = get_now()
+    now_iso = now_dt.isoformat()
+    processed_count = 0
+
+    # --- Step 0: Check main GPV page (hoe.com.ua/page/pogodinni-vidkljuchennja) for textual schedules ---
+    try:
+        gpv_html = fetch_gpv_html(OBL_URL)
+        if gpv_html:
+            text_schedules = parse_gpv_html_schedules(gpv_html, now_dt)
+            if text_schedules:
+                logger.info(f"Found textual GPV schedules on main GPV page for dates: {list(text_schedules.keys())}")
+                for short_date, item in sorted(text_schedules.items()):
+                    existing_latest = next(
+                        (e for e in reversed(db) if e.get("target_date") == short_date and e.get("processed")),
+                        None
+                    )
+                    if existing_latest and existing_latest.get("queues") == item["queues"] and existing_latest.get("message") == item["message"]:
+                        logger.info(f"  Text schedule for {short_date} already up-to-date in DB.")
+                        continue
+
+                    new_entry = {
+                        "timestamp": now_iso,
+                        "date": short_date,
+                        "target_date": short_date,
+                        "date_full": item.get("date_full", f"{short_date}.{now_dt.year}"),
+                        "source": "site_text",
+                        "type": "schedule",
+                        "processed": True,
+                        "raw_path": "site_text",
+                        "source_url": OBL_URL,
+                        "queues": item["queues"],
+                        "queues_raw": item["queues"].copy(),
+                        "queues_48": item.get("queues_48", {}),
+                        "queues_hash": item.get("queues_hash", ""),
+                        "announcements": [],
+                        "mode": item.get("mode", "schedule"),
+                        "status": item.get("status", "initial"),
+                        "message": item["message"],
+                        "user_announcement": item["message"] if item.get("status") in ("updated", "canceled") else ""
+                    }
+                    db.append(new_entry)
+                    processed_count += 1
+                    logger.info(f"  ✅ Saved textual GPV schedule for {short_date} (status={item.get('status')})")
+    except Exception as e:
+        logger.error(f"Error checking main GPV page for textual schedules: {e}")
+
     links = get_news_links(max_pages=2)
     logger.info(f"Found {len(links)} schedule-related posts.")
 
     if not links:
         logger.warning("No schedule posts found. Check CSS selectors or network.")
+        if processed_count > 0:
+            save_json(UNIFIED_DB, db)
         return
 
-    db = load_json(UNIFIED_DB, default=[])
     existing_dates = {entry.get("date") for entry in db if entry.get("processed")}
     logger.info(f"Already in DB (processed): {existing_dates}")
-
-    processed_count = 0
     for item in links:
         if not item.get("date"):
             logger.warning(f"Skipping '{item['title']}' — could not extract date")
@@ -266,6 +313,36 @@ def process_history(limit_days=7):
                         continue
 
             if not img_urls:
+                # Try parsing textual GPV schedule directly from post text if no image is present
+                if news_text:
+                    post_text_schedules = parse_gpv_html_schedules(news_text, now_dt)
+                    post_sched = post_text_schedules.get(item["date"])
+                    if post_sched:
+                        new_entry = {
+                            "date": item["date"],
+                            "target_date": item["date"],
+                            "date_full": post_sched.get("date_full", f"{item['date']}.{now_dt.year}"),
+                            "source": "site_history_text",
+                            "type": "schedule",
+                            "processed": True,
+                            "timestamp": get_now().isoformat(),
+                            "source_url": item["link"],
+                            "raw_path": "site_history_text",
+                            "queues": post_sched["queues"],
+                            "queues_raw": post_sched["queues"].copy(),
+                            "queues_48": post_sched.get("queues_48", {}),
+                            "queues_hash": post_sched.get("queues_hash", ""),
+                            "announcements": [],
+                            "mode": post_sched.get("mode", "schedule"),
+                            "status": post_sched.get("status", "initial"),
+                            "message": post_sched["message"]
+                        }
+                        db.append(new_entry)
+                        processed_count += 1
+                        existing_dates.add(item["date"])
+                        logger.info(f"  ✅ Successfully parsed textual schedule from post for {item['date']}")
+                        continue
+
                 logger.warning(f"No images found for {item['date']}")
                 continue
 

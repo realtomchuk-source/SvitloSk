@@ -1,5 +1,5 @@
 const REPO_OWNER = 'realtomchuk-source';
-const REPO_NAME = 'svitlo-starkon';
+const REPO_NAME = 'SvitloSk';
 const WORKFLOW_ID = 'monitor.yml';
 
 export const triggerParserWorkflow = async (token: string, inputs: any) => {
