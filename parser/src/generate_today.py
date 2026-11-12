@@ -44,21 +44,25 @@ FULL_QUEUES_LIST = [
 ]
 
 def get_fallback_queues():
-    """Returns a full grid (1.1-6.2) with all 1s (No outages)."""
-    return {q: "1" * 24 for q in FULL_QUEUES_LIST}
+    """Returns a full grid (1.1-6.2) with all 1s (No outages, 48 slots)."""
+    return {q: "1" * 48 for q in FULL_QUEUES_LIST}
 
 def ensure_full_queues(queues):
-    """Ensures that the queues dictionary contains all standard queues (1.1-6.2)."""
+    """Ensures that the queues dictionary contains all standard queues (1.1-6.2) normalized to 48 slots."""
     if not queues:
         return get_fallback_queues()
     
     result = {}
     for q_name in FULL_QUEUES_LIST:
-        if q_name in queues:
-            result[q_name] = queues[q_name]
+        raw_val = queues.get(q_name)
+        if not raw_val:
+            result[q_name] = "1" * 48
+        elif len(raw_val) == 48:
+            result[q_name] = raw_val
+        elif len(raw_val) == 24:
+            result[q_name] = "".join(c * 2 for c in raw_val)
         else:
-            # If a queue is missing from the real schedule, we assume it has light on (1)
-            result[q_name] = "1" * 24
+            result[q_name] = "1" * 48
     return result
 
 def archive_day(today_data):
@@ -96,11 +100,13 @@ def archive_day(today_data):
         queues = today_data.get("queues", {})
         
         for q_name, bitstring in queues.items():
-            # Convert 24-char to 48-char
-            archived_queues[q_name] = "".join(c * 2 for c in bitstring)
-            # Calculate stats
-            hours_on = bitstring.count('1')
-            hours_off = bitstring.count('0')
+            if len(bitstring) == 48:
+                archived_queues[q_name] = bitstring
+            else:
+                archived_queues[q_name] = "".join(c * 2 for c in bitstring)
+            # Calculate stats in hours (each character in 48-grid is 0.5 hours)
+            hours_on = round(archived_queues[q_name].count('1') * 0.5, 1)
+            hours_off = round(archived_queues[q_name].count('0') * 0.5, 1)
             stats[q_name] = {
                 "hoursOn": hours_on,
                 "hoursOff": hours_off
@@ -188,12 +194,13 @@ def generate_files():
             best_today = entry
             break
     if best_today:
+        source_queues = best_today.get("queues_48") or best_today.get("queues")
         today_data = {
             "date": today_str,
             "updated_at": now.isoformat(),
             "mode": best_today.get("mode", "schedule"),
             "message": best_today.get("message", f"Графік на {today_str}"),
-            "queues": ensure_full_queues(best_today.get("queues")),
+            "queues": ensure_full_queues(source_queues),
             "meta": {
                 "generated_at": now.strftime("%d.%m.%Y %H:%M"),
                 "state": "parser_found",
@@ -231,12 +238,13 @@ def generate_files():
             best_tomorrow = entry
             break
     if best_tomorrow:
+        source_tomorrow_queues = best_tomorrow.get("queues_48") or best_tomorrow.get("queues")
         tomorrow_data = {
             "date": tomorrow_str,
             "updated_at": now.isoformat(),
             "mode": best_tomorrow.get("mode", "schedule"),
             "message": best_tomorrow.get("message", f"Графік на {tomorrow_str}"),
-            "queues": ensure_full_queues(best_tomorrow.get("queues")),
+            "queues": ensure_full_queues(source_tomorrow_queues),
             "meta": {
                 "generated_at": now.strftime("%d.%m.%Y %H:%M"),
                 "state": "parser_found",

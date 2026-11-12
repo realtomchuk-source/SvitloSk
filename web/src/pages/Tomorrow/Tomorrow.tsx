@@ -16,7 +16,7 @@ import './Tomorrow.css'; // Custom theme styling for Tomorrow page
 
 export const Tomorrow: React.FC = () => {
   const { selectedGroup, tomorrowScheduleData } = useStore();
-  const fallbackSchedule = "1".repeat(24);
+  const fallbackSchedule = "1".repeat(48);
   const tomorrowQueueStr = tomorrowScheduleData?.queues[selectedGroup] || fallbackSchedule;
 
   // Real clock ticking for dashboard time parsing, but offset by +1 day for tomorrow
@@ -82,7 +82,8 @@ export const Tomorrow: React.FC = () => {
       isOn: info.isCurrentlyOn,
       timeH: info.h,
       timeM: info.m,
-      nextChangeHour: info.nextChangeHour
+      nextChangeHour: info.nextChangeHour,
+      nextChangeFormatted: info.nextChangeFormatted
     };
   }, [realTime, scrubPercent, tomorrowQueueStr]);
 
@@ -121,6 +122,7 @@ export const Tomorrow: React.FC = () => {
           timeH={displayContext.timeH}
           timeM={displayContext.timeM}
           nextChangeHour={displayContext.nextChangeHour}
+          nextChangeFormatted={displayContext.nextChangeFormatted}
           queuesStr={tomorrowQueueStr}
           currentTimePercent={pointerPercent}
           isVirtual={displayContext.isVirtual}

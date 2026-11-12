@@ -9,7 +9,8 @@ interface HeroCardProps {
   isOn: boolean;
   timeH: number;
   timeM: number;
-  nextChangeHour: number;
+  nextChangeHour?: number;
+  nextChangeFormatted?: string;
   queuesStr: string;
   currentTimePercent: number; // For the pointer
   isVirtual?: boolean;
@@ -20,6 +21,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   timeH,
   timeM,
   nextChangeHour,
+  nextChangeFormatted,
   queuesStr,
   currentTimePercent,
   isVirtual,
@@ -29,6 +31,15 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   const { tomorrowScheduleData, selectedGroup } = useStore();
   const statusClass = isOn ? 'status-on' : 'status-off';
   const iconSrc = isOn ? powerOffIcon : powerOnIcon;
+
+  // Normalized 48-slot string for the mini-graph
+  const s48 = queuesStr.length === 48 
+    ? queuesStr 
+    : queuesStr.split('').map(c => c + c).join('');
+
+  // Target change time string (e.g. "08:30" or "09:00" or fallback to nextChangeHour)
+  const changeTimeText = nextChangeFormatted || (nextChangeHour !== undefined ? `${nextChangeHour}:00` : '24:00');
+  const isEndOfDay = changeTimeText === '24:00';
 
   // Tomorrow schedule check
   const hasTomorrowData = tomorrowScheduleData !== null;
@@ -76,7 +87,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           {timeH}:{timeM.toString().padStart(2, '0')}
         </div>
         <div className="hero-context hero-context--active">
-          {nextChangeHour === 24 ? 'до кінця доби' : `до ${isOn ? 'вимкнення' : 'увімкнення'} о ${nextChangeHour}:00`}
+          {isEndOfDay ? 'до кінця доби' : `до ${isOn ? 'вимкнення' : 'увімкнення'} о ${changeTimeText}`}
         </div>
       </div>
 
@@ -98,7 +109,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
       <div style={{ gridColumn: '1 / span 3', gridRow: 2, position: 'relative', width: '100%', height: '6px', background: 'transparent', borderRadius: '3px', marginTop: '12px' }}>
         <div style={{ position: 'absolute', inset: 0, borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
           {Array.from({ length: 48 }).map((_, i) => {
-            const isAvailable = queuesStr[Math.floor(i / 2)] === '1';
+            const isAvailable = s48[i] === '1';
             const currentSlot = Math.floor((currentTimePercent / 100) * 48);
             const isTomorrowPage = location.pathname === '/tomorrow';
             const isPast = isTomorrowPage ? false : (i < currentSlot);

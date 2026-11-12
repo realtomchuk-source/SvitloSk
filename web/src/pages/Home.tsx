@@ -18,7 +18,7 @@ import '@/styles/legacy/sssk-modern.css';
 
 export const Home: React.FC = () => {
   const { selectedGroup, scheduleData } = useStore();
-  const fallbackSchedule = "1".repeat(24);
+  const fallbackSchedule = "1".repeat(48);
   const currentQueuesStr = scheduleData?.queues[selectedGroup] || fallbackSchedule;
   
   const [realTime, setRealTime] = useState(new Date());
@@ -78,7 +78,8 @@ export const Home: React.FC = () => {
       isOn: info.isCurrentlyOn,
       timeH: info.h,
       timeM: info.m,
-      nextChangeHour: info.nextChangeHour
+      nextChangeHour: info.nextChangeHour,
+      nextChangeFormatted: info.nextChangeFormatted
     };
   }, [realTime, scrubPercent, currentQueuesStr]);
   
@@ -177,6 +178,7 @@ export const Home: React.FC = () => {
           timeH={displayContext.timeH}
           timeM={displayContext.timeM}
           nextChangeHour={displayContext.nextChangeHour}
+          nextChangeFormatted={displayContext.nextChangeFormatted}
           queuesStr={currentQueuesStr}
           currentTimePercent={pointerPercent}
           isVirtual={displayContext.isVirtual}

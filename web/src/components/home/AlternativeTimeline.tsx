@@ -39,14 +39,23 @@ export const AlternativeTimeline: React.FC<AlternativeTimelineProps> = ({
     { hour: 24, label: '24:00', positionClass: 'tick-end' },
   ];
 
-  // Detect transitions (switches) between hours (1 to 23)
-  const breakouts: { hour: number; type: 'on' | 'off' }[] = [];
-  for (let i = 1; i < 24; i++) {
-    const prev = queuesStr[i - 1];
-    const curr = queuesStr[i];
+  // Normalize to 48 slots (each slot = 30 mins)
+  const s48 = queuesStr.length === 48
+    ? queuesStr
+    : queuesStr.split('').map((c) => c + c).join('');
+
+  // Detect transitions (switches) across 48 half-hour slots (1 to 47)
+  const breakouts: { slot: number; timeLabel: string; type: 'on' | 'off' }[] = [];
+  for (let i = 1; i < 48; i++) {
+    const prev = s48[i - 1];
+    const curr = s48[i];
     if (prev !== curr) {
+      const h = Math.floor(i / 2);
+      const m = (i % 2) * 30;
+      const timeLabel = `${h}:${m === 0 ? '00' : m}`;
       breakouts.push({
-        hour: i,
+        slot: i,
+        timeLabel,
         type: curr === '1' ? 'on' : 'off',
       });
     }
@@ -149,11 +158,11 @@ export const AlternativeTimeline: React.FC<AlternativeTimelineProps> = ({
           .filter((b) => b.type === 'on')
           .map((b) => (
             <div
-              key={b.hour}
+              key={b.slot}
               className="alt-breakout-item on-item"
-              style={{ left: `${(b.hour / 24) * 100}%` }}
+              style={{ left: `${(b.slot / 48) * 100}%` }}
             >
-              <span className="alt-breakout-badge on-badge">{b.hour}:00</span>
+              <span className="alt-breakout-badge on-badge">{b.timeLabel}</span>
               <div className="alt-breakout-tick on-tick" />
             </div>
           ))}
@@ -163,7 +172,8 @@ export const AlternativeTimeline: React.FC<AlternativeTimelineProps> = ({
       <div className="alt-timeline-grid-wrapper">
         <div className="alt-timeline-grid">
           {Array.from({ length: 24 }).map((_, hourIdx) => {
-            const isHourOn = queuesStr[hourIdx] === '1';
+            const slot1On = s48[hourIdx * 2] === '1';
+            const slot2On = s48[hourIdx * 2 + 1] === '1';
             
             return (
               <div key={hourIdx} className="alt-timeline-hour">
@@ -171,7 +181,7 @@ export const AlternativeTimeline: React.FC<AlternativeTimelineProps> = ({
                 <div
                   className={clsx(
                     "alt-capsule",
-                    isHourOn ? "status-on" : "status-off",
+                    slot1On ? "status-on" : "status-off",
                     (hourIdx * 2 < currentRealSlot) && "is-past",
                     (activeHourIdx === hourIdx && activeSlot % 2 === 0) && "is-active-virtual"
                   )}
@@ -180,7 +190,7 @@ export const AlternativeTimeline: React.FC<AlternativeTimelineProps> = ({
                 <div
                   className={clsx(
                     "alt-capsule",
-                    isHourOn ? "status-on" : "status-off",
+                    slot2On ? "status-on" : "status-off",
                     (hourIdx * 2 + 1 < currentRealSlot) && "is-past",
                     (activeHourIdx === hourIdx && activeSlot % 2 === 1) && "is-active-virtual"
                   )}
@@ -197,12 +207,12 @@ export const AlternativeTimeline: React.FC<AlternativeTimelineProps> = ({
           .filter((b) => b.type === 'off')
           .map((b) => (
             <div
-              key={b.hour}
+              key={b.slot}
               className="alt-breakout-item off-item"
-              style={{ left: `${(b.hour / 24) * 100}%` }}
+              style={{ left: `${(b.slot / 48) * 100}%` }}
             >
               <div className="alt-breakout-tick off-tick" />
-              <span className="alt-breakout-badge off-badge">{b.hour}:00</span>
+              <span className="alt-breakout-badge off-badge">{b.timeLabel}</span>
             </div>
           ))}
       </div>

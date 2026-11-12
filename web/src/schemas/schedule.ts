@@ -2,7 +2,9 @@ import { z } from 'zod';
 
 export const ScheduleModeSchema = z.enum(['schedule', 'all_clear', 'no_power']);
 
-export const QueuesSchema = z.record(z.string(), z.string().length(24));
+export const QueuesSchema = z.record(z.string(), z.string().refine(s => s.length === 24 || s.length === 48, {
+  message: "Queue string must be either 24 or 48 characters long"
+}));
 
 export const ScheduleSchema = z.object({
   date: z.string(),
