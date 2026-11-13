@@ -402,20 +402,24 @@
 }
 
 .hero-tomorrow-btn.btn-active {
-  background: rgba(238, 114, 33, 0.06) !important;
-  border-color: rgba(238, 114, 33, 0.2) !important;
+  background: rgba(238, 114, 33, 0.12) !important;
+  border-color: rgba(238, 114, 33, 0.4) !important;
   color: #EE7221 !important;
-  box-shadow: 0 2px 8px rgba(238, 114, 33, 0.04) !important;
+  box-shadow: 0 2px 10px rgba(238, 114, 33, 0.2) !important;
+  cursor: pointer !important;
 }
 
 .hero-tomorrow-btn.btn-active:active {
-  background: rgba(238, 114, 33, 0.12) !important;
+  background: rgba(238, 114, 33, 0.22) !important;
+  transform: scale(0.96);
 }
 
 .hero-tomorrow-btn.btn-pending {
-  background: rgba(113, 113, 122, 0.04) !important;
-  border-color: rgba(113, 113, 122, 0.15) !important;
-  color: #8E8E93 !important;
+  background: rgba(113, 113, 122, 0.05) !important;
+  border-color: rgba(113, 113, 122, 0.18) !important;
+  color: #9CA3AF !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
 }
 
 

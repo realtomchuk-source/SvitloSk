@@ -1,12 +1,40 @@
 import { ScheduleSchema, type Schedule, type TimeInterval } from '@/schemas/schedule';
 
-export const fetchSchedule = async (type: 'today' | 'tomorrow' = 'today'): Promise<Schedule> => {
+const OUTAGES_SK_BASE = 'https://raw.githubusercontent.com/realtomchuk-source/OutagesSk/main/data/gpv';
+
+export const fetchSchedule = async (type: 'today' | 'tomorrow' = 'today'): Promise<Schedule | null> => {
+  if (type === 'tomorrow') {
+    // Try primary source from OutagesSk repository
+    try {
+      const remoteRes = await fetch(`${OUTAGES_SK_BASE}/tomorrow.json?t=${Date.now()}`);
+      if (remoteRes.ok) {
+        const rawRemote = await remoteRes.json();
+        if (rawRemote.status !== 'waiting' && rawRemote.status !== 'pending' && rawRemote.queues) {
+          const mode = Object.values(rawRemote.queues as Record<string, string>).some(q => q.includes('0'))
+            ? 'schedule'
+            : 'all_clear';
+          return ScheduleSchema.parse({
+            ...rawRemote,
+            mode
+          });
+        }
+        return null;
+      }
+    } catch (err) {
+      console.warn('Failed to fetch tomorrow from OutagesSk primary source, trying local fallback:', err);
+    }
+  }
+
   const base = import.meta.env.BASE_URL;
   const response = await fetch(`${base}data/${type}.json?t=${Date.now()}`);
   if (!response.ok) {
+    if (type === 'tomorrow') return null;
     throw new Error(`Failed to fetch ${type} schedule`);
   }
   const data = await response.json();
+  if (type === 'tomorrow' && (data.status === 'pending' || data.status === 'waiting' || !data.queues)) {
+    return null;
+  }
   return ScheduleSchema.parse(data);
 };
 

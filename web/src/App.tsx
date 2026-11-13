@@ -25,9 +25,11 @@ function AppContent() {
       setLoading(true);
       try {
         const data = await fetchSchedule('today');
-        setScheduleData(data);
-        setError(null);
-        saveScheduleToArchive(data);
+        if (data) {
+          setScheduleData(data);
+          setError(null);
+          saveScheduleToArchive(data);
+        }
 
         // Silent load for tomorrow
         try {

@@ -9,7 +9,8 @@ export const QueuesSchema = z.record(z.string(), z.string().refine(s => s.length
 export const ScheduleSchema = z.object({
   date: z.string(),
   updated_at: z.string(),
-  mode: ScheduleModeSchema,
+  mode: ScheduleModeSchema.optional().default('schedule'),
+  status: z.string().optional(),
   message: z.string(),
   queues: QueuesSchema,
   meta: z.object({

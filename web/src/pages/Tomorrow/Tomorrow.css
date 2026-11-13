@@ -77,3 +77,28 @@
   border-color: rgba(0, 0, 0, 0.2) !important;
   background: #F9FAFB !important;
 }
+
+/* ── Top Return Button ──────────────────────────────────────────────────────── */
+.tomorrow-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  color: #A855F7;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tomorrow-back-btn:hover {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.tomorrow-back-btn:active {
+  transform: scale(0.97);
+}

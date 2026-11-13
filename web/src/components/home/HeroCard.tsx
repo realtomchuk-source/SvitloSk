@@ -28,7 +28,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { tomorrowScheduleData, selectedGroup } = useStore();
+  const { tomorrowScheduleData } = useStore();
   const statusClass = isOn ? 'status-on' : 'status-off';
   const iconSrc = isOn ? powerOffIcon : powerOnIcon;
 
@@ -41,29 +41,36 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   const changeTimeText = nextChangeFormatted || (nextChangeHour !== undefined ? `${nextChangeHour}:00` : '24:00');
   const isEndOfDay = changeTimeText === '24:00';
 
-  // Tomorrow schedule check
-  const hasTomorrowData = tomorrowScheduleData !== null;
-  const tomorrowQueueStr = tomorrowScheduleData?.queues[selectedGroup];
-  const hasTomorrowOutages = tomorrowQueueStr ? tomorrowQueueStr.includes('0') : false;
+  // Check if tomorrow schedule has any outages across all 12 queues (contains '0')
+  // AND is strictly for tomorrow's date
+  const isTomorrowValidAndHasOutages = React.useMemo(() => {
+    if (!tomorrowScheduleData?.queues) return false;
+    
+    // Validate target date if present
+    if (tomorrowScheduleData.date) {
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const tomorrowIso = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+      const tomorrowShort = `${String(tomorrow.getDate()).padStart(2, '0')}.${String(tomorrow.getMonth() + 1).padStart(2, '0')}`;
+      
+      const scheduleDate = tomorrowScheduleData.date.trim();
+      if (scheduleDate !== tomorrowIso && scheduleDate !== tomorrowShort) {
+        return false;
+      }
+    }
 
-  // Button Action & Styling
-  const isClickable = hasTomorrowData;
-  let line1 = '';
-  let line2 = '';
-  if (!hasTomorrowData) {
-    line1 = 'ГРАФІК';
-    line2 = 'ЗАВТРА';
-  } else if (hasTomorrowOutages) {
-    line1 = 'ГРАФІК';
-    line2 = 'ЗАВТРА';
-  } else {
-    line1 = 'ЗАВТРА';
-    line2 = 'СВІТЛО';
-  }
-  
-  const buttonClass = (!hasTomorrowData || !hasTomorrowOutages) 
-    ? 'btn-pending' 
-    : 'btn-active';
+    const queuesValues = Object.values(tomorrowScheduleData.queues);
+    if (queuesValues.length === 0) return false;
+    return queuesValues.some(q => q.includes('0'));
+  }, [tomorrowScheduleData]);
+
+  // Tomorrow schedule check: must have tomorrow schedule data AND have outages in 12 queues
+  const isTomorrowActive = isTomorrowValidAndHasOutages;
+  const isClickable = isTomorrowActive;
+
+  const buttonClass = isTomorrowActive ? 'btn-active' : 'btn-pending';
+  const line1 = 'ГРАФІК';
+  const line2 = 'ЗАВТРА';
 
   const handleTomorrowClick = () => {
     if (isClickable) {
