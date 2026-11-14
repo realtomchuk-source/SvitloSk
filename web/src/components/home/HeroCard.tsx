@@ -126,7 +126,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
               aria-hidden="true"
             >
               <path
-                d="M3.25 4L11.25 28L3.25 52"
+                d="M3.25 1L11.25 28L3.25 55"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
@@ -134,7 +134,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
                 opacity="0.25"
               />
               <path
-                d="M11.25 4L19.25 28L11.25 52"
+                d="M11.25 1L19.25 28L11.25 55"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
@@ -142,7 +142,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
                 opacity="0.55"
               />
               <path
-                d="M19.25 4L27.25 28L19.25 52"
+                d="M19.25 1L27.25 28L19.25 55"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
