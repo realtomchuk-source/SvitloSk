@@ -400,7 +400,7 @@
   min-height: 56px !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 8px !important;
   font-family: var(--sans) !important;
   outline: none !important;
   transition: opacity 0.2s ease, transform 0.15s ease !important;
@@ -418,9 +418,9 @@
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-end !important;
-  font-size: 13px !important;
+  font-size: 15px !important;
   font-weight: 600 !important;
-  line-height: 1.25 !important;
+  line-height: 1.1 !important;
   text-align: right !important;
   white-space: nowrap !important;
 }

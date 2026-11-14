@@ -119,32 +119,32 @@ export const HeroCard: React.FC<HeroCardProps> = ({
             </span>
             <svg
               className="hero-tomorrow-arrow"
-              width="28"
+              width="34"
               height="56"
-              viewBox="0 0 28 56"
+              viewBox="0 0 34 56"
               fill="none"
               aria-hidden="true"
             >
               <path
-                d="M3.25 1L11.25 28L3.25 55"
+                d="M2 2L14 28L2 54"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 opacity="0.25"
               />
               <path
-                d="M11.25 1L19.25 28L11.25 55"
+                d="M11 2L23 28L11 54"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 opacity="0.55"
               />
               <path
-                d="M19.25 1L27.25 28L19.25 55"
+                d="M20 2L32 28L20 54"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 opacity="1"
