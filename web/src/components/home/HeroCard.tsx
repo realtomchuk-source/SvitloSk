@@ -80,7 +80,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
     <div id="smart-hero" className={clsx('hero-card', statusClass)} style={{ margin: '0 20px', position: 'relative' }}>
       {/* ICON */}
       <div className="hero-icon">
-        <img src={iconSrc} alt="Status Icon" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
+        <img src={iconSrc} alt="Status Icon" style={{ width: '56px', height: '56px', minWidth: '56px', minHeight: '56px', flexShrink: 0, objectFit: 'contain' }} />
       </div>
 
       {/* TEXT BLOCK */}
@@ -112,7 +112,10 @@ export const HeroCard: React.FC<HeroCardProps> = ({
             onClick={handleTomorrowClick}
             disabled={!isClickable}
           >
-            <span className="hero-tomorrow-link-text">Графік на завтра</span>
+            <span className="hero-tomorrow-link-text">
+              <span>Графік</span>
+              <span>на завтра</span>
+            </span>
             <svg
               className="hero-tomorrow-arrow"
               width="28"

@@ -406,7 +406,18 @@
   transition: opacity 0.2s ease, transform 0.15s ease !important;
 }
 
+.hero-icon {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  flex-shrink: 0 !important;
+}
+
 .hero-tomorrow-link-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   line-height: 1.2 !important;
