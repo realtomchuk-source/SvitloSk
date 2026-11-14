@@ -106,8 +106,9 @@ export const Tomorrow: React.FC = () => {
       "неділя", "понеділок", "вівторок", "середа", "четвер", "п'ятниця", "субота"
     ];
     const month = monthNames[tomorrow.getMonth()];
+    const year = tomorrow.getFullYear();
     return {
-      tomorrowDateStr: `${day} ${month}`,
+      tomorrowDateStr: `${day} ${month} ${year} року`,
       tomorrowDayOfWeek: dayNames[tomorrow.getDay()]
     };
   }, []);
@@ -116,7 +117,7 @@ export const Tomorrow: React.FC = () => {
   const statusTimeStr = statusTimeMatch ? ` • ${statusTimeMatch[0]}` : '';
 
   const bannerMessage = tomorrowScheduleData
-    ? `Графік відключень на завтра (${tomorrowDayOfWeek}, ${tomorrowDateStr})${statusTimeStr}`
+    ? `Графік погодинних відключень, ${tomorrowDayOfWeek} ${tomorrowDateStr}${statusTimeStr}`
     : `Дані про графік на ${tomorrowDateStr} ще не надходили.`;
 
   return (
