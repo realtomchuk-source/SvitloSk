@@ -431,8 +431,12 @@
 }
 
 .hero-tomorrow-link.link-active {
-  color: #A855F7 !important;
+  color: #EE7221 !important;
   cursor: pointer !important;
+}
+
+.hero-tomorrow-link.link-active .hero-tomorrow-arrow {
+  color: #A855F7 !important;
 }
 
 .hero-tomorrow-link.link-active:active {
