@@ -68,9 +68,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   const isTomorrowActive = isTomorrowValidAndHasOutages;
   const isClickable = isTomorrowActive;
 
-  const buttonClass = isTomorrowActive ? 'btn-active' : 'btn-pending';
-  const line1 = 'ГРАФІК';
-  const line2 = 'ЗАВТРА';
+  const linkClass = isTomorrowActive ? 'link-active' : 'link-pending';
 
   const handleTomorrowClick = () => {
     if (isClickable) {
@@ -91,23 +89,63 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           {isOn ? 'Світло є' : 'Світла немає'}
         </div>
         <div className="hero-timer">
-          {timeH}:{timeM.toString().padStart(2, '0')}
+          {timeH > 0 && (
+            <>
+              <span>{timeH}</span>
+              <span className="hero-timer-unit">г.</span>
+            </>
+          )}
+          <span>{timeM}</span>
+          <span className="hero-timer-unit">хв.</span>
         </div>
         <div className="hero-context hero-context--active">
           {isEndOfDay ? 'до кінця доби' : `до ${isOn ? 'вимкнення' : 'увімкнення'} о ${changeTimeText}`}
         </div>
       </div>
 
-      {/* TOMORROW SCHEDULE BUTTON */}
+      {/* TOMORROW SCHEDULE LINK */}
       {location.pathname !== '/tomorrow' && (
         <div className="hero-phase-btn-container">
-          <button 
-            className={clsx("hero-tomorrow-btn", buttonClass)}
+          <button
+            type="button"
+            className={clsx("hero-tomorrow-link", linkClass)}
             onClick={handleTomorrowClick}
             disabled={!isClickable}
           >
-            <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.04em' }}>{line1}</span>
-            <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.04em', marginTop: '1px' }}>{line2}</span>
+            <span className="hero-tomorrow-link-text">Графік на завтра</span>
+            <svg
+              className="hero-tomorrow-arrow"
+              width="28"
+              height="56"
+              viewBox="0 0 28 56"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M2 4L10 28L2 52"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.25"
+              />
+              <path
+                d="M10 4L18 28L10 52"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.55"
+              />
+              <path
+                d="M18 4L26 28L18 52"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="1"
+              />
+            </svg>
           </button>
         </div>
       )}
