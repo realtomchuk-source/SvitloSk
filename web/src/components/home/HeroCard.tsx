@@ -92,7 +92,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           {timeH > 0 && (
             <>
               <span>{timeH}</span>
-              <span className="hero-timer-unit">г.</span>
+              <span className="hero-timer-unit">год.</span>
             </>
           )}
           <span>{timeM}</span>
