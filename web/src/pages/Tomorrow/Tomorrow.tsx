@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { clsx } from 'clsx';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { getStatusInfo } from '@/services/scheduleService';
 import { HeroCard } from '@/components/home/HeroCard';
@@ -17,7 +15,6 @@ import '@/styles/legacy/sssk-modern.css';
 import './Tomorrow.css'; // Custom theme styling for Tomorrow page
 
 export const Tomorrow: React.FC = () => {
-  const navigate = useNavigate();
   const { selectedGroup, tomorrowScheduleData } = useStore();
   const fallbackSchedule = "1".repeat(48);
   const tomorrowQueueStr = tomorrowScheduleData?.queues[selectedGroup] || fallbackSchedule;
@@ -96,8 +93,8 @@ export const Tomorrow: React.FC = () => {
   // Active slot index (0 - 47) for styling AlternativeTimeline capsules
   const activeSlot = Math.max(0, Math.min(47, Math.floor((scrubPercent !== null ? scrubPercent : 0) * 48)));
 
-  // Dynamically calculate tomorrow's date in Ukrainian format
-  const tomorrowDateStr = useMemo(() => {
+  // Dynamically calculate tomorrow's date and day of week in Ukrainian format
+  const { tomorrowDateStr, tomorrowDayOfWeek } = useMemo(() => {
     const now = new Date();
     const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     const day = tomorrow.getDate();
@@ -105,30 +102,27 @@ export const Tomorrow: React.FC = () => {
       "січня", "лютого", "березня", "квітня", "травня", "червня",
       "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
     ];
+    const dayNames = [
+      "неділя", "понеділок", "вівторок", "середа", "четвер", "п'ятниця", "субота"
+    ];
     const month = monthNames[tomorrow.getMonth()];
-    const year = tomorrow.getFullYear();
-    return `${day} ${month} ${year} року`;
+    return {
+      tomorrowDateStr: `${day} ${month}`,
+      tomorrowDayOfWeek: dayNames[tomorrow.getDay()]
+    };
   }, []);
 
-  const bannerMessage = tomorrowScheduleData?.message || (tomorrowScheduleData 
-    ? `Ви бачите графік на ${tomorrowDateStr}, який може змінитись.`
-    : `Дані про графік на ${tomorrowDateStr} ще не надходили.`);
+  const statusTimeMatch = tomorrowScheduleData?.message?.match(/станом на\s+\d{1,2}:\d{2}/i);
+  const statusTimeStr = statusTimeMatch ? ` • ${statusTimeMatch[0]}` : '';
+
+  const bannerMessage = tomorrowScheduleData
+    ? `Графік відключень на завтра (${tomorrowDayOfWeek}, ${tomorrowDateStr})${statusTimeStr}`
+    : `Дані про графік на ${tomorrowDateStr} ще не надходили.`;
 
   return (
     <div className={clsx("page-home page-tomorrow", !displayContext.isOn && "status-off")}>
       <section id="home-section" className="animate-in fade-in duration-700">
         
-        {/* Top return banner */}
-        <div style={{ padding: '0 20px', marginBottom: '12px' }}>
-          <button
-            onClick={() => navigate('/')}
-            className="tomorrow-back-btn"
-          >
-            <ArrowLeft size={16} />
-            <span>Повернутися на сьогодні</span>
-          </button>
-        </div>
-
         {/* Hero Card for Tomorrow */}
         <HeroCard 
           isOn={displayContext.isOn}
