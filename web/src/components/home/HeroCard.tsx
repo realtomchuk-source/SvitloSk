@@ -114,7 +114,8 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           >
             <span className="hero-tomorrow-link-text">
               <span>Графік</span>
-              <span>на завтра</span>
+              <span>на</span>
+              <span>завтра</span>
             </span>
             <svg
               className="hero-tomorrow-arrow"
@@ -125,7 +126,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
               aria-hidden="true"
             >
               <path
-                d="M2 4L10 28L2 52"
+                d="M3.25 4L11.25 28L3.25 52"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
@@ -133,7 +134,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
                 opacity="0.25"
               />
               <path
-                d="M10 4L18 28L10 52"
+                d="M11.25 4L19.25 28L11.25 52"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
@@ -141,7 +142,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
                 opacity="0.55"
               />
               <path
-                d="M18 4L26 28L18 52"
+                d="M19.25 4L27.25 28L19.25 52"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"

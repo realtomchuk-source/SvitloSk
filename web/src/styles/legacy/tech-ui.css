@@ -418,9 +418,9 @@
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-end !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   font-weight: 600 !important;
-  line-height: 1.2 !important;
+  line-height: 1.15 !important;
   text-align: right !important;
   white-space: nowrap !important;
 }
