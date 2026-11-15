@@ -395,15 +395,18 @@
 
 .hero-tomorrow-link {
   background: transparent !important;
-  border: none !important;
-  padding: 0 0 0 8px !important;
-  min-height: 56px !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  padding: 8px 10px !important;
+  min-height: 52px !important;
   display: inline-flex !important;
+  flex-direction: column !important;
   align-items: center !important;
-  gap: 8px !important;
+  justify-content: center !important;
+  gap: 4px !important;
   font-family: var(--sans) !important;
   outline: none !important;
-  transition: opacity 0.2s ease, transform 0.15s ease !important;
+  transition: opacity 0.2s ease, transform 0.15s ease, background-color 0.2s ease !important;
 }
 
 .hero-icon {
@@ -414,29 +417,49 @@
   flex-shrink: 0 !important;
 }
 
+.hero-tomorrow-link-top {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.hero-tomorrow-activity {
+  flex-shrink: 0 !important;
+}
+
 .hero-tomorrow-link-text {
   display: flex !important;
   flex-direction: column !important;
-  align-items: flex-end !important;
-  font-size: 15px !important;
+  align-items: flex-start !important;
+  color: #111827 !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
-  line-height: 1.1 !important;
-  text-align: right !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
   white-space: nowrap !important;
 }
 
 .hero-tomorrow-arrow {
   flex-shrink: 0 !important;
+}
+
+.hero-tomorrow-link-sub {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
   opacity: 0.85 !important;
 }
 
 .hero-tomorrow-link.link-active {
-  color: #A855F7 !important;
+  background: rgba(238, 114, 33, 0.10) !important;
+  border-color: rgba(238, 114, 33, 0.22) !important;
+  color: #EE7221 !important;
   cursor: pointer !important;
 }
 
 .hero-tomorrow-link.link-active .hero-tomorrow-arrow {
-  color: #A855F7 !important;
+  color: inherit !important;
 }
 
 .hero-tomorrow-link.link-active:active {
@@ -445,9 +468,10 @@
 }
 
 .hero-tomorrow-link.link-pending {
-  color: #9CA3AF !important;
+  background: rgba(156, 163, 175, 0.12) !important;
+  border-color: rgba(156, 163, 175, 0.22) !important;
+  color: #6B7280 !important;
   cursor: default !important;
-  opacity: 0.75 !important;
 }
 
 

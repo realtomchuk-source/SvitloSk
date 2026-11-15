@@ -68,7 +68,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
   const isTomorrowActive = isTomorrowValidAndHasOutages;
   const isClickable = isTomorrowActive;
 
-  const linkClass = isTomorrowActive ? 'link-active' : 'link-pending';
+  const linkClass = isClickable ? 'link-active' : 'link-pending';
 
   const handleTomorrowClick = () => {
     if (isClickable) {
@@ -112,36 +112,49 @@ export const HeroCard: React.FC<HeroCardProps> = ({
             onClick={handleTomorrowClick}
             disabled={!isClickable}
           >
-            <span className="hero-tomorrow-link-text">
-              <span>Графік</span>
-              <span>на</span>
-              <span>завтра</span>
+            <span className="hero-tomorrow-link-top">
+              <svg
+                className="hero-tomorrow-activity"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M22 12H18L15 21L9 3L6 12H2"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="hero-tomorrow-link-text">
+                <span>Графік</span>
+                <span>на завтра</span>
+              </span>
+              {isClickable && (
+                <svg
+                  className="hero-tomorrow-arrow"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M9 18L15 12L9 6"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
             </span>
-            <svg
-              className="hero-tomorrow-arrow"
-              width="42"
-              height="56"
-              viewBox="0 0 42 56"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M3 3L27 28L3 53"
-                stroke="currentColor"
-                strokeWidth="3.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity="0.35"
-              />
-              <path
-                d="M15 3L39 28L15 53"
-                stroke="currentColor"
-                strokeWidth="3.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity="1"
-              />
-            </svg>
+            <span className="hero-tomorrow-link-sub">
+              {isClickable ? 'Переглянути' : 'Ще не опублікований'}
+            </span>
           </button>
         </div>
       )}
