@@ -399,6 +399,7 @@
   border: 1px solid transparent !important;
   border-radius: 12px !important;
   padding: 4px 8px !important;
+  margin-right: 4px !important;
   height: 60px !important;
   min-height: 60px !important;
   box-sizing: border-box !important;
