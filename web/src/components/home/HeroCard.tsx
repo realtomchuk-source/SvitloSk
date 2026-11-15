@@ -109,36 +109,38 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           <button
             type="button"
             className={clsx("hero-tomorrow-link", linkClass)}
-            style={{ height: '64px', minHeight: '64px' }}
             onClick={handleTomorrowClick}
             disabled={!isClickable}
           >
-            <span className="hero-tomorrow-link-top">
-              <svg
-                className="hero-tomorrow-activity"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M22 12H18L15 21L9 3L6 12H2"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="hero-tomorrow-link-text">
-                <span>Графік</span>
-                <span>на завтра</span>
+            <svg
+              className="hero-tomorrow-activity"
+              width="30"
+              height="30"
+              viewBox="1.5 1.5 21 21"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M22 12H18L15 21L9 3L6 12H2"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="hero-tomorrow-link-text">
+              <span>Графік</span>
+              <span>на завтра</span>
+            </span>
+            <span className="hero-tomorrow-link-bottom">
+              <span className="hero-tomorrow-link-sub">
+                {isClickable ? 'Переглянути' : 'Очікується'}
               </span>
               {isClickable && (
                 <svg
                   className="hero-tomorrow-arrow"
-                  width="12"
-                  height="12"
+                  width="11"
+                  height="11"
                   viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
@@ -152,9 +154,6 @@ export const HeroCard: React.FC<HeroCardProps> = ({
                   />
                 </svg>
               )}
-            </span>
-            <span className="hero-tomorrow-link-sub">
-              {isClickable ? 'Переглянути' : 'Не опублікований'}
             </span>
           </button>
         </div>

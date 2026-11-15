@@ -395,19 +395,22 @@
 }
 
 .hero-tomorrow-link {
+  position: relative !important;
   background: transparent !important;
   border: 1px solid transparent !important;
-  border-radius: 12px !important;
-  padding: 4px 6px !important;
-  margin-right: 6px !important;
-  height: 64px !important;
-  min-height: 64px !important;
+  border-radius: 14px !important;
+  padding: 10px 10px 9px 10px !important;
+  margin-right: 4px !important;
+  width: 84px !important;
+  height: 84px !important;
+  min-height: 84px !important;
+  aspect-ratio: 1 / 1 !important;
   box-sizing: border-box !important;
   display: inline-flex !important;
   flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 3px !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  gap: 5px !important;
   font-family: var(--sans) !important;
   outline: none !important;
   transition: opacity 0.2s ease, transform 0.15s ease, background-color 0.2s ease !important;
@@ -421,13 +424,12 @@
   flex-shrink: 0 !important;
 }
 
-.hero-tomorrow-link-top {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-}
-
 .hero-tomorrow-activity {
+  position: absolute !important;
+  top: 9px !important;
+  right: 10px !important;
+  width: 30px !important;
+  height: 30px !important;
   flex-shrink: 0 !important;
 }
 
@@ -436,11 +438,20 @@
   flex-direction: column !important;
   align-items: flex-start !important;
   color: #111827 !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  line-height: 1.1 !important;
+  font-size: 11.5px !important;
+  font-weight: 650 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.2px !important;
   text-align: left !important;
   white-space: nowrap !important;
+}
+
+.hero-tomorrow-link-bottom {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 2px !important;
 }
 
 .hero-tomorrow-arrow {
@@ -451,6 +462,8 @@
   font-size: 9.5px !important;
   font-weight: 500 !important;
   line-height: 1.1 !important;
+  letter-spacing: -0.15px !important;
+  text-align: left !important;
   white-space: nowrap !important;
   opacity: 0.85 !important;
 }
@@ -476,6 +489,10 @@
   border-color: rgba(156, 163, 175, 0.22) !important;
   color: #6B7280 !important;
   cursor: default !important;
+}
+
+.hero-tomorrow-link.link-pending .hero-tomorrow-activity {
+  color: #374151 !important;
 }
 
 
