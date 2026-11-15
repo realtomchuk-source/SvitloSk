@@ -109,14 +109,15 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           <button
             type="button"
             className={clsx("hero-tomorrow-link", linkClass)}
+            style={{ height: '60px', minHeight: '60px' }}
             onClick={handleTomorrowClick}
             disabled={!isClickable}
           >
             <span className="hero-tomorrow-link-top">
               <svg
                 className="hero-tomorrow-activity"
-                width="20"
-                height="20"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="none"
                 aria-hidden="true"
@@ -136,8 +137,8 @@ export const HeroCard: React.FC<HeroCardProps> = ({
               {isClickable && (
                 <svg
                   className="hero-tomorrow-arrow"
-                  width="14"
-                  height="14"
+                  width="12"
+                  height="12"
                   viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
