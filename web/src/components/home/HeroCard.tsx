@@ -153,7 +153,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
               )}
             </span>
             <span className="hero-tomorrow-link-sub">
-              {isClickable ? 'Переглянути' : 'Ще не опублікований'}
+              {isClickable ? 'Переглянути' : 'Не опублікований'}
             </span>
           </button>
         </div>
