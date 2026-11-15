@@ -109,7 +109,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
           <button
             type="button"
             className={clsx("hero-tomorrow-link", linkClass)}
-            style={{ height: '60px', minHeight: '60px' }}
+            style={{ height: '64px', minHeight: '64px' }}
             onClick={handleTomorrowClick}
             disabled={!isClickable}
           >
