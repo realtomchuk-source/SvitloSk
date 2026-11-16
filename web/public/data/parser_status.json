@@ -1,16 +1,16 @@
 {
-  "last_sync": "2026-11-16T15:12:50.880897+02:00",
+  "last_sync": "2026-11-17T01:34:24.772898+02:00",
   "today": {
-    "date": "16.11",
-    "state": "parser_found",
-    "updated": "16.11.2026 15:12",
-    "captured_at": "2026-11-16T15:12:35.849587+02:00",
-    "source_media_url": "https://hoe.com.ua/page/pogodinni-vidkljuchennja"
+    "date": "17.11",
+    "state": "no_outages_fallback",
+    "updated": "17.11.2026 01:34",
+    "captured_at": null,
+    "source_media_url": null
   },
   "tomorrow": {
-    "date": "17.11",
+    "date": "18.11",
     "state": "pending",
-    "updated": "16.11.2026 15:12",
+    "updated": "17.11.2026 01:34",
     "captured_at": null,
     "source_media_url": null
   }
