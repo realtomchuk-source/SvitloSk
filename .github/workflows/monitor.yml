@@ -2,10 +2,10 @@ name: SSSK Monitor
 
 on:
   schedule:
-    # Peak hours: 19:00 - 23:00 Kyiv (16:00 - 20:00 UTC) every 15 minutes
+    # Peak hours: 18:00 - 22:45 Kyiv (16:00 - 20:45 UTC) every 15 minutes
     - cron: '*/15 16-20 * * *'
-    # Standard mode: Every 5 hours
-    - cron: '0 */5 * * *'
+    # Daytime backup (offset from :00 to avoid GitHub cron congestion): 06:07 - 17:37 Kyiv
+    - cron: '7,37 4-15 * * *'
     # Midnight Kyiv — switch tomorrow→today JSON for PWA
     - cron: '0 21 * * *'  # 00:00 Kyiv (summer EEST=UTC+3)
     - cron: '0 22 * * *'  # 00:00 Kyiv (winter EET=UTC+2)
@@ -31,12 +31,34 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: parser/requirements.txt
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ukr sqlite3
           cd parser
           pip install -r requirements.txt
+
+      - name: Check if heavy Vision/Playwright dependencies are needed
+        id: light_check
+        run: |
+          cd parser/src
+          python - << 'EOF'
+          import os
+          from modules.gpv_text_parser import fetch_gpv_html, parse_gpv_html_schedules
+          from modules.utils import get_now
+          html = fetch_gpv_html()
+          schedules = parse_gpv_html_schedules(html, get_now()) if html else {}
+          val = "false" if schedules else "true"
+          print(f"needs_vision={val}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"needs_vision={val}\n")
+          EOF
+
+      - name: Install heavy Vision/Playwright dependencies (fallback only)
+        if: steps.light_check.outputs.needs_vision == 'true'
+        run: |
+          sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ukr sqlite3
           playwright install --with-deps chromium
 
       # ===== Chain 1: New Parser (SQLite pipeline) — may fail, that's OK =====

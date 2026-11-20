@@ -281,10 +281,14 @@ def process_text_schedules(text_schedules, source_used, raw_path, state):
             "TEXT_CANCELED" if item.get("status") == "canceled" else "TEXT_INITIAL"
         )
 
-        # Check if latest entry for this target_date in unified_schedules.json already has the exact same queues & message
+        # Check if latest entry for this target_date in unified_schedules.json already has the exact same 48-slot queues & message
         existing_latest = next((e for e in reversed(db) if e.get("target_date") == short_date and e.get("processed")), None)
         if existing_latest:
-            if existing_latest.get("queues") == queues_24 and existing_latest.get("message") == message:
+            same_grid = (
+                (existing_latest.get("queues_hash") == queues_hash and bool(queues_hash))
+                or (existing_latest.get("queues_48") == queues_48 and bool(queues_48))
+            )
+            if same_grid and existing_latest.get("message") == message:
                 logger.info(f"Text schedule for {short_date} is already up-to-date in unified_schedules.json.")
                 continue
 

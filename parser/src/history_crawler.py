@@ -211,9 +211,16 @@ def process_history(limit_days=7):
                         (e for e in reversed(db) if e.get("target_date") == short_date and e.get("processed")),
                         None
                     )
-                    if existing_latest and existing_latest.get("queues") == item["queues"] and existing_latest.get("message") == item["message"]:
-                        logger.info(f"  Text schedule for {short_date} already up-to-date in DB.")
-                        continue
+                    if existing_latest:
+                        item_hash = item.get("queues_hash", "")
+                        item_48 = item.get("queues_48", {})
+                        same_grid = (
+                            (existing_latest.get("queues_hash") == item_hash and bool(item_hash))
+                            or (existing_latest.get("queues_48") == item_48 and bool(item_48))
+                        )
+                        if same_grid and existing_latest.get("message") == item["message"]:
+                            logger.info(f"  Text schedule for {short_date} already up-to-date in DB.")
+                            continue
 
                     new_entry = {
                         "timestamp": now_iso,
