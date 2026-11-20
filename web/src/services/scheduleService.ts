@@ -1,6 +1,7 @@
 import { ScheduleSchema, type Schedule, type TimeInterval } from '@/schemas/schedule';
 
 const OUTAGES_SK_BASE = 'https://raw.githubusercontent.com/realtomchuk-source/OutagesSk/main/data/gpv';
+const SVITLO_SK_RAW_BASE = 'https://raw.githubusercontent.com/realtomchuk-source/SvitloSk/main/web/public/data';
 
 export const fetchSchedule = async (type: 'today' | 'tomorrow' = 'today'): Promise<Schedule | null> => {
   if (type === 'tomorrow') {
@@ -18,11 +19,24 @@ export const fetchSchedule = async (type: 'today' | 'tomorrow' = 'today'): Promi
             mode
           });
         }
-        return null;
       }
     } catch (err) {
-      console.warn('Failed to fetch tomorrow from OutagesSk primary source, trying local fallback:', err);
+      console.warn('Failed to fetch tomorrow from OutagesSk primary source, trying SvitloSk raw:', err);
     }
+  }
+
+  // Primary live source: direct raw GitHub JSON (instant updates without waiting for GitHub Pages deploy)
+  try {
+    const rawRes = await fetch(`${SVITLO_SK_RAW_BASE}/${type}.json?t=${Date.now()}`);
+    if (rawRes.ok) {
+      const rawData = await rawRes.json();
+      if (type === 'tomorrow' && (rawData.status === 'pending' || rawData.status === 'waiting' || !rawData.queues)) {
+        return null;
+      }
+      return ScheduleSchema.parse(rawData);
+    }
+  } catch (err) {
+    console.warn(`Failed to fetch ${type} from SvitloSk raw GitHub, trying local fallback:`, err);
   }
 
   const base = import.meta.env.BASE_URL;
