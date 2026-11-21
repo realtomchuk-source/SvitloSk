@@ -237,7 +237,11 @@ export function MarqueeBanner({ isOn = true, customMessage }: { isOn?: boolean; 
 
   const isLoading = announcements.length === 0;
 
-  const parseAnnouncementText = (text: string) => {
+  const parseAnnouncementText = (rawText: string) => {
+    const text = rawText.replace(
+      /Інформація\s+про\s+відключення\s+на\s+сьогодні\s+та\s+завтра\s+відсутня\.?/gi,
+      'Інформація про аварійні та планові знеструмлення в Старокостянтинівській громаді на сьогодні та завтра відсутня.'
+    );
     const regex = /([Оо]новлено\s+[оо0]\s+\d{1,2}:\d{2})|([Зз]неструмлення:\s*)([а-яА-ЯёЁіІїЇєЄґҐ\s'-]+?)(\s*\()|([Сс]тарокостянтинів[а-яА-ЯёЁіІїЇєЄґҐ]*)|(\|)|(\d{1,2}\s+[а-яА-ЯіІїЇєЄґҐ]+\s+\d{4}\s+року)/g;
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
