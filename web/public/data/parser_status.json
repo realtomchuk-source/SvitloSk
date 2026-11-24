@@ -1,17 +1,17 @@
 {
-  "last_sync": "2026-11-24T23:32:46.239721+02:00",
+  "last_sync": "2026-11-24T23:47:41.898825+02:00",
   "today": {
     "date": "24.11",
     "state": "parser_found",
-    "updated": "24.11.2026 23:32",
+    "updated": "24.11.2026 23:47",
     "captured_at": "2026-11-24T20:17:38.361238+02:00",
     "source_media_url": "https://hoe.com.ua/page/pogodinni-vidkljuchennja"
   },
   "tomorrow": {
     "date": "25.11",
     "state": "parser_found",
-    "updated": "24.11.2026 23:32",
-    "captured_at": "2026-11-24T20:32:43.308232+02:00",
+    "updated": "24.11.2026 23:47",
+    "captured_at": "2026-11-24T23:47:34.830662+02:00",
     "source_media_url": "https://hoe.com.ua/page/pogodinni-vidkljuchennja"
   }
 }
