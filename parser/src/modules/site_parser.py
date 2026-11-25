@@ -176,7 +176,16 @@ def run_site_parser(state):
     # 4. Check for textual GPV schedule or "no outages" text when image is absent
     is_empty = False
     if not img_url:
-        text_schedules = parse_gpv_html_schedules(html, get_now())
+        from config import UNIFIED_DB
+        from modules.utils import load_json
+        db = load_json(UNIFIED_DB, default=[])
+        existing_by_date = {}
+        for entry in db:
+            td = entry.get("target_date")
+            if td and entry.get("processed"):
+                existing_by_date[td] = entry
+
+        text_schedules = parse_gpv_html_schedules(html, get_now(), existing_by_date=existing_by_date)
         if text_schedules:
             html_hash = get_hash(html)
             last_html_hash = state.get("last_html_hash")

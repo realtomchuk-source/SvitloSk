@@ -40,6 +40,53 @@ UA_MONTHS = {
 }
 
 
+def merge_grids(base_grid: str, new_grid: str) -> str:
+    """Об'єднує дві бітові сітки ('1' - світло є, '0' - відключення): '0' перемагає '1'."""
+    if not base_grid or len(base_grid) != len(new_grid):
+        return new_grid
+    return "".join("0" if (b == "0" or n == "0") else "1" for b, n in zip(base_grid, new_grid))
+
+
+def extract_effective_from_time(header_text: str) -> tuple[int, int] | None:
+    """Шукає в заголовку час початку дії оновлення, напр. 'оновлено з 20:00' або 'з 14:30'."""
+    m = re.search(
+        r"(?:оновлено\s+з|діє\s+з|починаючи\s+з|після|від|з)\s*(\d{1,2})[:.](\d{2})",
+        header_text,
+        flags=re.IGNORECASE,
+    )
+    if not m:
+        return None
+    h, minute = int(m.group(1)), int(m.group(2))
+    if 0 <= h <= 23 and 0 <= minute <= 59:
+        return (h, minute)
+    return None
+
+
+def apply_grid_update(
+    base_grid: str,
+    new_grid: str,
+    is_additional: bool,
+    effective_from: tuple[int, int] | None,
+    slots_per_day: int,
+) -> str:
+    """
+    Накладає оновлення на існуючу сітку:
+    - якщо 'додаткові'/'додатково' -> merge (додає '0' до існуючих);
+    - якщо вказано час оновлення (effective_from) -> до цього часу лишає base_grid, після -> new_grid;
+    - інакше -> безпечний merge, щоб не затирати попередні відключення.
+    """
+    if is_additional or effective_from is None:
+        return merge_grids(base_grid, new_grid)
+
+    h, m = effective_from
+    if slots_per_day == 48:
+        idx = h * 2 + (1 if m >= 30 else 0)
+    else:
+        idx = h + (1 if m > 30 else 0)
+    idx = max(0, min(slots_per_day, idx))
+    return base_grid[:idx] + new_grid[idx:]
+
+
 def compute_queues_hash(queues: dict, is_canceled: bool = False) -> str:
     payload = json.dumps({"canceled": is_canceled, "queues": queues}, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
@@ -179,10 +226,15 @@ def parse_single_block(raw_block_text: str, ref_dt: datetime) -> dict | None:
         kw in lower_header
         for kw in ["скасовано", "не застосовуватимуться", "не будуть застосовані", "відключень не планується"]
     )
-    is_update = any(
+    is_additional = any(
         kw in lower_header
-        for kw in ["оновлено", "оновлення", "змінено", "зміни", "скориговано", "додатково", "увага"]
+        for kw in ["додаткові", "додатково"]
     )
+    is_update = is_additional or any(
+        kw in lower_header
+        for kw in ["оновлено", "оновлення", "змінено", "зміни", "скориговано", "увага"]
+    )
+    effective_from = extract_effective_from_time(header_text)
 
     # Шукаємо рядки підчерг: Підчерга 1.1 – 03:00-06:00; 12:00-16:00.
     parsed_queues_24 = {}
@@ -214,13 +266,19 @@ def parse_single_block(raw_block_text: str, ref_dt: datetime) -> dict | None:
         "date_full": full_date,
         "header_text": header_text,
         "is_update": is_update,
+        "is_additional": is_additional,
+        "effective_from": effective_from,
         "is_canceled": is_canceled,
         "queues_24": parsed_queues_24,
         "queues_48": parsed_queues_48,
     }
 
 
-def parse_gpv_html_schedules(html_content: str, ref_dt: datetime) -> dict[str, dict]:
+def parse_gpv_html_schedules(
+    html_content: str,
+    ref_dt: datetime,
+    existing_by_date: dict[str, dict] | None = None,
+) -> dict[str, dict]:
     """
     Розбирає HTML сторінки ГПВ або новини, групує блоки за датою в хронологічному порядку
     (від найстарішого до найновішого) і повертає фінальний зведений стан для кожної знайденої дати.
@@ -262,8 +320,11 @@ def parse_gpv_html_schedules(html_content: str, ref_dt: datetime) -> dict[str, d
         # На сторінці верхній блок — найсвіжіший. Розвертаємо, щоб накладати від першого до останнього
         chronological = list(reversed(blocks))
 
-        running_24 = {q: DEFAULT_ON_24 for q in ALL_QUEUES}
-        running_48 = {q: DEFAULT_ON_48 for q in ALL_QUEUES}
+        existing = (existing_by_date or {}).get(short_date, {})
+        existing_24 = existing.get("queues", {})
+        existing_48 = existing.get("queues_48", {})
+        running_24 = {q: existing_24.get(q, DEFAULT_ON_24) for q in ALL_QUEUES}
+        running_48 = {q: existing_48.get(q, DEFAULT_ON_48) for q in ALL_QUEUES}
         final_status = "initial"
         final_header = chronological[-1]["header_text"]
         is_canceled = False
@@ -276,14 +337,22 @@ def parse_gpv_html_schedules(html_content: str, ref_dt: datetime) -> dict[str, d
                 is_canceled = True
             else:
                 is_canceled = False
-                if len(block["queues_24"]) == len(ALL_QUEUES):
+                is_additional = block.get("is_additional", False)
+                effective_from = block.get("effective_from")
+                is_full_block = len(block["queues_24"]) == len(ALL_QUEUES)
+
+                if is_full_block and not is_additional and effective_from is None:
                     running_24 = {q: block["queues_24"][q] for q in ALL_QUEUES}
                     running_48 = {q: block["queues_48"][q] for q in ALL_QUEUES}
                 else:
                     for q, g24 in block["queues_24"].items():
-                        running_24[q] = g24
+                        running_24[q] = apply_grid_update(
+                            running_24.get(q, DEFAULT_ON_24), g24, is_additional, effective_from, 24
+                        )
                     for q, g48 in block["queues_48"].items():
-                        running_48[q] = g48
+                        running_48[q] = apply_grid_update(
+                            running_48.get(q, DEFAULT_ON_48), g48, is_additional, effective_from, 48
+                        )
 
                 if idx > 0 or block["is_update"]:
                     final_status = "updated"
