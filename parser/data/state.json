@@ -1,10 +1,10 @@
 {
-  "last_run": "2026-11-26T16:17:32.080929+02:00",
+  "last_run": "2026-11-26T16:32:36.191042+02:00",
   "last_success_site": "2026-04-10T12:16:19.240066+03:00",
-  "last_site_hash": "5fc1630a60bac1f65fbbfbfe5a79a4b0",
+  "last_site_hash": "2d2d092ed1ec7a9e8c7ba0d8ff4925cb",
   "current_source": "site",
   "override_until": null,
   "override_interval_minutes": null,
-  "last_html_hash": "4d53e06a6f247edc37f931e734e0a791",
+  "last_html_hash": "d7db1eea819ef46d66eb936f291f5572",
   "last_img_url": "https://hoe.com.ua/page/pogodinni-vidkljuchennja"
 }
